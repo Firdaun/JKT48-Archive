@@ -3,4 +3,4 @@ import { PrismaClient } from '../../generated/prisma/index.js'
 import 'dotenv/config'
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
-export const prisma = new PrismaClient({ adapter })
+export const prismaClient = new PrismaClient({ log: ['query', 'error', 'warn'], adapter })

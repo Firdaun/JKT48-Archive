@@ -1,11 +1,15 @@
 import express from "express"
+import cors from "cors"
+import { router } from "./routes/member.routes.js"
+
 const app = express()
 const port = 3000
 
-app.get('/', (req, res) => {
-    res.send('JKT48 Archive Bot Is Running!')
-})
+app.use(cors())
+app.use(express.json())
+
+app.use(router)
 
 app.listen(port, () => {
-    console.log(`server jalan di port${port}`);
+    console.log(`server active in port${port}`)
 })
