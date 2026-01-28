@@ -8,7 +8,8 @@ const create = async (request) => {
     const member = await prismaClient.member.create({
         data:{
             name: request.name,
-            nickname: request.nickname
+            nickname: request.nickname,
+            generation: request.generation || 0
         }
     })
     return member
