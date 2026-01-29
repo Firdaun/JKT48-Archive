@@ -15,15 +15,31 @@ export default function Admin() {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [queryParams, setQueryParams] = useState({
+        page: 1,
+        size: 10,
+        search: '',
+        sort: 'id'
+    })
+
+    const [pagingInfo, setPagingInfo] = useState({
+        total_page: 1,
+        current_page: 1,
+        total_item: 0
+    });
+
     useEffect(() => {
-        fetchMembers();
-    }, []);
+        if (activeTab === 'members') {
+            fetchMembers()
+        }
+    }, [queryParams, activeTab]);
 
     const fetchMembers = async () => {
         setLoading(true);
         try {
-            const response = await memberApi.getAllMembers();
+            const response = await memberApi.getAllMembers(queryParams);
             setMembers(response.data);
+            setPagingInfo(response.paging)
         } catch (err) {
             console.error("Error fetching data:", err);
         } finally {
@@ -36,7 +52,13 @@ export default function Admin() {
             case 'dashboard':
                 return <DashboardStats memberCount={members.length} photoCount={INITIAL_PHOTOS.length} />;
             case 'members':
-                return <MemberManager members={members} />;
+                return <MemberManager 
+                members={members}
+                loading={loading}
+                queryParams={queryParams}
+                setQueryParams={setQueryParams}
+                pagingInfo={pagingInfo}
+                />;
             case 'photos':
                 return <PhotoManager photos={INITIAL_PHOTOS} />;
             default:

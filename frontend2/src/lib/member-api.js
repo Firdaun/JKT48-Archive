@@ -15,8 +15,9 @@ const handleResponse = async (response) => {
 }
 
 export const memberApi = {
-    getAllMembers: async () => {
-        const response = await fetch(`${API_BASE_URL}/members`)
+    getAllMembers: async (params = {}) => {
+        const query = new URLSearchParams(params).toString()
+        const response = await fetch(`${API_BASE_URL}/members?${query}`)
         return handleResponse(response)
     },
 

@@ -2,9 +2,10 @@ import { memberService } from "../service/member.service.js"
 
 const list = async (req, res, next) => {
     try {
-        const result = await memberService.getAll()
+        const result = await memberService.get(req.query)
         res.status(200).json({
-            data: result
+            data: result.data,
+            paging: result.paging
         })
     } catch (e) {
         next(e)

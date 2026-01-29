@@ -3,6 +3,7 @@ import cors from "cors"
 import { publicRouter } from "./routes/public.routes.js"
 import { authMiddleware } from "./middleware/auth.middleware.js"
 import { adminRouter } from "./routes/admin.routes.js"
+import { errorMiddleware } from "./middleware/error.middleware.js"
 
 const app = express()
 const port = 3000
@@ -14,7 +15,7 @@ app.use(publicRouter)
 app.use(authMiddleware)
 app.use(adminRouter)
 
-
+app.use(errorMiddleware)
 app.listen(port, () => {
     console.log(`server active in port${port}`)
 })
