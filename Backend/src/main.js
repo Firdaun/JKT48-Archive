@@ -15,8 +15,6 @@ app.use(authMiddleware)
 app.use(adminRouter)
 
 
-app.use(adminRouter)
-
 app.listen(port, () => {
     console.log(`server active in port${port}`)
 })
