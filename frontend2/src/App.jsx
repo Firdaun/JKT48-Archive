@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import DashboardStats from './components/DashboardStats';
 import MemberManager from './components/MemberManager';
 import PhotoManager from './components/PhotoManager';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const INITIAL_PHOTOS = [
     { id: 101, srcUrl: 'https://via.placeholder.com/150', caption: 'Semangat hari ini!', member: 'Christy', postedAt: '2023-10-20' },
@@ -12,8 +13,7 @@ const INITIAL_PHOTOS = [
 
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [members, setMembers] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient()
 
     const [queryParams, setQueryParams] = useState({
         page: 1,
@@ -22,42 +22,48 @@ export default function Admin() {
         sort: 'id'
     })
 
-    const [pagingInfo, setPagingInfo] = useState({
-        total_page: 1,
-        current_page: 1,
-        total_item: 0
-    });
+    const {
+        data,
+        isLoading,
+        isError,
+        isFetching
+    } = useQuery({
+        queryKey: ['members', queryParams],
+        queryFn: () => memberApi.getAllMembers(queryParams),
+        placeholderData: keepPreviousData,
+        staleTime: 1000 * 60 * 5
+    })
 
     useEffect(() => {
-        if (activeTab === 'members') {
-            fetchMembers()
-        }
-    }, [queryParams, activeTab]);
+        if (!isError && !isLoading && data?.paging) {
+            const currentPage = data.paging.page
+            const totalPage = data.paging.total_page
+            if (currentPage < totalPage) {
+                const nextPage = currentPage + 1
+                queryClient.prefetchQuery({
+                    queryKey: ['members', { ...queryParams, page: nextPage }],
+                    queryFn: () => memberApi.getAllMembers({ ...queryParams, page: nextPage }),
+                    staleTime: 15 * 60 * 1000
+                })
+            }
 
-    const fetchMembers = async () => {
-        setLoading(true);
-        try {
-            const response = await memberApi.getAllMembers(queryParams);
-            setMembers(response.data);
-            setPagingInfo(response.paging)
-        } catch (err) {
-            console.error("Error fetching data:", err);
-        } finally {
-            setLoading(false);
         }
-    }
+    }, [data, isError, isLoading, queryParams, queryClient])
+
+    const members = data?.data || []
+    const pagingInfo = data?.paging || { total_page: 1, page: 1, total_item: 0 }
 
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <DashboardStats memberCount={members.length} photoCount={INITIAL_PHOTOS.length} />;
+                return <DashboardStats memberCount={pagingInfo.total_item} photoCount={INITIAL_PHOTOS.length} />;
             case 'members':
-                return <MemberManager 
-                members={members}
-                loading={loading}
-                queryParams={queryParams}
-                setQueryParams={setQueryParams}
-                pagingInfo={pagingInfo}
+                return <MemberManager
+                    members={members}
+                    loading={isFetching}
+                    queryParams={queryParams}
+                    setQueryParams={setQueryParams}
+                    pagingInfo={pagingInfo}
                 />;
             case 'photos':
                 return <PhotoManager photos={INITIAL_PHOTOS} />;
@@ -80,7 +86,7 @@ export default function Admin() {
                     </div>
                 </header>
 
-                <div className="p-8 max-w-7xl mx-auto">
+                <div className="px-8 pt-5 max-w-7xl mx-auto">
                     {renderContent()}
                 </div>
             </main>
