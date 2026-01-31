@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import AddMember from './AddMember';
 
 export default function MemberManager({ members, loading, queryParams, setQueryParams, pagingInfo }) {
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(queryParams.search)
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
     const handleSortChange = (value) => {
         setQueryParams(prev => ({ ...prev, sort: value, page: 1 }))
@@ -102,7 +105,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                         </div>
                     </div>
 
-                    <button className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700 transition">
+                    <button onClick={() => setIsAddModalOpen(true)} className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700 transition">
                         <Plus size={18} /> Add Member
                     </button>
                 </div>
@@ -177,6 +180,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                     </button>
                 </div>
             </div>
+            <AddMember isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}/>
         </div>
     );
 }
