@@ -5,7 +5,7 @@ import './index.css'
 import Admin from './App'
 
 const queryClient = new QueryClient({
-  defaultOption: {
+  defaultOptions: {
     queries: {
       refetchOnWindowFocus: false
     }

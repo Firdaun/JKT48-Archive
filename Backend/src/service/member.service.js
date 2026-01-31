@@ -19,19 +19,19 @@ const get = async (request) => {
 
     const whereClause = filters.length > 0 ? { AND: filters } : {}
 
-    let orderBy = {}
+    let orderBy = []
     switch (data.sort) {
         case 'name-asc':
-            orderBy = { name: 'asc' }
+            orderBy = [{ name: 'asc' }, { id: 'asc' }]
             break
         case 'name-desc':
-            orderBy = { name: 'desc' }
+            orderBy = [{ name: 'desc' }, { id: 'asc' }]
             break
         case 'gen-asc':
-            orderBy = { generation: 'asc' }
+            orderBy = [{ generation: 'asc' }, { name: 'asc' }]
             break
         case 'gen-desc':
-            orderBy = { generation: 'desc' }
+            orderBy = [{ generation: 'desc' }, { name: 'asc' }]
             break
         case 'id':
         default:

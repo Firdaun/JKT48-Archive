@@ -31,7 +31,7 @@ export default function Admin() {
         queryKey: ['members', queryParams],
         queryFn: () => memberApi.getAllMembers(queryParams),
         placeholderData: keepPreviousData,
-        staleTime: 1000 * 60 * 5
+        staleTime: 1000 * 60 * 15
     })
 
     useEffect(() => {
