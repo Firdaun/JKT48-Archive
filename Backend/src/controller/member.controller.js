@@ -23,7 +23,26 @@ const add = async (req, res, next) => {
     }
 }
 
+const update = async (req, res, next) => {
+    try {
+        const memberId = parseInt(req.params.id)
+
+        const request = {
+            ...req.body,
+            id: memberId
+        }
+
+        const result = await memberService.update(request)
+        res.status(200).json({
+            data: result
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
 export const memberController = {
     list,
-    add
+    add,
+    update
 }

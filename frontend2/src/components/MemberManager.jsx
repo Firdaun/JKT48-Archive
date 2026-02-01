@@ -1,12 +1,27 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import AddMember from './AddMember';
+import FormModal from './FormModal';
 
 export default function MemberManager({ members, loading, queryParams, setQueryParams, pagingInfo }) {
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(queryParams.search)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedMember, setSelectedMember] = useState(null);
 
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+    const handleAddClick = () => {
+        setSelectedMember(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditClick = (member) => {
+        setSelectedMember(member); 
+        setIsModalOpen(true);
+    };
+    
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedMember(null);
+    };
 
     const handleSortChange = (value) => {
         setQueryParams(prev => ({ ...prev, sort: value, page: 1 }))
@@ -105,7 +120,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                         </div>
                     </div>
 
-                    <button onClick={() => setIsAddModalOpen(true)} className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700 transition">
+                    <button onClick={handleAddClick} className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700 transition">
                         <Plus size={18} /> Add Member
                     </button>
                 </div>
@@ -145,7 +160,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                                     <td className="p-4"><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold text-blue-600">Gen {member.generation}</span></td>
                                     <td className="p-4">{getStatusBadge(member.isActive)}</td>
                                     <td className="p-4 text-right space-x-2">
-                                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
+                                        <button onClick={() => handleEditClick(member)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
                                         <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
                                     </td>
                                 </tr>
@@ -180,7 +195,8 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                     </button>
                 </div>
             </div>
-            <AddMember isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}/>
+            <FormModal isOpen={isModalOpen} onClose={handleCloseModal} initialData={selectedMember}/>
+            
         </div>
     );
 }

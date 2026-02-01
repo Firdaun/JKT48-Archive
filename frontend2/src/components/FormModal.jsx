@@ -2,11 +2,12 @@ import { X, Loader2, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { memberApi } from '../lib/member-api';
+import { useEffect } from 'react';
 
-export default function AddMember({ isOpen, onClose }) {
+export default function FormModal({ isOpen, onClose, initialData }) {
     const queryClient = useQueryClient();
+    const isEditMode = !!initialData
     
-    // 1. Setup React Hook Form
     const { 
         register, 
         handleSubmit, 
@@ -14,27 +15,47 @@ export default function AddMember({ isOpen, onClose }) {
         formState: { errors } 
     } = useForm();
 
-    // 2. Setup TanStack Mutation (Untuk Create Data)
-    const mutation = useMutation({
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData) {
+                reset({
+                    name: initialData.name,
+                    nickname: initialData.nickname,
+                    generation: initialData.generation
+                })
+            } else {
+                reset({
+                    name: '',
+                    nickname: '',
+                    generation: ''
+                })
+            }
+        }
+    }, [isOpen, initialData, reset])
+
+    const createMutation = useMutation({
         mutationFn: memberApi.createMember,
         onSuccess: () => {
-            // Refresh data member di background agar tabel update otomatis
-            queryClient.invalidateQueries({ queryKey: ['members'] });
-            
-            // Tutup modal dan reset form
-            reset();
-            onClose();
-            
-            // Opsional: Kasih alert/toast sukses disini
+            queryClient.invalidateQueries({ queryKey: ['members']})
+            onClose()
+            reset()
         },
-        onError: (error) => {
-            alert("Gagal menambahkan member: " + error.message);
-        }
-    });
+        onError: (error) => alert(`Gagal tambah member: ${error.message}`)
+    })
 
-    // Handle saat form disubmit
+    const updateMutation = useMutation({
+        mutationFn: (data) => memberApi.updateMember(initialData.id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['members']})
+            onClose()
+            reset()
+        },
+        onError: (error) => alert(`Gagal update member: ${error.message}`)
+    })
+
+    const mutation = isEditMode ? updateMutation : createMutation
+
     const onSubmit = (data) => {
-        // Konversi generation ke number (karena input form string)
         const payload = {
             ...data,
             generation: parseInt(data.generation)
@@ -42,19 +63,15 @@ export default function AddMember({ isOpen, onClose }) {
         mutation.mutate(payload);
     };
 
-    // Jika modal tertutup, jangan render apa-apa (return null)
     if (!isOpen) return null;
 
     return (
-        // --- OVERLAY HITAM TRANSPARAN ---
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
             
-            {/* --- KOTAK MODAL --- */}
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden scale-100 animate-in zoom-in-95 duration-200">
                 
-                {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <h3 className="font-bold text-lg text-slate-800">Add New Member</h3>
+                    <h3 className="font-bold text-lg text-slate-800">{isEditMode ? 'Edit Member' : 'Add New Member'}</h3>
                     <button 
                         onClick={onClose}
                         className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition"
@@ -63,10 +80,8 @@ export default function AddMember({ isOpen, onClose }) {
                     </button>
                 </div>
 
-                {/* Body / Form */}
                 <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
                     
-                    {/* Input Name */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
                         <input 
@@ -78,7 +93,6 @@ export default function AddMember({ isOpen, onClose }) {
                         {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
                     </div>
 
-                    {/* Input Nickname */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Nickname</label>
                         <input 
@@ -89,7 +103,6 @@ export default function AddMember({ isOpen, onClose }) {
                         {errors.nickname && <span className="text-xs text-red-500">{errors.nickname.message}</span>}
                     </div>
 
-                    {/* Input Generation */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Generation</label>
                         <input 
@@ -100,7 +113,6 @@ export default function AddMember({ isOpen, onClose }) {
                             {errors.generation && <span className="text-xs text-red-500">{errors.generation.message}</span>}
                     </div>
 
-                    {/* Footer Actions */}
                     <div className="pt-4 flex gap-3 justify-end border-t border-slate-50 mt-4">
                         <button 
                             type="button"
@@ -119,7 +131,7 @@ export default function AddMember({ isOpen, onClose }) {
                                 </>
                             ) : (
                                 <>
-                                    <Save size={16} /> Save Member
+                                    <Save size={16} /> {isEditMode ? 'Update Changes' : 'Save Member'}
                                 </>
                             )}
                         </button>

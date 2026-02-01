@@ -4,5 +4,6 @@ import { memberController } from "../controller/member.controller.js"
 const adminRouter = new express.Router()
 
 adminRouter.post('/api/admin/members', memberController.add)
+adminRouter.put('/api/admin/members/:id', memberController.update)
 
 export { adminRouter }

@@ -1,4 +1,5 @@
 import { prismaClient } from "../application/database.js"
+import { ResponseError } from "../error/response.error.js"
 import { apiValidation } from "../validation/api-validation.js"
 import { validate } from "../validation/validation.js"
 
@@ -73,7 +74,33 @@ const create = async (request) => {
     return member
 }
 
+const update = async (request) => {
+    const data = validate(apiValidation.updateMemberValidation, request)
+
+    const totalInDatabase = await prismaClient.member.count({
+        where: {
+            id: data.id
+        }
+    })
+
+    if (totalInDatabase !== 1) {
+        throw new ResponseError(404, "Member isn't found")
+    }
+
+    return prismaClient.member.update({
+        where: {
+            id: data.id
+        },
+        data: {
+            name: data.name,
+            nickname: data.nickname,
+            generation: data.generation
+        }
+    })
+}
+
 export const memberService = {
     get,
-    create
+    create,
+    update
 }
