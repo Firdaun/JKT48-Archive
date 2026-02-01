@@ -74,8 +74,7 @@ export default function FormModal({ isOpen, onClose, initialData }) {
                     <h3 className="font-bold text-lg text-slate-800">{isEditMode ? 'Edit Member' : 'Add New Member'}</h3>
                     <button 
                         onClick={onClose}
-                        className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition"
-                    >
+                        className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition">
                         <X size={20} />
                     </button>
                 </div>
@@ -88,8 +87,7 @@ export default function FormModal({ isOpen, onClose, initialData }) {
                             {...register("name", { required: "Nama wajib diisi" })}
                             type="text" 
                             placeholder="e.g. Shani Indira Natio"
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EE1D52] transition ${errors.name ? 'border-red-500' : 'border-slate-300'}`}
-                        />
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EE1D52] transition ${errors.name ? 'border-red-500' : 'border-slate-300'}`}/>
                         {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
                     </div>
 
