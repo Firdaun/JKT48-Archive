@@ -6,6 +6,8 @@ const getMemberValidation = Joi.object({
     sort: Joi.string().valid('id', 'name-asc', 'name-desc', 'gen-asc', 'gen-desc').optional().default('id')
 })
 
+const getMemberIdValidation = Joi.number().positive().required()
+
 const updateMemberValidation = Joi.object({
     id: Joi.number().positive().required(),
     name: Joi.string().min(1).max(100).required(),
@@ -15,5 +17,6 @@ const updateMemberValidation = Joi.object({
 
 export const apiValidation = {
     getMemberValidation,
-    updateMemberValidation
+    updateMemberValidation,
+    getMemberIdValidation
 }

@@ -99,8 +99,29 @@ const update = async (request) => {
     })
 }
 
+const remove = async (memberId) => {
+    memberId = validate(apiValidation.getMemberIdValidation, memberId)
+
+    const totalInDatabase = await prismaClient.member.count({
+        where: {
+            id: memberId
+        }
+    })
+
+    if (totalInDatabase !== 1) {
+        throw new ResponseError(404, "Member isn't found")
+    }
+
+    return prismaClient.member.delete({
+        where: {
+            id: memberId
+        }
+    })
+}
+
 export const memberService = {
     get,
     create,
-    update
+    update,
+    remove
 }

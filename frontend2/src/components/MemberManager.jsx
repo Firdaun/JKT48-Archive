@@ -1,12 +1,30 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import FormModal from './FormModal';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { memberApi } from '../lib/member-api';
 
 export default function MemberManager({ members, loading, queryParams, setQueryParams, pagingInfo }) {
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(queryParams.search)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
+    const queryClient = useQueryClient()
+
+    const deleteMutation = useMutation({
+        mutationFn: memberApi.deleteMember,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['members']})
+            alert('Member berhasil dihapus.')
+        },
+        onError: (error) => alert(`Gagal menghapus: ${error.message}`)
+    })
+
+    const handleDeleteClick = (id, name) => {
+        if (window.confirm(`Yakin ingin menghapus member "${name}"? Data tidak bisa dikembalikan.`)) {
+            deleteMutation.mutate(id);
+        }
+    }
 
     const handleAddClick = () => {
         setSelectedMember(null);
@@ -161,7 +179,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                                     <td className="p-4">{getStatusBadge(member.isActive)}</td>
                                     <td className="p-4 text-right space-x-2">
                                         <button onClick={() => handleEditClick(member)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
-                                        <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
+                                        <button onClick={() => handleDeleteClick(member.id, member.name)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
                                     </td>
                                 </tr>
                             ))

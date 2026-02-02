@@ -25,7 +25,7 @@ const add = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const memberId = parseInt(req.params.id)
+        const memberId = req.params.id
 
         const request = {
             ...req.body,
@@ -41,8 +41,22 @@ const update = async (req, res, next) => {
     }
 }
 
+const remove = async (req, res, next) => {
+    try {
+        const memberId = req.params.id
+
+        await memberService.remove(memberId)
+        res.status(200).json({
+            data: 'OK'
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
 export const memberController = {
     list,
     add,
-    update
+    update,
+    remove
 }
