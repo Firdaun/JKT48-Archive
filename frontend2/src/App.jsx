@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
-import { memberApi } from './lib/member-api';
-import Sidebar from './components/Sidebar';
-import DashboardStats from './components/DashboardStats';
-import MemberManager from './components/MemberManager';
-import PhotoManager from './components/PhotoManager';
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react'
+import { memberApi } from './lib/member-api'
+import Sidebar from './components/Sidebar'
+import DashboardStats from './components/DashboardStats'
+import MemberManager from './components/MemberManager'
+import PhotoManager from './components/PhotoManager'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const INITIAL_PHOTOS = [
     { id: 101, srcUrl: 'https://via.placeholder.com/150', caption: 'Semangat hari ini!', member: 'Christy', postedAt: '2023-10-20' },
     { id: 102, srcUrl: 'https://via.placeholder.com/150', caption: 'Oyasumi~', member: 'Freya', postedAt: '2023-10-21' },
-];
+]
 
 export default function Admin() {
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [activeTab, setActiveTab] = useState('dashboard')
     const queryClient = useQueryClient()
-    const [selectedMemberForPhotos, setSelectedMemberForPhotos] = useState(null); // <--- State Baru
+    const [selectedMemberForPhotos, setSelectedMemberForPhotos] = useState(null)
 
     const [queryParams, setQueryParams] = useState({
         page: 1,
@@ -36,19 +36,17 @@ export default function Admin() {
     })
 
     const handleViewPhotos = (member) => {
-        setSelectedMemberForPhotos(member); // Simpan data member
-        setActiveTab('photos');             // Pindah tab
-    };
+        setSelectedMemberForPhotos(member)
+        setActiveTab('photos')
+    }
 
-    // 2. Fungsi dipanggil dari PhotoManager saat nama member diklik
     const handleBackToMembers = () => {
-        setActiveTab('members');
-    };
+        setActiveTab('members')
+    }
 
-    // 3. Fungsi dipanggil dari PhotoManager saat tombol X diklik
     const handleClearPhotoFilter = () => {
-        setSelectedMemberForPhotos(null);
-    };
+        setSelectedMemberForPhotos(null)
+    }
 
     useEffect(() => {
         if (!isError && !isLoading && data?.paging) {
@@ -72,7 +70,7 @@ export default function Admin() {
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <DashboardStats memberCount={pagingInfo.total_item} photoCount={INITIAL_PHOTOS.length} />;
+                return <DashboardStats memberCount={pagingInfo.total_item} photoCount={INITIAL_PHOTOS.length} />
             case 'members':
                 return <MemberManager
                     members={members}
@@ -81,18 +79,18 @@ export default function Admin() {
                     setQueryParams={setQueryParams}
                     pagingInfo={pagingInfo}
                     onViewPhotos={handleViewPhotos}
-                />;
+                />
             case 'photos':
                 return <PhotoManager
                     photos={INITIAL_PHOTOS}
-                    selectedMember={selectedMemberForPhotos} // <--- Oper Data Member
-                    onClearFilter={handleClearPhotoFilter}   // <--- Oper Fungsi Reset
+                    selectedMember={selectedMemberForPhotos}
+                    onClearFilter={handleClearPhotoFilter}
                     onMemberClick={handleBackToMembers}
                 />
             default:
-                return <DashboardStats memberCount={members.length} photoCount={INITIAL_PHOTOS.length} />;
+                return <DashboardStats memberCount={members.length} photoCount={INITIAL_PHOTOS.length} />
         }
-    };
+    }
 
     return (
         <div className="flex h-screen bg-gray-100 font-sans text-slate-800">
@@ -113,5 +111,5 @@ export default function Admin() {
                 </div>
             </main>
         </div>
-    );
+    )
 }

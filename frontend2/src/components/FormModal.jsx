@@ -1,11 +1,11 @@
-import { X, Loader2, Save } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { memberApi } from '../lib/member-api';
-import { useEffect } from 'react';
+import { X, Loader2, Save } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { memberApi } from '../lib/member-api'
+import { useEffect } from 'react'
 
 export default function FormModal({ isOpen, onClose, initialData }) {
-    const queryClient = useQueryClient();
+    const queryClient = useQueryClient()
     const isEditMode = !!initialData
     
     const { 
@@ -13,7 +13,7 @@ export default function FormModal({ isOpen, onClose, initialData }) {
         handleSubmit, 
         reset, 
         formState: { errors } 
-    } = useForm();
+    } = useForm()
 
     useEffect(() => {
         if (isOpen) {
@@ -59,11 +59,11 @@ export default function FormModal({ isOpen, onClose, initialData }) {
         const payload = {
             ...data,
             generation: parseInt(data.generation)
-        };
-        mutation.mutate(payload);
-    };
+        }
+        mutation.mutate(payload)
+    }
 
-    if (!isOpen) return null;
+    if (!isOpen) return null
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -138,5 +138,5 @@ export default function FormModal({ isOpen, onClose, initialData }) {
                 </form>
             </div>
         </div>
-    );
+    )
 }

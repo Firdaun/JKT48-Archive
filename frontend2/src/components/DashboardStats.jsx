@@ -1,4 +1,4 @@
-import { Users, Image as ImageIcon, Settings } from 'lucide-react';
+import { Users, Image as ImageIcon, Settings } from 'lucide-react'
 
 export default function DashboardStats({ memberCount, photoCount }) {
     return (
@@ -7,7 +7,7 @@ export default function DashboardStats({ memberCount, photoCount }) {
             <StatCard title="Total Photos" value={photoCount} icon={<ImageIcon className="text-purple-500" />} />
             <StatCard title="Bot Status" value="Active" icon={<Settings className="text-green-500" />} isStatus />
         </div>
-    );
+    )
 }
 
 function StatCard({ title, value, icon, isStatus }) {
@@ -19,5 +19,5 @@ function StatCard({ title, value, icon, isStatus }) {
             </div>
             <div className="p-3 bg-slate-50 rounded-full">{icon}</div>
         </div>
-    );
+    )
 }

@@ -2,9 +2,7 @@ import { Search, X, User, Filter } from 'lucide-react'
 
 export default function PhotoManager({ photos, selectedMember, onClearFilter, onMemberClick }) {
 
-    const displayedPhotos = selectedMember 
-        ? photos.filter(p => p.member === selectedMember.nickname || p.member === selectedMember.name)
-        : photos;
+    const displayedPhotos = selectedMember ? photos.filter(p => p.member.toLowerCase() === selectedMember.nickname.toLowerCase() || p.member.toLowerCase() === selectedMember.name.toLowerCase()) : photos
 
     return (
         <div className="bg-white h-220.25 rounded-xl shadow-sm border border-slate-200">
@@ -12,13 +10,12 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                 <h3 className="font-bold text-lg">Scraped Photos</h3>
                 <div className={`flex items-center border rounded-lg overflow-hidden transition-all duration-300 ${selectedMember ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-300 border-dashed'}`}>
                         
-                        {/* Bagian Label (Selalu Muncul) */}
                         <button 
-                            onClick={onMemberClick} // Hanya bisa diklik balik kalau ada member
+                            onClick={onMemberClick}
                             className={`px-3 py-1.5 hover:bg-blue-100 hover:cursor-pointer flex items-center gap-2 text-sm font-medium transition 
                                 ${selectedMember 
                                     ? 'text-blue-700 hover:bg-blue-100 cursor-pointer' 
-                                    : 'text-slate-500 cursor-default' // Kalau filter mati, jadi teks biasa
+                                    : 'text-slate-500 cursor-default'
                                 }`}
                             title={selectedMember ? "Back to Member List" : "No filter active"}>
                             {selectedMember ? (
@@ -34,7 +31,6 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                             )}
                         </button>
 
-                        {/* Bagian Tombol X (Hanya Muncul Jika Filter Aktif) */}
                         {selectedMember && (
                             <button 
                                 onClick={onClearFilter}
@@ -62,5 +58,5 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                 ))}
             </div>
         </div>
-    );
+    )
 }

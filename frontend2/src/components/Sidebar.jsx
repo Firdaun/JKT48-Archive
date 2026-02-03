@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Image as ImageIcon, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Image as ImageIcon, LogOut } from 'lucide-react'
 
 export default function Sidebar({ activeTab, setActiveTab }) {
     return (
@@ -36,10 +36,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                 </button>
             </div>
         </aside>
-    );
+    )
 }
 
-// Sub-component (Hanya dipakai di Sidebar, jadi simpan di sini saja)
 function SidebarItem({ icon, label, active, onClick }) {
     return (
         <button 
@@ -50,5 +49,5 @@ function SidebarItem({ icon, label, active, onClick }) {
             {icon}
             <span className="font-medium">{label}</span>
         </button>
-    );
+    )
 }

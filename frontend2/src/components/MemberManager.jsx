@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
-import FormModal from './FormModal';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { memberApi } from '../lib/member-api';
+import { useEffect, useState } from 'react'
+import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react'
+import FormModal from './FormModal'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { memberApi } from '../lib/member-api'
 
 export default function MemberManager({ members, loading, queryParams, setQueryParams, pagingInfo, onViewPhotos }) {
-    const [isSortOpen, setIsSortOpen] = useState(false);
+    const [isSortOpen, setIsSortOpen] = useState(false)
     const [searchInput, setSearchInput] = useState(queryParams.search)
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedMember, setSelectedMember] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [selectedMember, setSelectedMember] = useState(null)
     const queryClient = useQueryClient()
 
     const deleteMutation = useMutation({
@@ -22,24 +22,24 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
 
     const handleDeleteClick = (id, name) => {
         if (window.confirm(`Yakin ingin menghapus member "${name}"? Data tidak bisa dikembalikan.`)) {
-            deleteMutation.mutate(id);
+            deleteMutation.mutate(id)
         }
     }
 
     const handleAddClick = () => {
-        setSelectedMember(null);
-        setIsModalOpen(true);
-    };
+        setSelectedMember(null)
+        setIsModalOpen(true)
+    }
 
     const handleEditClick = (member) => {
-        setSelectedMember(member); 
-        setIsModalOpen(true);
-    };
+        setSelectedMember(member) 
+        setIsModalOpen(true)
+    }
     
     const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedMember(null);
-    };
+        setIsModalOpen(false)
+        setSelectedMember(null)
+    }
 
     const handleSortChange = (value) => {
         setQueryParams(prev => ({ ...prev, sort: value, page: 1 }))
@@ -68,11 +68,11 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
 
     const getSortLabel = () => {
         switch (queryParams.sort) {
-            case 'name-asc': return 'Name (A-Z)';
-            case 'name-desc': return 'Name (Z-A)';
-            case 'gen-asc': return 'Generation (Old-New)';
-            case 'gen-desc': return 'Generation (New-Old)';
-            default: return 'ID (Default)';
+            case 'name-asc': return 'Name (A-Z)'
+            case 'name-desc': return 'Name (Z-A)'
+            case 'gen-asc': return 'Generation (Old-New)'
+            case 'gen-desc': return 'Generation (New-Old)'
+            default: return 'ID (Default)'
         }
     }
 
@@ -216,5 +216,5 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
             <FormModal isOpen={isModalOpen} onClose={handleCloseModal} initialData={selectedMember}/>
             
         </div>
-    );
+    )
 }
