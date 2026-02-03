@@ -2,66 +2,66 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useEffect, useState } from 'react'
 export default function App() {
     const photos = [
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/oline_manuel.png' },
-        { src: 'src/assets/christy1.jpg' },
-        { src: 'src/assets/christy2.jpg' },
-        { src: 'src/assets/christy3.jpg' },
-        { src: 'src/assets/christy4.jpg' },
-        { src: 'src/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/oline_manuel.png' },
+        { src: '/assets/christy1.jpg' },
+        { src: '/assets/christy2.jpg' },
+        { src: '/assets/christy3.jpg' },
+        { src: '/assets/christy4.jpg' },
+        { src: '/assets/christy1.jpg' },
     ]
     const photoProfile = [
         { src: '/kabesha/abigail_rachel.jpg' },
@@ -126,20 +126,20 @@ export default function App() {
         containScroll: false,
         dragFree: true
     })
-    const onSelect = useCallback((emblaApi) => {
+    
+    useCallback((emblaApi) => {
         setSelectedIndex(emblaApi.selectedScrollSnap())
     }, [])
+
     useEffect(() => {
         if (!emblaApi) return
-        onSelect(emblaApi)
-        emblaApi.on('select', onSelect)
-        emblaApi.on('reInit', onSelect)
-    }, [emblaApi, onSelect])
+    }, [emblaApi])
     
 
     const scrollToIndex = useCallback((index) => {
         if (emblaApi) {
             emblaApi.scrollTo(index)
+            setSelectedIndex(index)
         }
     }, [emblaApi])
 
