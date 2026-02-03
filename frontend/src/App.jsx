@@ -1,5 +1,5 @@
 import useEmblaCarousel from 'embla-carousel-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 export default function App() {
     const photos = [
         { src: '/assets/oline_manuel.png' },
@@ -126,15 +126,6 @@ export default function App() {
         containScroll: false,
         dragFree: true
     })
-    
-    useCallback((emblaApi) => {
-        setSelectedIndex(emblaApi.selectedScrollSnap())
-    }, [])
-
-    useEffect(() => {
-        if (!emblaApi) return
-    }, [emblaApi])
-    
 
     const scrollToIndex = useCallback((index) => {
         if (emblaApi) {

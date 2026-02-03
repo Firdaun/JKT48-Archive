@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import FormModal from './FormModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { memberApi } from '../lib/member-api';
 
-export default function MemberManager({ members, loading, queryParams, setQueryParams, pagingInfo }) {
+export default function MemberManager({ members, loading, queryParams, setQueryParams, pagingInfo, onViewPhotos }) {
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(queryParams.search)
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,7 +98,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                     <div className='relative'>
                         <button
                             onClick={() => setIsSortOpen(!isSortOpen)}
-                            className="flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition min-w-40 justify-between h-full">
+                            className="flex items-center gap-2 border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition min-w-40 justify-between h-full">
                             <span className="truncate">Sort: {getSortLabel()}</span>
                             <ChevronDown size={16} className={`transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
                         </button>
@@ -171,7 +171,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                             </tr>
                         ) : (
                             members.map((member) => (
-                                <tr key={member.id} className="hover:bg-slate-50 transition">
+                                <tr key={member.id} onClick={() => onViewPhotos(member)} className="hover:bg-slate-50 hover:cursor-pointer transition">
                                     <td className="p-4 font-medium text-slate-400">#{member.id}</td>
                                     <td className="p-4 font-medium">{member.name}</td>
                                     <td className="p-4 text-slate-600">{member.nickname}</td>

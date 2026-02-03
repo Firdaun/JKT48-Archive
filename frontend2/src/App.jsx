@@ -14,6 +14,7 @@ const INITIAL_PHOTOS = [
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('dashboard');
     const queryClient = useQueryClient()
+    const [selectedMemberForPhotos, setSelectedMemberForPhotos] = useState(null); // <--- State Baru
 
     const [queryParams, setQueryParams] = useState({
         page: 1,
@@ -33,6 +34,21 @@ export default function Admin() {
         placeholderData: keepPreviousData,
         staleTime: 1000 * 60 * 15
     })
+
+    const handleViewPhotos = (member) => {
+        setSelectedMemberForPhotos(member); // Simpan data member
+        setActiveTab('photos');             // Pindah tab
+    };
+
+    // 2. Fungsi dipanggil dari PhotoManager saat nama member diklik
+    const handleBackToMembers = () => {
+        setActiveTab('members');
+    };
+
+    // 3. Fungsi dipanggil dari PhotoManager saat tombol X diklik
+    const handleClearPhotoFilter = () => {
+        setSelectedMemberForPhotos(null);
+    };
 
     useEffect(() => {
         if (!isError && !isLoading && data?.paging) {
@@ -64,9 +80,15 @@ export default function Admin() {
                     queryParams={queryParams}
                     setQueryParams={setQueryParams}
                     pagingInfo={pagingInfo}
+                    onViewPhotos={handleViewPhotos}
                 />;
             case 'photos':
-                return <PhotoManager photos={INITIAL_PHOTOS} />;
+                return <PhotoManager
+                    photos={INITIAL_PHOTOS}
+                    selectedMember={selectedMemberForPhotos} // <--- Oper Data Member
+                    onClearFilter={handleClearPhotoFilter}   // <--- Oper Fungsi Reset
+                    onMemberClick={handleBackToMembers}
+                />
             default:
                 return <DashboardStats memberCount={members.length} photoCount={INITIAL_PHOTOS.length} />;
         }
