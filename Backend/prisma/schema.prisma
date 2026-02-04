@@ -35,10 +35,13 @@ model SocialAccount {
 }
 
 model Photo {
-  id       Int      @id @default(autoincrement())
-  srcUrl   String
-  fileId   String?
-  caption  String?  @db.Text
+  id        Int     @id @default(autoincrement())
+  srcUrl    String
+  fileId    String?
+  caption   String? @db.Text
+  postUrl   String
+  mediaType String
+
   postedAt DateTime
   savedAt  DateTime @default(now())
 

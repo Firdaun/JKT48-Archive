@@ -22,7 +22,8 @@
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "pg": "^8.17.2",
-    "puppeteer": "^24.36.0"
+    "puppeteer": "^24.36.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
