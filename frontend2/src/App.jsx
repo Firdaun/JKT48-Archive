@@ -7,8 +7,8 @@ import PhotoManager from './components/PhotoManager'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const INITIAL_PHOTOS = [
-    { id: 101, srcUrl: 'https://via.placeholder.com/150', caption: 'Semangat hari ini!', member: 'Christy', postedAt: '2023-10-20' },
-    { id: 102, srcUrl: 'https://via.placeholder.com/150', caption: 'Oyasumi~', member: 'Freya', postedAt: '2023-10-21' },
+    { id: 101, src: '/christy1.jpg', caption: 'Semangat hari ini!', member: 'Christy', postedAt: '2023-10-20' },
+    { id: 102, src: '/christy1.jpg', caption: 'Oyasumi~', member: 'Freya', postedAt: '2023-10-21' },
 ]
 
 export default function Admin() {

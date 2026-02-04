@@ -49,7 +49,7 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
             <div className="p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {displayedPhotos.map((photo) => (
                     <div key={photo.id} className="group relative rounded-lg overflow-hidden border border-slate-200">
-                        <img src={photo.srcUrl} alt="" className="w-full aspect-square object-cover bg-slate-100" />
+                        <img src={photo.src} alt="" className="w-full aspect-square object-cover bg-slate-100" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex flex-col justify-end p-3">
                             <p className="text-white text-xs font-bold">{photo.member}</p>
                             <p className="text-white/80 text-[10px] truncate">{photo.postedAt}</p>
