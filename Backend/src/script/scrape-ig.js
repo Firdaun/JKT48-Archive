@@ -74,16 +74,24 @@ const scrapeInstagram = async () => {
     let postLinks = await page.evaluate(() => {
         const boxes = Array.from(document.querySelectorAll('._aagu'))
         return boxes.map(box => {
-            // Dari kotak foto, cari link (a) pembungkus terdekat di atasnya
             const link = box.closest('a')
             return link ? link.href : null
         })
-        .filter(href => href && href.includes('/p/')) // Hanya ambil link postingan (/p/)
+        .filter(href => href && href.includes('/p/'))
         .filter((value, index, self) => self.indexOf(value) === index) 
     })
 
-    if (postLinks.length > 0) {
-        postLinks = postLinks.slice(0, 3)
+    // if (postLinks.length > 0) {
+    //     postLinks = postLinks.slice(0, 3)
+    // }
+
+    if (postLinks.length >= 1) {
+        console.log("🎯 Mode Testing: Target spesifik postingan ke-3")
+        
+        postLinks = postLinks.slice(0, 1) 
+    } else {
+        console.log("⚠️ Postingan kurang dari 3! Tidak bisa mengambil postingan ke-3.")
+        postLinks = []
     }
 
     console.log(`📦 Ditemukan ${postLinks.length} postingan terbaru.`)
@@ -124,28 +132,72 @@ const scrapeInstagram = async () => {
             const postedAt = new Date(postedAtString)
 
             const caption = await page.evaluate(() => {
-                const h1 = document.querySelector('h1')
-                if (h1) return h1.innerText
+                let foundCaption = ''
+                try {
+                    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+                    for (const script of scripts) {
+                        const json = JSON.parse(script.innerText)
+                        if (json.caption) { foundCaption = json.caption; break }
+                        if (json.headline) { foundCaption = json.headline; break }
+                        if (Array.isArray(json) && json[0] && json[0].caption) { foundCaption = json[0].caption; break }
+                    }
+                } catch (e) {}
 
-                const span = document.querySelector('span._aacl._aaco._aacu._aacx._aad7._aade') || document.querySelector('li div[role="button"] + div span')
-                return span ? span.innerText : ''
+                if (foundCaption) return foundCaption
+
+                try {
+                    const meta = document.querySelector('meta[name="description"]')
+                    if (meta && meta.content) {
+                        const content = meta.content
+                        const match = content.match(/on Instagram: "(.+)"$/i) || content.match(/on Instagram: “(.+)”$/i)
+                        if (match && match[1]) foundCaption = match[1]
+                    }
+                } catch (e) {}
+
+                if (foundCaption) return foundCaption
+
+                try {
+                    const images = Array.from(document.querySelectorAll('article img'))
+                    const mainImg = images.find(img => img.clientWidth > 300)
+                    if (mainImg && mainImg.alt) {
+                        const alt = mainImg.alt
+                        if (!alt.startsWith('May be') && !alt.startsWith('Photo by') && alt.length > 5) foundCaption = alt
+                    }
+                } catch (e) {}
+
+                return foundCaption || ''
             })
+
+            console.log(`Caption Debug: "${caption.substring(0, 30)}..."`)
+
+            // Perubahan: Menghentikan proses loop saat ini jika caption kosong agar tidak menyimpan data rusak
+            if (!caption || caption.trim() === '') {
+                console.error(`❌ ERROR: Caption kosong! Postingan ${link} DILEWATI.`)
+                continue
+            }
 
             let slideCounter = 0
             let hasNext = true
             const processedImages = new Set()
 
             while (hasNext) {
-                slideCounter++
+                const ignoreList = Array.from(processedImages)
 
-                const imgSrc = await page.evaluate(() => {
-                    const images = Array.from(document.querySelectorAll('main img, article img'))
-                    const validImg = images.find(img => img.src.startsWith('http') && img.clientWidth > 300)
+                const imgSrc = await page.evaluate((ignoreList) => {
+                    const images = Array.from(document.querySelectorAll('article img, main img'))
+                    
+                    const validImg = images.find(img => 
+                        img.src.startsWith('http') && 
+                        img.clientWidth > 300 && 
+                        !ignoreList.includes(img.src)
+                    )
+                    
                     return validImg ? validImg.src : null
-                })
-
-                if (imgSrc && !processedImages.has(imgSrc)) {
+                }, ignoreList)
+                
+                if (imgSrc) {
                     processedImages.add(imgSrc)
+                    slideCounter++
 
                     const fileId = uuidv4()
                     const fileName = `${postedAt.toISOString().split('T')[0]}_${fileId}.jpg`
@@ -172,7 +224,8 @@ const scrapeInstagram = async () => {
                 
                 if (nextButton) {
                     await nextButton.click()
-                    await delay(2000)
+                    
+                    await delay(2500) 
                 } else {
                     hasNext = false
                 }
