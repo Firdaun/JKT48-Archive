@@ -15,8 +15,17 @@ const updateMemberValidation = Joi.object({
     generation: Joi.number().min(1).positive().required()
 })
 
+const getPhotoValidation = Joi.object({
+    page: Joi.number().min(1).positive().default(1),
+    size: Joi.number().min(1).positive().max(100).default(10),
+    member_id: Joi.number().optional(),
+    search: Joi.string().optional(),
+    sort: Joi.string().optional().default('newest')
+})
+
 export const apiValidation = {
     getMemberValidation,
     updateMemberValidation,
-    getMemberIdValidation
+    getMemberIdValidation,
+    getPhotoValidation
 }
