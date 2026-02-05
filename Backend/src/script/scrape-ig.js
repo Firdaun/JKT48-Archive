@@ -59,22 +59,41 @@ const scrapeInstagram = async () => {
     console.log(`🔍 Membuka profil @${TARGET_USERNAME}...`)
     await page.goto(`https://www.instagram.com/${TARGET_USERNAME}/`, { waitUntil: 'networkidle2' })
     
-    try {
-        await page.waitForSelector('article', { timeout: 10000 }) 
-    } catch (e) {
-        console.log("⚠️ Tidak bisa menemukan grid foto. Mungkin login gagal atau profil private/salah.")
-        // Screenshot buat debug kalau error lagi
-        await page.screenshot({ path: 'debug-error.png' }) 
-    }
+    console.log("⏳ Menunggu grid foto muncul...")
     
+    try {
+        await page.waitForSelector('._aagu', { timeout: 20000 })
+        console.log("✅ Grid foto terdeteksi!")
+    } catch (e) {
+        console.error("⚠️ Waktu habis! Postingan tidak muncul-muncul.")
+        await page.screenshot({ path: 'debug-failed-load.png' })
+        await browser.close()
+        return
+    }
+
     let postLinks = await page.evaluate(() => {
-        const anchors = Array.from(document.querySelectorAll('a[href^="/p/"]'))
-        return anchors.map(a => a.href)
+        const boxes = Array.from(document.querySelectorAll('._aagu'))
+        return boxes.map(box => {
+            // Dari kotak foto, cari link (a) pembungkus terdekat di atasnya
+            const link = box.closest('a')
+            return link ? link.href : null
+        })
+        .filter(href => href && href.includes('/p/')) // Hanya ambil link postingan (/p/)
+        .filter((value, index, self) => self.indexOf(value) === index) 
     })
 
-    postLinks = postLinks.slice(0, 3)
+    if (postLinks.length > 0) {
+        postLinks = postLinks.slice(0, 3)
+    }
 
     console.log(`📦 Ditemukan ${postLinks.length} postingan terbaru.`)
+    console.log("📋 List Link:", postLinks)
+
+    if (postLinks.length === 0) {
+        console.log("⚠️ Tidak ada postingan yang bisa diambil. Bot berhenti.")
+        await browser.close()
+        return
+    }
 
     for (const link of postLinks) {
         const existingPost = await prismaClient.photo.findFirst({
@@ -90,6 +109,12 @@ const scrapeInstagram = async () => {
 
         try {
             await page.goto(link, { waitUntil: 'networkidle2'})
+            try {
+                await page.waitForSelector('article img', { timeout: 10000 }) 
+            } catch {
+                await page.waitForSelector('main img', { timeout: 10000 })
+            }
+            
             await delay(2000)
 
             const postedAtString = await page.evaluate(() => {
@@ -102,7 +127,7 @@ const scrapeInstagram = async () => {
                 const h1 = document.querySelector('h1')
                 if (h1) return h1.innerText
 
-                const span = document.querySelector('span._aacl._aaco._aacu._aacx._aad7._aade')
+                const span = document.querySelector('span._aacl._aaco._aacu._aacx._aad7._aade') || document.querySelector('li div[role="button"] + div span')
                 return span ? span.innerText : ''
             })
 
@@ -114,8 +139,8 @@ const scrapeInstagram = async () => {
                 slideCounter++
 
                 const imgSrc = await page.evaluate(() => {
-                    const images = Array.from(document.querySelectorAll('article img'))
-                    const validImg = images.find(img => img.src.startsWith('http') && img.clientWidth > 100)
+                    const images = Array.from(document.querySelectorAll('main img, article img'))
+                    const validImg = images.find(img => img.src.startsWith('http') && img.clientWidth > 300)
                     return validImg ? validImg.src : null
                 })
 
@@ -134,7 +159,7 @@ const scrapeInstagram = async () => {
                             srcUrl: dbUrl,
                             fileId: fileId,
                             caption: caption,
-                            postUrl: link, // Key Grouping
+                            postUrl: link,
                             mediaType: slideCounter > 1 ? 'CAROUSEL_ALBUM' : 'IMAGE',
                             postedAt: postedAt,
                             memberId: member.id
@@ -147,9 +172,9 @@ const scrapeInstagram = async () => {
                 
                 if (nextButton) {
                     await nextButton.click()
-                    await delay(1500) // Tunggu animasi geser
+                    await delay(2000)
                 } else {
-                    hasNext = false // Tidak ada tombol next, selesai
+                    hasNext = false
                 }
             }
         } catch (e) {
@@ -157,7 +182,7 @@ const scrapeInstagram = async () => {
         }
         await delay(3000)
     }
-    console.log('🎉 Selesai! Semua update terbaru sudah didownload.')
+    console.log('Proses selesai')
     await browser.close()
 }
 scrapeInstagram()
