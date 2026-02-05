@@ -85,10 +85,10 @@ const scrapeInstagram = async () => {
     //     postLinks = postLinks.slice(0, 3)
     // }
 
-    if (postLinks.length >= 1) {
+    if (postLinks.length >= 12) {
         console.log("🎯 Mode Testing: Target spesifik postingan ke-3")
         
-        postLinks = postLinks.slice(0, 1) 
+        postLinks = postLinks.slice(11, 12)
     } else {
         console.log("⚠️ Postingan kurang dari 3! Tidak bisa mengambil postingan ke-3.")
         postLinks = []
@@ -125,6 +125,13 @@ const scrapeInstagram = async () => {
             
             await delay(2000)
 
+            // console.log("📸 CEKREK! Menyimpan struktur HTML postingan ke file...")
+            // const htmlContent = await page.content()
+            // fs.writeFileSync('debug-post.html', htmlContent)
+            // await page.screenshot({ path: 'debug-post.png' })
+            // console.log("✅ File 'debug-post.html' dan 'debug-post.png' berhasil dibuat!")
+            // console.log("👉 Tolong kirim file 'debug-post.html' itu ke saya sekarang.")
+
             const postedAtString = await page.evaluate(() => {
                 const timeEl = document.querySelector('time')
                 return timeEl ? timeEl.getAttribute('datetime') : new Date().toISOString()
@@ -132,45 +139,42 @@ const scrapeInstagram = async () => {
             const postedAt = new Date(postedAtString)
 
             const caption = await page.evaluate(() => {
-                let foundCaption = ''
+                const extractQuote = (text) => {
+                    const match = text.match(/: "([\s\S]+)"/) || text.match(/: “([\s\S]+)”/);
+                    return match ? match[1] : null;
+                };
+
+                const ogTitle = document.querySelector('meta[property="og:title"]')?.content;
+                if (ogTitle) {
+                    const extracted = extractQuote(ogTitle);
+                    if (extracted) return extracted;
+                }
+
+                const metaDesc = document.querySelector('meta[name="description"]')?.content;
+                if (metaDesc) {
+                    const extracted = extractQuote(metaDesc);
+                    if (extracted) return extracted;
+                }
+
                 try {
-                    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+                    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
                     for (const script of scripts) {
-                        const json = JSON.parse(script.innerText)
-                        if (json.caption) { foundCaption = json.caption; break }
-                        if (json.headline) { foundCaption = json.headline; break }
-                        if (Array.isArray(json) && json[0] && json[0].caption) { foundCaption = json[0].caption; break }
+                        const json = JSON.parse(script.innerText);
+                        if (json.caption) return json.caption;
+                        if (json.headline) return json.headline;
+                        if (Array.isArray(json) && json[0]?.caption) return json[0].caption;
                     }
                 } catch (e) {}
 
-                if (foundCaption) return foundCaption
+                if (mainImg && mainImg.alt && !mainImg.alt.startsWith('May be')) {
+                    return mainImg.alt;
+                }
 
-                try {
-                    const meta = document.querySelector('meta[name="description"]')
-                    if (meta && meta.content) {
-                        const content = meta.content
-                        const match = content.match(/on Instagram: "(.+)"$/i) || content.match(/on Instagram: “(.+)”$/i)
-                        if (match && match[1]) foundCaption = match[1]
-                    }
-                } catch (e) {}
-
-                if (foundCaption) return foundCaption
-
-                try {
-                    const images = Array.from(document.querySelectorAll('article img'))
-                    const mainImg = images.find(img => img.clientWidth > 300)
-                    if (mainImg && mainImg.alt) {
-                        const alt = mainImg.alt
-                        if (!alt.startsWith('May be') && !alt.startsWith('Photo by') && alt.length > 5) foundCaption = alt
-                    }
-                } catch (e) {}
-
-                return foundCaption || ''
+                return ''
             })
 
-            console.log(`Caption Debug: "${caption.substring(0, 30)}..."`)
+            console.log(`📝 Caption Ditemukan: "${caption}"`)
 
-            // Perubahan: Menghentikan proses loop saat ini jika caption kosong agar tidak menyimpan data rusak
             if (!caption || caption.trim() === '') {
                 console.error(`❌ ERROR: Caption kosong! Postingan ${link} DILEWATI.`)
                 continue
