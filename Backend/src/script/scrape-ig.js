@@ -19,7 +19,7 @@ const downloadImage = async (url, filepath) => {
 
 const scrapeInstagram = async () => {
     const member = await prismaClient.member.findFirst({
-        where: { nickname: {equals: MEMBER_NICKNAME, mode: 'insensitive'}}
+        where: { nickname: { equals: MEMBER_NICKNAME, mode: 'insensitive' } }
     })
 
     if (!member) {
@@ -29,7 +29,7 @@ const scrapeInstagram = async () => {
 
     const saveDir = path.join(SAVE_BASE_DIR, member.nickname.toLowerCase())
     if (!fs.existsSync(saveDir)) {
-        fs.mkdirSync(saveDir, { recursive: true})
+        fs.mkdirSync(saveDir, { recursive: true })
     }
 
     console.log(`Memulai Bot Instagram untuk: ${MEMBER_NICKNAME}`);
@@ -58,15 +58,14 @@ const scrapeInstagram = async () => {
 
     console.log(`🔍 Membuka profil @${TARGET_USERNAME}...`)
     await page.goto(`https://www.instagram.com/${TARGET_USERNAME}/`, { waitUntil: 'networkidle2' })
-    
+
     console.log("⏳ Menunggu grid foto muncul...")
-    
+
     try {
         await page.waitForSelector('._aagu', { timeout: 20000 })
         console.log("✅ Grid foto terdeteksi!")
     } catch (e) {
         console.error("⚠️ Waktu habis! Postingan tidak muncul-muncul.")
-        await page.screenshot({ path: 'debug-failed-load.png' })
         await browser.close()
         return
     }
@@ -77,65 +76,68 @@ const scrapeInstagram = async () => {
             const link = box.closest('a')
             return link ? link.href : null
         })
-        .filter(href => href && href.includes('/p/'))
-        .filter((value, index, self) => self.indexOf(value) === index) 
+            .filter(href => href && href.includes('/p/'))
+            .filter((currentUrl, index, urlList) => urlList.indexOf(currentUrl) === index)
     })
 
-    // if (postLinks.length > 0) {
-    //     postLinks = postLinks.slice(0, 3)
-    // }
-
-    if (postLinks.length >= 12) {
-        console.log("🎯 Mode Testing: Target spesifik postingan ke-3")
-        
-        postLinks = postLinks.slice(11, 12)
-    } else {
-        console.log("⚠️ Postingan kurang dari 3! Tidak bisa mengambil postingan ke-3.")
-        postLinks = []
+    if (postLinks.length >= 2) {
+        postLinks = postLinks.slice(1, 2)
     }
 
     console.log(`📦 Ditemukan ${postLinks.length} postingan terbaru.`)
     console.log("📋 List Link:", postLinks)
 
     if (postLinks.length === 0) {
-        console.log("⚠️ Tidak ada postingan yang bisa diambil. Bot berhenti.")
+        console.log("⚠️ Tidak ada postingan yang bisa diambil. Selector mungkin berubah.")
+        const htmlContent = await page.content()
+        const debugFileName = 'debug-error-layout.html'
+        fs.writeFileSync(debugFileName, htmlContent)
+        console.log(`💾 Source code halaman telah disimpan di file: ${debugFileName}`)
+        console.log("👉 Silakan buka file tersebut di browser dan cek Inspect Element untuk melihat class terbarunya.")
+
         await browser.close()
         return
     }
 
     for (const link of postLinks) {
         const existingPost = await prismaClient.photo.findFirst({
-            where: { postUrl: link}
+            where: { postUrl: link }
         })
 
         if (existingPost) {
             console.log(`✋ Postingan ${link} sudah ada. Stop scraping karena ini postingan lama.`)
-            break; 
+            break;
         }
 
         console.log(`⬇️ Memproses Post: ${link}`)
 
         try {
-            await page.goto(link, { waitUntil: 'networkidle2'})
+            await page.goto(link, { waitUntil: 'networkidle2' })
             try {
-                await page.waitForSelector('article img', { timeout: 10000 }) 
+                await page.waitForSelector('article img', { timeout: 10000 })
             } catch {
                 await page.waitForSelector('main img', { timeout: 10000 })
             }
-            
-            await delay(2000)
 
-            // console.log("📸 CEKREK! Menyimpan struktur HTML postingan ke file...")
-            // const htmlContent = await page.content()
-            // fs.writeFileSync('debug-post.html', htmlContent)
-            // await page.screenshot({ path: 'debug-post.png' })
-            // console.log("✅ File 'debug-post.html' dan 'debug-post.png' berhasil dibuat!")
-            // console.log("👉 Tolong kirim file 'debug-post.html' itu ke saya sekarang.")
+            await delay(2000)
 
             const postedAtString = await page.evaluate(() => {
                 const timeEl = document.querySelector('time')
-                return timeEl ? timeEl.getAttribute('datetime') : new Date().toISOString()
+                return timeEl ? timeEl.getAttribute('datetime') : null
             })
+
+            if (!postedAtString) {
+                console.error(`❌ FATAL ERROR: Elemen waktu (<time>) tidak ditemukan di link: ${link}`)
+
+                console.log("📸 Menyimpan bukti error untuk debugging...")
+                const htmlContent = await page.content()
+                fs.writeFileSync('debug-error-time-missing.html', htmlContent)
+
+                console.log("🛑 Program dihentikan")
+                await browser.close()
+                process.exit(1)
+            }
+
             const postedAt = new Date(postedAtString)
 
             const caption = await page.evaluate(() => {
@@ -147,38 +149,51 @@ const scrapeInstagram = async () => {
                 const ogTitle = document.querySelector('meta[property="og:title"]')?.content;
                 if (ogTitle) {
                     const extracted = extractQuote(ogTitle);
-                    if (extracted) return extracted;
+                    if (extracted) {
+                        return { text: extracted, source: 'PLAN A (OG Title)' }
+                    }
                 }
 
                 const metaDesc = document.querySelector('meta[name="description"]')?.content;
                 if (metaDesc) {
                     const extracted = extractQuote(metaDesc);
-                    if (extracted) return extracted;
+                    if (extracted) {
+                        return { text: extracted, source: 'PLAN B (Meta Desc)' }
+                    }
                 }
 
                 try {
                     const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
                     for (const script of scripts) {
                         const json = JSON.parse(script.innerText);
-                        if (json.caption) return json.caption;
-                        if (json.headline) return json.headline;
-                        if (Array.isArray(json) && json[0]?.caption) return json[0].caption;
+                        if (json.caption) {
+                            return { text: json.caption, source: 'PLAN C (JSON Single)' }
+                        }
+                        if (json.headline) {
+                            return { text: json.headline, source: 'PLAN C (JSON Headline)' }
+                        }
+                        if (Array.isArray(json) && json[0]?.caption) {
+                            return { text: json[0].caption, source: 'PLAN C (JSON Array)' };
+                        }
                     }
-                } catch (e) {}
+                } catch (e) { }
 
-                if (mainImg && mainImg.alt && !mainImg.alt.startsWith('May be')) {
-                    return mainImg.alt;
-                }
-
-                return ''
+                return { text: '', source: 'TIDAK DITEMUKAN' }
             })
 
-            console.log(`📝 Caption Ditemukan: "${caption}"`)
+            if (caption.text === '') {
+                console.error(`❌ FATAL ERROR: Caption tidak ditemukan di link: ${link}`)
+                console.error("🛑 Program dihentikan paksa karena caption kosong.")
 
-            if (!caption || caption.trim() === '') {
-                console.error(`❌ ERROR: Caption kosong! Postingan ${link} DILEWATI.`)
-                continue
+                console.log("📸 Menyimpan file debug 'debug-error-no-caption.html'...")
+                const htmlContent = await page.content()
+                fs.writeFileSync('debug-error-no-caption.html', htmlContent)
+
+                await browser.close()
+                process.exit(1)
             }
+
+            console.log(`✅ Caption ditemukan menggunakan: [ ${caption.source} ]`)
 
             let slideCounter = 0
             let hasNext = true
@@ -189,16 +204,16 @@ const scrapeInstagram = async () => {
 
                 const imgSrc = await page.evaluate((ignoreList) => {
                     const images = Array.from(document.querySelectorAll('article img, main img'))
-                    
-                    const validImg = images.find(img => 
-                        img.src.startsWith('http') && 
-                        img.clientWidth > 300 && 
+
+                    const validImg = images.find(img =>
+                        img.src.startsWith('http') &&
+                        img.clientWidth > 300 &&
                         !ignoreList.includes(img.src)
                     )
-                    
+
                     return validImg ? validImg.src : null
                 }, ignoreList)
-                
+
                 if (imgSrc) {
                     processedImages.add(imgSrc)
                     slideCounter++
@@ -214,7 +229,7 @@ const scrapeInstagram = async () => {
                         data: {
                             srcUrl: dbUrl,
                             fileId: fileId,
-                            caption: caption,
+                            caption: caption.text,
                             postUrl: link,
                             mediaType: slideCounter > 1 ? 'CAROUSEL_ALBUM' : 'IMAGE',
                             postedAt: postedAt,
@@ -225,11 +240,11 @@ const scrapeInstagram = async () => {
                 }
 
                 const nextButton = await page.$('button[aria-label="Next"]')
-                
+
                 if (nextButton) {
                     await nextButton.click()
-                    
-                    await delay(2500) 
+
+                    await delay(2500)
                 } else {
                     hasNext = false
                 }
