@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.API_BACKEND_URL
+const VITE_BASE_URL = import.meta.env.VITE_BACKEND_URL
 
 const handleResponse = async (response) => {
     if (!response.ok) {
@@ -9,14 +9,14 @@ const handleResponse = async (response) => {
 }
 
 export const photoApi = {
-    getAllPhotos: async () => {
-        const response = await fetch(`${API_BASE_URL}/photos`)
+    getAllPhotos: async (params = {}) => {
+        const query = new URLSearchParams(params).toString()
+        const response = await fetch(`${VITE_BASE_URL}/api/photos?${query}`)
         return handleResponse(response)
     },
 
-    // hapus photo
     deletePhoto: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/photos/${id}`, {
+        const response = await fetch(`${VITE_BASE_URL}/api/photos/${id}`, {
             method: 'DELETE',
         })
         return handleResponse(response)

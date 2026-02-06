@@ -17,13 +17,12 @@ const handleResponse = async (response) => {
 export const memberApi = {
     getAllMembers: async (params = {}) => {
         const query = new URLSearchParams(params).toString()
-        const response = await fetch(`${API_BASE_URL}/members?${query}`)
+        const response = await fetch(`${API_BASE_URL}/api/members?${query}`)
         return handleResponse(response)
     },
 
-    // tambah member
     createMember: async (data) => {
-        const response = await fetch(`${API_BASE_URL}/admin/members`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/members`, {
             method: 'POST',
             headers: getHeaders(),
             body: JSON.stringify(data)
@@ -31,9 +30,8 @@ export const memberApi = {
         return handleResponse(response)
     },
 
-    // update member
     updateMember: async (id, data) => {
-        const response = await fetch(`${API_BASE_URL}/admin/members/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/members/${id}`, {
             method: 'PUT',
             headers: getHeaders(),
             body: JSON.stringify(data)
@@ -41,9 +39,8 @@ export const memberApi = {
         return handleResponse(response)
     },
 
-    // hapus member
     deleteMember: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/admin/members/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/members/${id}`, {
             method: 'DELETE',
             headers: getHeaders()
         })

@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react'
 import { memberApi } from './lib/member-api'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
+import { photoApi } from './lib/photo-api'
 import Sidebar from './components/Sidebar'
 import DashboardStats from './components/DashboardStats'
 import MemberManager from './components/MemberManager'
 import PhotoManager from './components/PhotoManager'
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
-
-const INITIAL_PHOTOS = [
-    { id: 101, src: '/christy1.jpg', caption: 'Semangat hari ini!', member: 'Christy', postedAt: '2023-10-20' },
-    { id: 102, src: '/christy1.jpg', caption: 'Oyasumi~', member: 'Freya', postedAt: '2023-10-21' },
-]
 
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('dashboard')
@@ -23,16 +19,18 @@ export default function Admin() {
         sort: 'id'
     })
 
-    const {
-        data,
-        isLoading,
-        isError,
-        isFetching
-    } = useQuery({
+    const membersQuery = useQuery({
         queryKey: ['members', queryParams],
         queryFn: () => memberApi.getAllMembers(queryParams),
         placeholderData: keepPreviousData,
         staleTime: 1000 * 60 * 15
+    })
+
+    const photosQuery = useQuery({
+        queryKey: ['photos', selectedMemberForPhotos?.id],
+        queryFn: () => photoApi.getAllPhotos(
+            selectedMemberForPhotos ? { member_id: selectedMemberForPhotos.id } : {}
+        )
     })
 
     const handleViewPhotos = (member) => {
@@ -49,9 +47,9 @@ export default function Admin() {
     }
 
     useEffect(() => {
-        if (!isError && !isLoading && data?.paging) {
-            const currentPage = data.paging.page
-            const totalPage = data.paging.total_page
+        if (!membersQuery.isError && !membersQuery.isLoading && membersQuery.data?.paging) {
+            const currentPage = membersQuery.data.paging.page
+            const totalPage = membersQuery.data.paging.total_page
             if (currentPage < totalPage) {
                 const nextPage = currentPage + 1
                 queryClient.prefetchQuery({
@@ -62,33 +60,40 @@ export default function Admin() {
             }
 
         }
-    }, [data, isError, isLoading, queryParams, queryClient])
+    }, [membersQuery.data, membersQuery.isError, membersQuery.isLoading, queryParams, queryClient])
 
-    const members = data?.data || []
-    const pagingInfo = data?.paging || { total_page: 1, page: 1, total_item: 0 }
+    const members = membersQuery.data?.data || []
+    const memberPagingInfo = membersQuery.data?.paging || { total_page: 1, page: 1, total_item: 0 }
+
+    const photos = photosQuery.data?.data || []
+    const photoTotal = photosQuery.data?.paging?.total_item || 0
 
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <DashboardStats memberCount={pagingInfo.total_item} photoCount={INITIAL_PHOTOS.length} />
+                return <DashboardStats
+                    memberCount={memberPagingInfo.total_item}
+                    photoCount={photoTotal}
+                />
             case 'members':
                 return <MemberManager
                     members={members}
-                    loading={isFetching}
+                    loading={membersQuery.isFetching}
                     queryParams={queryParams}
                     setQueryParams={setQueryParams}
-                    pagingInfo={pagingInfo}
+                    pagingInfo={memberPagingInfo}
                     onViewPhotos={handleViewPhotos}
                 />
             case 'photos':
                 return <PhotoManager
-                    photos={INITIAL_PHOTOS}
+                    photos={photos}
+                    loading={photosQuery.isLoading}
                     selectedMember={selectedMemberForPhotos}
                     onClearFilter={handleClearPhotoFilter}
                     onMemberClick={handleBackToMembers}
                 />
             default:
-                return <DashboardStats memberCount={members.length} photoCount={INITIAL_PHOTOS.length} />
+                return <DashboardStats memberCount={members.length} photoCount={memberPagingInfo.total_item} />
         }
     }
 

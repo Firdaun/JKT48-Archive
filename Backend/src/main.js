@@ -5,17 +5,18 @@ import { authMiddleware } from "./middleware/auth.middleware.js"
 import { adminRouter } from "./routes/admin.routes.js"
 import { errorMiddleware } from "./middleware/error.middleware.js"
 
-const app = express()
+export const app = express()
 const port = 3000
 
 app.use(cors())
 app.use(express.json())
 
+app.use('/photos', express.static('public/photos'))
 app.use(publicRouter)
 app.use(authMiddleware)
 app.use(adminRouter)
 
 app.use(errorMiddleware)
 app.listen(port, () => {
-    console.log(`server active in port${port}`)
+    console.log(`server active in port ${port}`)
 })
