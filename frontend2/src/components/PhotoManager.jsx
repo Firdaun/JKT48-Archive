@@ -1,12 +1,24 @@
 import { Search, X, User, Filter, Loader2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
-export default function PhotoManager({ photos, selectedMember, onClearFilter, onMemberClick, loading }) {
+export default function PhotoManager({ photos, selectedMember, onClearFilter, onMemberClick, loading, pagingInfo, setQueryParams }) {
 
     const displayedPhotos = photos;
 
+    const TARGET_SLOTS = 32; 
+
+    // 👇 2. HITUNG SISA SLOT KOSONG
+    // Misal: foto ada 5. Maka 32 - 5 = 27 slot kosong.
+    const emptySlotsCount = Math.max(0, TARGET_SLOTS - displayedPhotos.length);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= pagingInfo.total_page) {
+            setQueryParams(prev => ({ ...prev, page: newPage }))
+        }
+    }
+
     return (
-        <div className="bg-white h-auto rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
             <div className="px-5 py-3 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg">Scraped Photos</h3>
                 <div className={`flex items-center border rounded-lg overflow-hidden transition-all duration-300 ${selectedMember ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-300 border-dashed'}`}>
@@ -100,36 +112,44 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                                 </div>
                             )
                         })}
+                        {[...Array(emptySlotsCount)].map((_, index) => (
+                            <div 
+                                key={`empty-${index}`} 
+                                className="aspect-square rounded-lg"
+                            >
+                                {/* Kosongkan isinya, cuma butuh 'aspect-square' biar makan tempat */}
+                            </div>
+                        ))}
                     </div>
                 )}
-                
-            <div className="p-3 pb-0 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <span className="text-sm text-slate-500">
-                    Total: <span className="font-semibold">
-                        {/* {pagingInfo.total_item} */}
-                        </span> members
-                </span>
 
-                <div className="flex items-center gap-2">
-                    <button
-                        // onClick={() => handlePageChange(pagingInfo.page - 1)}
-                        // disabled={pagingInfo.page === 1}
-                        className="p-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
-                        <ChevronLeft size={18} />
-                    </button>
-
-                    <span className="text-sm font-medium px-2">
-                        {/* Page {pagingInfo.page} of {pagingInfo.total_page || 1} */}
+                <div className="p-3 pb-0 flex items-center justify-between bg-slate-50/50">
+                    <span className="text-sm text-slate-500">
+                        Total: <span className="font-semibold">
+                            {pagingInfo?.total_item || 0}
+                        </span> photos
                     </span>
 
-                    <button
-                        // onClick={() => handlePageChange(pagingInfo.page + 1)}
-                        // disabled={pagingInfo.page >= pagingInfo.total_page}
-                        className="p-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
-                        <ChevronRight size={18} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => handlePageChange(pagingInfo.page - 1)}
+                            disabled={pagingInfo?.page === 1}
+                            className="p-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <ChevronLeft size={18} />
+                        </button>
+
+                        <span className="text-sm font-medium px-2">
+                            Page {pagingInfo.page} of {pagingInfo.total_page || 1}
+                        </span>
+
+                        <button
+                            onClick={() => handlePageChange(pagingInfo.page + 1)}
+                            disabled={pagingInfo.page >= pagingInfo.total_page}
+                            className="p-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <ChevronRight size={18} />
+                        </button>
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     )

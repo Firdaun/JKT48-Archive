@@ -12,6 +12,11 @@ export default function Admin() {
     const queryClient = useQueryClient()
     const [selectedMemberForPhotos, setSelectedMemberForPhotos] = useState(null)
 
+    const [photoQueryParams, setPhotoQueryParams] = useState({
+        page: 1,
+        size: 32,
+    })
+
     const [queryParams, setQueryParams] = useState({
         page: 1,
         size: 10,
@@ -27,23 +32,26 @@ export default function Admin() {
     })
 
     const photosQuery = useQuery({
-        queryKey: ['photos', selectedMemberForPhotos?.id],
-        queryFn: () => photoApi.getAllPhotos(
-            selectedMemberForPhotos ? { member_id: selectedMemberForPhotos.id } : {}
-        )
+        queryKey: ['photos', selectedMemberForPhotos?.id, photoQueryParams],
+        queryFn: () => photoApi.getAllPhotos({
+            ...photoQueryParams,
+            ...(selectedMemberForPhotos ? { member_id: selectedMemberForPhotos.id } : {})
+        })
     })
 
     const handleViewPhotos = (member) => {
         setSelectedMemberForPhotos(member)
+        setPhotoQueryParams(prev => ({ ...prev, page: 1 }))
         setActiveTab('photos')
+    }
+    
+    const handleClearPhotoFilter = () => {
+        setSelectedMemberForPhotos(null)
+        setPhotoQueryParams(prev => ({ ...prev, page: 1 }))
     }
 
     const handleBackToMembers = () => {
         setActiveTab('members')
-    }
-
-    const handleClearPhotoFilter = () => {
-        setSelectedMemberForPhotos(null)
     }
 
     useEffect(() => {
@@ -66,14 +74,14 @@ export default function Admin() {
     const memberPagingInfo = membersQuery.data?.paging || { total_page: 1, page: 1, total_item: 0 }
 
     const photos = photosQuery.data?.data || []
-    const photoTotal = photosQuery.data?.paging?.total_item || 0
+    const photoPagingInfo = photosQuery.data?.paging || { total_page: 1, page: 1, total_item: 0 }
 
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
                 return <DashboardStats
                     memberCount={memberPagingInfo.total_item}
-                    photoCount={photoTotal}
+                    photoCount={photoPagingInfo.total_item}
                 />
             case 'members':
                 return <MemberManager
@@ -88,6 +96,8 @@ export default function Admin() {
                 return <PhotoManager
                     photos={photos}
                     loading={photosQuery.isLoading}
+                    pagingInfo={photoPagingInfo}
+                    setQueryParams={setPhotoQueryParams}
                     selectedMember={selectedMemberForPhotos}
                     onClearFilter={handleClearPhotoFilter}
                     onMemberClick={handleBackToMembers}
