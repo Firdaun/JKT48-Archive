@@ -36,7 +36,9 @@ export default function Admin() {
         queryFn: () => photoApi.getAllPhotos({
             ...photoQueryParams,
             ...(selectedMemberForPhotos ? { member_id: selectedMemberForPhotos.id } : {})
-        })
+        }),
+        staleTime: 1000 * 60 * 15,
+        gcTime: 1000 * 60 * 30,
     })
 
     const handleViewPhotos = (member) => {
@@ -66,9 +68,27 @@ export default function Admin() {
                     staleTime: 15 * 60 * 1000
                 })
             }
-
         }
     }, [membersQuery.data, membersQuery.isError, membersQuery.isLoading, queryParams, queryClient])
+
+    useEffect(() => {
+        if (!photosQuery.isError && !photosQuery.isLoading && photosQuery.data?.paging) {
+            const currentPage = photosQuery.data.paging.page
+            const totalPage = photosQuery.data.paging.total_page
+            if (currentPage < totalPage) {
+                const nextPage = currentPage + 1
+                queryClient.prefetchQuery({
+                    queryKey: ['photos', selectedMemberForPhotos?.id, { ...photoQueryParams, page: nextPage }],
+                    queryFn: () => photoApi.getAllPhotos({
+                        ...photoQueryParams,
+                        page: nextPage,
+                        ...(selectedMemberForPhotos ? { member_id: selectedMemberForPhotos.id } : {})
+                    }),
+                    staleTime: 1000 * 60 * 15
+                })
+            }
+        }
+    }, [photosQuery.data, photosQuery.isError, photosQuery.isLoading, photoQueryParams, selectedMemberForPhotos, queryClient])
 
     const members = membersQuery.data?.data || []
     const memberPagingInfo = membersQuery.data?.paging || { total_page: 1, page: 1, total_item: 0 }
@@ -95,7 +115,7 @@ export default function Admin() {
             case 'photos':
                 return <PhotoManager
                     photos={photos}
-                    loading={photosQuery.isLoading}
+                    loading={photosQuery.isFetching}
                     pagingInfo={photoPagingInfo}
                     setQueryParams={setPhotoQueryParams}
                     selectedMember={selectedMemberForPhotos}

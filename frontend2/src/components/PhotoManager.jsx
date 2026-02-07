@@ -19,8 +19,13 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-            <div className="px-5 py-3 border-b border-slate-100 flex justify-between items-center">
+            <div className="px-5 relative py-3 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg">Scraped Photos</h3>
+                {loading && (
+                        <p className="text-xs top-10 absolute text-[#EE1D52] animate-pulse font-medium">
+                            Sedang memuat data...
+                        </p>
+                    )}
                 <div className={`flex items-center border rounded-lg overflow-hidden transition-all duration-300 ${selectedMember ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-300 border-dashed'}`}>
 
                     <button
@@ -61,12 +66,12 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
             </div>
             <div className="py-3 px-5 ">
                 {loading ? (
-                    <div className="flex h-full flex-col items-center justify-center text-slate-400 gap-2">
+                    <div className="flex h-192.75 flex-col items-center justify-center text-slate-400 gap-2">
                         <Loader2 className="animate-spin text-[#EE1D52]" size={32} />
                         <span className="text-sm font-medium">Memuat foto...</span>
                     </div>
                 ) : displayedPhotos.length === 0 ? (
-                    <div className="flex h-full items-center justify-center text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                    <div className="flex h-192.75 items-center justify-center text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
                         <div className="text-center">
                             <p className="font-medium">Belum ada foto yang discrape.</p>
                             <p className="text-xs mt-1">Jalankan bot scraper terlebih dahulu.</p>
