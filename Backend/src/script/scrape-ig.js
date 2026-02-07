@@ -4,8 +4,8 @@ import path from 'path'
 import fetch from 'node-fetch'
 import { prismaClient } from '../application/database.js'
 import { v4 as uuidv4 } from 'uuid'
-const TARGET_USERNAME = 'jkt48.fritzy.r'
-const MEMBER_NICKNAME = 'Fritzy'
+const TARGET_USERNAME = 'jkt48.lana.a'
+const MEMBER_NICKNAME = 'lana'
 const COOKIES_PATH = './cookies.json'
 const SAVE_BASE_DIR = './public/photos'
 
@@ -80,8 +80,8 @@ const scrapeInstagram = async () => {
             .filter((currentUrl, index, urlList) => urlList.indexOf(currentUrl) === index)
     })
 
-    if (postLinks.length >= 2) {
-        postLinks = postLinks.slice(1, 2)
+    if (postLinks.length >= 4) {
+        postLinks = postLinks.slice(2, 4)
     }
 
     console.log(`📦 Ditemukan ${postLinks.length} postingan terbaru.`)

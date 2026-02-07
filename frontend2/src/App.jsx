@@ -111,7 +111,7 @@ export default function Admin() {
                     </div>
                 </header>
 
-                <div className="px-8 pt-5 max-w-7xl mx-auto">
+                <div className="px-8 pt-3 max-w-425 mx-auto">
                     {renderContent()}
                 </div>
             </main>

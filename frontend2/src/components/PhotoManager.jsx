@@ -1,4 +1,4 @@
-import { Search, X, User, Filter, Loader2, Calendar } from 'lucide-react'
+import { Search, X, User, Filter, Loader2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
 export default function PhotoManager({ photos, selectedMember, onClearFilter, onMemberClick, loading }) {
@@ -6,8 +6,8 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
     const displayedPhotos = photos;
 
     return (
-        <div className="bg-white h-220.25 rounded-xl shadow-sm border border-slate-200">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+        <div className="bg-white h-auto rounded-xl shadow-sm border border-slate-200">
+            <div className="px-5 py-3 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg">Scraped Photos</h3>
                 <div className={`flex items-center border rounded-lg overflow-hidden transition-all duration-300 ${selectedMember ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-300 border-dashed'}`}>
 
@@ -47,7 +47,7 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                     <input type="text" placeholder="Search caption..." className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none" />
                 </div>
             </div>
-            <div className="p-6 flex-1 overflow-y-auto min-h-0">
+            <div className="py-3 px-5 ">
                 {loading ? (
                     <div className="flex h-full flex-col items-center justify-center text-slate-400 gap-2">
                         <Loader2 className="animate-spin text-[#EE1D52]" size={32} />
@@ -61,7 +61,7 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-8 gap-4">
                         {displayedPhotos.map((photo) => {
                             const fullImageUrl = `${API_URL}${photo.srcUrl}`
 
@@ -102,6 +102,34 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                         })}
                     </div>
                 )}
+                
+            <div className="p-3 pb-0 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <span className="text-sm text-slate-500">
+                    Total: <span className="font-semibold">
+                        {/* {pagingInfo.total_item} */}
+                        </span> members
+                </span>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        // onClick={() => handlePageChange(pagingInfo.page - 1)}
+                        // disabled={pagingInfo.page === 1}
+                        className="p-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
+                        <ChevronLeft size={18} />
+                    </button>
+
+                    <span className="text-sm font-medium px-2">
+                        {/* Page {pagingInfo.page} of {pagingInfo.total_page || 1} */}
+                    </span>
+
+                    <button
+                        // onClick={() => handlePageChange(pagingInfo.page + 1)}
+                        // disabled={pagingInfo.page >= pagingInfo.total_page}
+                        className="p-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
+                        <ChevronRight size={18} />
+                    </button>
+                </div>
+            </div>
             </div>
         </div>
     )
