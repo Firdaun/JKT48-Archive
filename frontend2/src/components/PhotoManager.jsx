@@ -1,14 +1,11 @@
 import { Search, X, User, Filter, Loader2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useState } from 'react';
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
-export default function PhotoManager({ photos, selectedMember, onClearFilter, onMemberClick, loading, pagingInfo, setQueryParams }) {
-
+export default function PhotoManager({ photos, selectedMember, queryParams, onClearFilter, onMemberClick, loading, pagingInfo, setQueryParams }) {
+    const [searchInput, setSearchInput] = useState(queryParams?.search || '')
     const displayedPhotos = photos;
-
-    const TARGET_SLOTS = 32; 
-
-    // 👇 2. HITUNG SISA SLOT KOSONG
-    // Misal: foto ada 5. Maka 32 - 5 = 27 slot kosong.
+    const TARGET_SLOTS = 32;
     const emptySlotsCount = Math.max(0, TARGET_SLOTS - displayedPhotos.length);
 
     const handlePageChange = (newPage) => {
@@ -16,6 +13,19 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
             setQueryParams(prev => ({ ...prev, page: newPage }))
         }
     }
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (searchInput !== queryParams.search) {
+                setQueryParams(prev => ({
+                    ...prev,
+                    search: searchInput,
+                    page: 1
+                }))
+            }
+        }, 500)
+        return () => clearTimeout(handler)
+    }, [searchInput, queryParams, setQueryParams])
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
@@ -53,15 +63,14 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                         <button
                             onClick={onClearFilter}
                             className="px-2 py-1.5 border-l border-blue-200 hover:bg-blue-100 text-blue-500 hover:text-blue-700 transition"
-                            title="Clear Filter"
-                        >
+                            title="Clear Filter">
                             <X size={14} />
                         </button>
                     )}
                 </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input type="text" placeholder="Search caption..." className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none" />
+                    <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search caption..." className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none" />
                 </div>
             </div>
             <div className="py-3 px-5 ">
@@ -118,12 +127,7 @@ export default function PhotoManager({ photos, selectedMember, onClearFilter, on
                             )
                         })}
                         {[...Array(emptySlotsCount)].map((_, index) => (
-                            <div 
-                                key={`empty-${index}`} 
-                                className="aspect-square rounded-lg"
-                            >
-                                {/* Kosongkan isinya, cuma butuh 'aspect-square' biar makan tempat */}
-                            </div>
+                            <div key={`empty-${index}`} className="aspect-square rounded-lg"></div>
                         ))}
                     </div>
                 )}

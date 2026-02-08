@@ -15,6 +15,7 @@ export default function Admin() {
     const [photoQueryParams, setPhotoQueryParams] = useState({
         page: 1,
         size: 32,
+        search: ''
     })
 
     const [queryParams, setQueryParams] = useState({
@@ -117,6 +118,7 @@ export default function Admin() {
                     photos={photos}
                     loading={photosQuery.isFetching}
                     pagingInfo={photoPagingInfo}
+                    queryParams={photoQueryParams}
                     setQueryParams={setPhotoQueryParams}
                     selectedMember={selectedMemberForPhotos}
                     onClearFilter={handleClearPhotoFilter}
