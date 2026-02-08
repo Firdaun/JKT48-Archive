@@ -97,7 +97,6 @@ export default function PhotoManager({ photos, selectedMember, queryParams, onCl
                                         src={fullImageUrl}
                                         alt={photo.caption || "Foto JKT48"}
                                         className="w-full h-full object-cover bg-slate-100"
-                                        loading="lazy"
                                         onError={(e) => {
                                             e.target.src = "https://placehold.co/400?text=Image+Error"
                                         }}

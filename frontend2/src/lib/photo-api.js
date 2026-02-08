@@ -10,11 +10,7 @@ const handleResponse = async (response) => {
 
 export const photoApi = {
     getAllPhotos: async (params = {}) => {
-        const cleanParams = {}
-
-        Object.keys(params).forEach(key => { params[key] && (cleanParams[key] = params[key]) })
-
-        const query = new URLSearchParams(cleanParams).toString()
+        const query = new URLSearchParams(params).toString()
         const response = await fetch(`${VITE_BASE_URL}/api/photos?${query}`)
         return handleResponse(response)
     },
