@@ -178,8 +178,8 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                                     <td className="p-4"><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold text-blue-600">Gen {member.generation}</span></td>
                                     <td className="p-4">{getStatusBadge(member.isActive)}</td>
                                     <td className="p-4 text-right space-x-2">
-                                        <button onClick={() => handleEditClick(member)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
-                                        <button onClick={() => handleDeleteClick(member.id, member.name)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
+                                        <button onClick={(e) => {e.stopPropagation(); handleEditClick(member)}} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
+                                        <button onClick={(e) => {e.stopPropagation(); handleDeleteClick(member.id, member.name)}} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
                                     </td>
                                 </tr>
                             ))

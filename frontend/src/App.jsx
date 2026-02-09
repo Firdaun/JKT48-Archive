@@ -1,68 +1,23 @@
+import { useQuery } from '@tanstack/react-query'
 import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useState } from 'react'
+import { photoApi } from './lib/photo-api'
+const API_URL = import.meta.env.VITE_BACKEND_URL
 export default function App() {
-    const photos = [
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/oline_manuel.png' },
-        { src: '/assets/christy1.jpg' },
-        { src: '/assets/christy2.jpg' },
-        { src: '/assets/christy3.jpg' },
-        { src: '/assets/christy4.jpg' },
-        { src: '/assets/christy1.jpg' },
-    ]
+
+    const [photoQueryParams, setPhotoQueryParams] = useState({
+        page: 1,
+        size: 32,
+        search: ''
+    })
+
+    const imgQuery = useQuery({
+        queryKey: ['public-photos'],
+        queryFn: () => photoApi.getPublicPhotos(photoQueryParams)
+    })
+
+    const photos = imgQuery.data?.data || []
+
     const photoProfile = [
         { src: '/kabesha/abigail_rachel.jpg' },
         { src: '/kabesha/adeline_wijaya.jpg' },
@@ -134,16 +89,17 @@ export default function App() {
         }
     }, [emblaApi])
 
+
     return (
         <>
             <div className="flex justify-center overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
                 <div className='h-full gap-10 flex'>
                     {photoProfile.map((itemsp, indexp) => (
-                        <div key={indexp} onClick={() => scrollToIndex(indexp)} 
-                        className={`w-15 h-15 md:w-17 md:h-17 lg:w-20 lg:h-20 overflow-hidden rounded-full ${indexp === selectedIndex
-                            ? 'ring-4 ring-[#EE1D52] scale-110 opacity-100 shadow-lg'
-                            : 'opacity-50 hover:opacity-100 scale-100'
-                        }`}>
+                        <div key={indexp} onClick={() => scrollToIndex(indexp)}
+                            className={`w-15 h-15 md:w-17 md:h-17 lg:w-20 lg:h-20 overflow-hidden rounded-full ${indexp === selectedIndex
+                                ? 'ring-4 ring-[#EE1D52] scale-110 opacity-100 shadow-lg'
+                                : 'opacity-50 hover:opacity-100 scale-100'
+                                }`}>
                             <img src={itemsp.src} alt="" />
                         </div>
                     ))}
@@ -162,9 +118,17 @@ export default function App() {
                 </div>
             </div>
             <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-10">
-                {photos.map((items, index) => (
-                    <div key={index} className="relative aspect-square group">
-                        <img className="w-full h-full object-cover" src={items.src} alt="" />
+                {imgQuery.isFetching ? (
+                    <div className="col-span-full py-10 text-center text-black">
+                        <p className="animate-pulse">Loading photos...</p>
+                    </div>
+                ) : photos.length === 0 ? (
+                    <div className="col-span-full py-10 text-center text-red-400">
+                        <p>Gagal memuat foto.</p>
+                    </div>
+                ) : photos.map((items) => (
+                    <div key={items.id} className="relative aspect-square group">
+                        <img className="w-full h-full object-cover" src={`${API_URL}${items.srcUrl}`} alt={items.caption || "Foto JKT48"} />
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40"></div>
                         <div className="absolute z-10 top-2 right-0 text-white opacity-0 cursor-pointer group-hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z"></path></svg></div>
                     </div>
