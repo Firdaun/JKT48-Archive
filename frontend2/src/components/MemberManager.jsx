@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react'
+import { Plus, Trash2, Edit, ChevronDown, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import FormModal from './FormModal'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { memberApi } from '../lib/member-api'
