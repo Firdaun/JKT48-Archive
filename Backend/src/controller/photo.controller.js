@@ -6,6 +6,7 @@ const get = async (req, res, next) => {
             page: req.query.page,
             size: req.query.size,
             member_id: req.query.member_id,
+            nickname: req.query.nickname,
             search: req.query.search,
             sort: req.query.sort
         }

@@ -4,15 +4,17 @@ import { useCallback, useState } from 'react'
 import { photoApi } from './lib/photo-api'
 const API_URL = import.meta.env.VITE_BACKEND_URL
 export default function App() {
+    const [selectedIndex, setSelectedIndex] = useState(0)
 
     const [photoQueryParams, setPhotoQueryParams] = useState({
         page: 1,
-        size: 32,
-        search: ''
+        size: 10,
+        search: '',
+        nickname: ''
     })
 
     const imgQuery = useQuery({
-        queryKey: ['public-photos'],
+        queryKey: ['public-photos', photoQueryParams],
         queryFn: () => photoApi.getPublicPhotos(photoQueryParams)
     })
 
@@ -88,13 +90,26 @@ export default function App() {
         }
     }, [emblaApi])
 
+    const handleMemberClick = (index, memberName) => {
+        scrollToIndex(index)
+        setPhotoQueryParams(prev => ({
+            ...prev,
+            search: '',
+            nickname: memberName,
+                page: 1
+        }))
+    }
+    console.log(photos);
+    
+
+
 
     return (
         <>
             <div className="flex justify-center overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
                 <div className='h-full gap-10 flex'>
                     {photoProfile.map((itemsp, indexp) => (
-                        <div key={indexp} onClick={() => scrollToIndex(indexp)}
+                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)}
                             className={`w-15 h-15 md:w-17 md:h-17 lg:w-20 lg:h-20 overflow-hidden rounded-full ${indexp === selectedIndex
                                 ? 'ring-4 ring-[#EE1D52] scale-110 opacity-100 shadow-lg'
                                 : 'opacity-50 hover:opacity-100 scale-100'
