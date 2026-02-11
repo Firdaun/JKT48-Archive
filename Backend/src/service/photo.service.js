@@ -16,7 +16,6 @@ const get = async (request) => {
     }
 
     if (data.nickname) {
-        console.log("✅ Logika Nickname JALAN! Memfilter:", data.nickname)
         filters.push({
             member: {
                 nickname: {

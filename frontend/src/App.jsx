@@ -8,9 +8,7 @@ export default function App() {
 
     const [photoQueryParams, setPhotoQueryParams] = useState({
         page: 1,
-        size: 10,
-        search: '',
-        nickname: ''
+        size: 40,
     })
 
     const imgQuery = useQuery({
@@ -94,15 +92,9 @@ export default function App() {
         scrollToIndex(index)
         setPhotoQueryParams(prev => ({
             ...prev,
-            search: '',
-            nickname: memberName,
-                page: 1
+            nickname: memberName ? memberName : '',
         }))
     }
-    console.log(photos);
-    
-
-
 
     return (
         <>
