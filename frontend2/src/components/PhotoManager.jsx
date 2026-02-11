@@ -16,16 +16,19 @@ export default function PhotoManager({ photos, selectedMember, queryParams, onCl
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (searchInput !== queryParams.search) {
-                setQueryParams(prev => ({
-                    ...prev,
-                    search: searchInput,
-                    page: 1
-                }))
-            }
+            setQueryParams(prev => {
+                if (prev.search !== searchInput) {
+                    return {
+                        ...prev,
+                        search: searchInput,
+                        page: 1
+                    }
+                }
+                return prev
+            })
         }, 500)
         return () => clearTimeout(handler)
-    }, [searchInput, queryParams, setQueryParams])
+    }, [searchInput, queryParams])
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">

@@ -14,7 +14,7 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
     const deleteMutation = useMutation({
         mutationFn: memberApi.deleteMember,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['members']})
+            queryClient.invalidateQueries({ queryKey: ['members'] })
             alert('Member berhasil dihapus.')
         },
         onError: (error) => alert(`Gagal menghapus: ${error.message}`)
@@ -32,10 +32,10 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
     }
 
     const handleEditClick = (member) => {
-        setSelectedMember(member) 
+        setSelectedMember(member)
         setIsModalOpen(true)
     }
-    
+
     const handleCloseModal = () => {
         setIsModalOpen(false)
         setSelectedMember(null)
@@ -54,17 +54,19 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (searchInput !== queryParams.search) {
-                setQueryParams(prev => ({...prev,
-                    search: searchInput,
-                    page: 1
-                }))
-            }
+            setQueryParams(prev => {
+                if (prev.search !== searchInput) {
+                    return {
+                        ...prev,
+                        search: searchInput,
+                        page: 1
+                    }
+                }
+                return prev
+            })
         }, 500)
-        return () => {
-            clearTimeout(handler)
-        }
-    }, [searchInput, setQueryParams, queryParams.search])
+        return () => clearTimeout(handler)
+    }, [searchInput, setQueryParams])
 
     const getSortLabel = () => {
         switch (queryParams.sort) {
@@ -178,8 +180,8 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                                     <td className="p-4"><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold text-blue-600">Gen {member.generation}</span></td>
                                     <td className="p-4">{getStatusBadge(member.isActive)}</td>
                                     <td className="p-4 text-right space-x-2">
-                                        <button onClick={(e) => {e.stopPropagation(); handleEditClick(member)}} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
-                                        <button onClick={(e) => {e.stopPropagation(); handleDeleteClick(member.id, member.name)}} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleEditClick(member) }} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(member.id, member.name) }} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button>
                                     </td>
                                 </tr>
                             ))
@@ -213,8 +215,8 @@ export default function MemberManager({ members, loading, queryParams, setQueryP
                     </button>
                 </div>
             </div>
-            <FormModal isOpen={isModalOpen} onClose={handleCloseModal} initialData={selectedMember}/>
-            
+            <FormModal isOpen={isModalOpen} onClose={handleCloseModal} initialData={selectedMember} />
+
         </div>
     )
 }
