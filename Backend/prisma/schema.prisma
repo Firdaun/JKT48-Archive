@@ -45,6 +45,8 @@ model Photo {
   postedAt DateTime
   savedAt  DateTime @default(now())
 
+  source    String   @default("instagram")
+
   memberId Int
   member   Member @relation(fields: [memberId], references: [id])
 }

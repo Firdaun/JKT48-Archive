@@ -21,7 +21,8 @@ const getPhotoValidation = Joi.object({
     member_id: Joi.number().optional(),
     nickname: Joi.string().optional().allow(''),
     search: Joi.string().optional().allow(''),
-    sort: Joi.string().optional().default('newest')
+    sort: Joi.string().optional().default('newest'),
+    source: Joi.string().optional().valid('instagram', 'tiktok','twitter')
 })
 
 export const apiValidation = {

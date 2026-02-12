@@ -8,7 +8,8 @@ const get = async (req, res, next) => {
             member_id: req.query.member_id,
             nickname: req.query.nickname,
             search: req.query.search,
-            sort: req.query.sort
+            sort: req.query.sort,
+            source: req.query.source
         }
 
         const result = await photoService.get(request)

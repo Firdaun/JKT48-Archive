@@ -19,7 +19,7 @@ const get = async (request) => {
         filters.push({
             member: {
                 nickname: {
-                    equals: data.nickname, 
+                    equals: data.nickname,
                     mode: 'insensitive'
                 }
             }
@@ -34,6 +34,11 @@ const get = async (request) => {
             }
         })
     }
+    if (data.source) {
+        filters.push({
+            source: data.source
+        })
+    }
 
     const whereClause = filters.length > 0 ? { AND: filters } : {}
 
@@ -41,7 +46,7 @@ const get = async (request) => {
     switch (data.sort) {
         case 'oldest':
             orderBy = [
-                { postedAt: 'asc'},
+                { postedAt: 'asc' },
                 { fileId: 'asc' }
             ]
             break;
