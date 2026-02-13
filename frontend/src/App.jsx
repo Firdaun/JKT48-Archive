@@ -103,7 +103,7 @@ export default function App() {
     ]
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
-        loop: false,
+        loop: true,
         align: 'center',
         containScroll: false,
         dragFree: true
@@ -146,16 +146,13 @@ export default function App() {
 
     return (
         <>
-            <div className="flex justify-center overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
-                <div className='gap-10 h-25 flex'>
+            <div className="overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
+                <div className='h-25 flex'>
                     {photoProfile.map((itemsp, indexp) => (
-                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)}
-                            className={`w-15 h-15 md:w-17 md:h-17 lg:w-20 lg:h-20 rounded-full ${indexp === selectedIndex
-                                ? 'ring-4 ring-[#EE1D52] scale-110 opacity-100 shadow-lg'
-                                : 'opacity-50 hover:opacity-100 scale-100'
-                                }`}>
-                            <div className='w-full h-full rounded-full overflow-hidden'>
-                                <img src={itemsp.src} alt={itemsp.name} />
+                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)} className={`${indexp === selectedIndex ? 'ring-4 ring-[#EE1D52] scale-110 opacity-100 shadow-lg' : 'opacity-50 hover:opacity-100 scale-100'}
+                        h-20 rounded-full ml-4 shrink-0`}>
+                            <div className='w-20 h-full rounded-full overflow-hidden'>
+                                <img src={itemsp.src} alt={itemsp.name}/>
                             </div>
                             <p className='text-xs mt-1 flex items-center justify-center text-white font-bold'>{itemsp.name}</p>
                         </div>
