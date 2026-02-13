@@ -149,8 +149,8 @@ export default function App() {
             <div className="overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
                 <div className='h-25 flex'>
                     {photoProfile.map((itemsp, indexp) => (
-                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)} className={`${indexp === selectedIndex ? 'ring-4 ring-[#EE1D52] scale-110 opacity-100 shadow-lg' : 'opacity-50 hover:opacity-100 scale-100'}
-                        h-20 rounded-full ml-4 shrink-0`}>
+                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)} className={`${indexp === selectedIndex ? 'ring-4 ring-[#EE1D52] opacity-100 shadow-lg' : 'opacity-50 hover:opacity-100'}
+                        h-20 rounded-full ml-4`}>
                             <div className='w-20 h-full rounded-full overflow-hidden'>
                                 <img src={itemsp.src} alt={itemsp.name}/>
                             </div>
