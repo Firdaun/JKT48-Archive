@@ -5,65 +5,65 @@ import { photoApi } from './lib/photo-api'
 import { useSearchParams } from 'react-router'
 const API_URL = import.meta.env.VITE_BACKEND_URL
 const photoProfile = [
-        { src: '/kabesha/abigail_rachel.jpg', name: 'aralie' },
-        { src: '/kabesha/adeline_wijaya.jpg', name: 'delynn' },
-        { src: '/kabesha/alya_amanda.jpg', name: 'alya' },
-        { src: '/kabesha/amanda_sukma.jpg', name: 'amanda' },
-        { src: '/kabesha/angelina_christy.jpg', name: 'christy' },
-        { src: '/kabesha/anindya_ramadhani.jpg', name: 'anin' },
-        { src: '/kabesha/astrella_virgiananda.jpg', name: 'virgi' },
-        { src: '/kabesha/aulia_riza.jpg', name: 'auwia' },
-        { src: '/kabesha/aurellia.jpg', name: 'lia' },
-        { src: '/kabesha/aurhel_alana.jpg', name: 'lana' },
-        { src: '/kabesha/bong_aprilli.jpg', name: 'rily' },
-        { src: '/kabesha/catherina_vallencia.jpg', name: 'erine' },
-        { src: '/kabesha/cathleen_nixie.jpg', name: 'cathy' },
-        { src: '/kabesha/celline_thefani.jpg', name: 'elin' },
-        { src: '/kabesha/chelsea_davina.jpg', name: 'chelsea' },
-        { src: '/kabesha/cornelia_vanisa.jpg', name: 'oniel' },
-        { src: '/kabesha/cynthia_yaputera.jpg', name: 'cynthia' },
-        { src: '/kabesha/dena_natalia.jpg', name: 'dena' },
-        { src: '/kabesha/desy_natalia.jpg', name: 'desy' },
-        { src: '/kabesha/febriola_sinambela.jpg', name: 'olla' },
-        { src: '/kabesha/feni_fitriyanti.jpg', name: 'feni' },
-        { src: '/kabesha/fiony_alveria.jpg', name: 'fiony' },
-        { src: '/kabesha/freya_jayawardana.jpg', name: 'freya' },
-        { src: '/kabesha/fritzy_rosmerian.jpg', name: 'fritzy' },
-        { src: '/kabesha/gabriela_abigail.jpg', name: 'ella' },
-        { src: '/kabesha/gendis_mayrannisa.jpg', name: 'gendis' },
-        { src: '/kabesha/gita_sekar_andarini.jpg', name: 'gita' },
-        { src: '/kabesha/grace_octaviani.jpg', name: 'gracie' },
-        { src: '/kabesha/greesella_adhalia.jpg', name: 'greesel' },
-        { src: '/kabesha/hagia_sopia.jpg', name: 'gia' },
-        { src: '/kabesha/helisma_putri.jpg', name: 'eli' },
-        { src: '/kabesha/hillary_abigail.jpg', name: 'lily' },
-        { src: '/kabesha/humaira_ramadhani.jpg', name: 'maira' },
-        { src: '/kabesha/indah_cahya.jpg', name: 'indah' },
-        { src: '/kabesha/jacqueline_immanuela.jpg', name: 'ekin' },
-        { src: '/kabesha/jazzlyn_trisha.jpg', name: 'trisha' },
-        { src: '/kabesha/jemima_evodie.jpg', name: 'jemima' },
-        { src: '/kabesha/jessica_chandra.jpg', name: 'jessi' },
-        { src: '/kabesha/jesslyn_elly.jpg', name: 'lyn' },
-        { src: '/kabesha/kathrina_irene.jpg', name: 'katrin' },
-        { src: '/kabesha/lulu_salsabila.jpg', name: 'lulu' },
-        { src: '/kabesha/marsha_lenathea.jpg', name: 'marsha' },
-        { src: '/kabesha/michelle_alexandra.jpg', name: 'michie' },
-        { src: '/kabesha/michelle_levia.jpg', name: 'levi' },
-        { src: '/kabesha/mikaela_kusjanto.jpg', name: 'mikaela' },
-        { src: '/kabesha/mutiara_azzahra.jpg', name: 'muthe' },
-        { src: '/kabesha/nayla_suji.jpg', name: 'nayla' },
-        { src: '/kabesha/nina_tutachia.jpg', name: 'nachia' },
-        { src: '/kabesha/nur_intan.jpg', name: 'intah' },
-        { src: '/kabesha/oline_manuel.jpg', name: 'oline' },
-        { src: '/kabesha/raisha_syifa.jpg', name: 'raisha' },
-        { src: '/kabesha/ribka_budiman.jpg', name: 'ribka' },
-        { src: '/kabesha/shabilqis_naila.jpg', name: 'nala' },
-        { src: '/kabesha/victoria_kimberly.jpg', name: 'kimmy' }
-    ]
+    { src: '/kabesha/abigail_rachel.jpg', name: 'aralie' },
+    { src: '/kabesha/adeline_wijaya.jpg', name: 'delynn' },
+    { src: '/kabesha/alya_amanda.jpg', name: 'alya' },
+    { src: '/kabesha/amanda_sukma.jpg', name: 'amanda' },
+    { src: '/kabesha/angelina_christy.jpg', name: 'christy' },
+    { src: '/kabesha/anindya_ramadhani.jpg', name: 'anin' },
+    { src: '/kabesha/astrella_virgiananda.jpg', name: 'virgi' },
+    { src: '/kabesha/aulia_riza.jpg', name: 'auwia' },
+    { src: '/kabesha/aurellia.jpg', name: 'lia' },
+    { src: '/kabesha/aurhel_alana.jpg', name: 'lana' },
+    { src: '/kabesha/bong_aprilli.jpg', name: 'rily' },
+    { src: '/kabesha/catherina_vallencia.jpg', name: 'erine' },
+    { src: '/kabesha/cathleen_nixie.jpg', name: 'cathy' },
+    { src: '/kabesha/celline_thefani.jpg', name: 'elin' },
+    { src: '/kabesha/chelsea_davina.jpg', name: 'chelsea' },
+    { src: '/kabesha/cornelia_vanisa.jpg', name: 'oniel' },
+    { src: '/kabesha/cynthia_yaputera.jpg', name: 'cynthia' },
+    { src: '/kabesha/dena_natalia.jpg', name: 'dena' },
+    { src: '/kabesha/desy_natalia.jpg', name: 'desy' },
+    { src: '/kabesha/febriola_sinambela.jpg', name: 'olla' },
+    { src: '/kabesha/feni_fitriyanti.jpg', name: 'feni' },
+    { src: '/kabesha/fiony_alveria.jpg', name: 'fiony' },
+    { src: '/kabesha/freya_jayawardana.jpg', name: 'freya' },
+    { src: '/kabesha/fritzy_rosmerian.jpg', name: 'fritzy' },
+    { src: '/kabesha/gabriela_abigail.jpg', name: 'ella' },
+    { src: '/kabesha/gendis_mayrannisa.jpg', name: 'gendis' },
+    { src: '/kabesha/gita_sekar_andarini.jpg', name: 'gita' },
+    { src: '/kabesha/grace_octaviani.jpg', name: 'gracie' },
+    { src: '/kabesha/greesella_adhalia.jpg', name: 'greesel' },
+    { src: '/kabesha/hagia_sopia.jpg', name: 'gia' },
+    { src: '/kabesha/helisma_putri.jpg', name: 'eli' },
+    { src: '/kabesha/hillary_abigail.jpg', name: 'lily' },
+    { src: '/kabesha/humaira_ramadhani.jpg', name: 'maira' },
+    { src: '/kabesha/indah_cahya.jpg', name: 'indah' },
+    { src: '/kabesha/jacqueline_immanuela.jpg', name: 'ekin' },
+    { src: '/kabesha/jazzlyn_trisha.jpg', name: 'trisha' },
+    { src: '/kabesha/jemima_evodie.jpg', name: 'jemima' },
+    { src: '/kabesha/jessica_chandra.jpg', name: 'jessi' },
+    { src: '/kabesha/jesslyn_elly.jpg', name: 'lyn' },
+    { src: '/kabesha/kathrina_irene.jpg', name: 'katrin' },
+    { src: '/kabesha/lulu_salsabila.jpg', name: 'lulu' },
+    { src: '/kabesha/marsha_lenathea.jpg', name: 'marsha' },
+    { src: '/kabesha/michelle_alexandra.jpg', name: 'michie' },
+    { src: '/kabesha/michelle_levia.jpg', name: 'levi' },
+    { src: '/kabesha/mikaela_kusjanto.jpg', name: 'mikaela' },
+    { src: '/kabesha/mutiara_azzahra.jpg', name: 'muthe' },
+    { src: '/kabesha/nayla_suji.jpg', name: 'nayla' },
+    { src: '/kabesha/nina_tutachia.jpg', name: 'nachia' },
+    { src: '/kabesha/nur_intan.jpg', name: 'intah' },
+    { src: '/kabesha/oline_manuel.jpg', name: 'oline' },
+    { src: '/kabesha/raisha_syifa.jpg', name: 'raisha' },
+    { src: '/kabesha/ribka_budiman.jpg', name: 'ribka' },
+    { src: '/kabesha/shabilqis_naila.jpg', name: 'nala' },
+    { src: '/kabesha/victoria_kimberly.jpg', name: 'kimmy' }
+]
 export default function App() {
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const source = searchParams.get('source') || 'instagram'
+    const source = searchParams.get('source') || ''
     const nickname = searchParams.get('nickname') || ''
     const page = parseInt(searchParams.get('page') || '1')
 
@@ -135,6 +135,12 @@ export default function App() {
         setSearchParams(prev => createNicknameParams(prev, memberName))
     }
 
+    const handleClear = () => {
+        setSearchInput('')
+        setSelectedIndex(-1)
+        setSearchParams({})
+    }
+
     useEffect(() => {
         const handler = setTimeout(() => {
             const foundIndex = photoProfile.findIndex(member => member.name.toLocaleLowerCase() === searchInput.toLowerCase().trim())
@@ -145,14 +151,14 @@ export default function App() {
     }, [searchInput, scrollToIndex, setSearchParams])
 
     return (
-        <>
+        <div className='h-screen'>
             <div className="overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
                 <div className='h-25 flex'>
                     {photoProfile.map((itemsp, indexp) => (
                         <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)} className={`${indexp === selectedIndex ? 'ring-4 ring-[#EE1D52] opacity-100 shadow-lg' : 'opacity-50 hover:opacity-100'}
                         h-20 rounded-full ml-4`}>
                             <div className='w-20 h-full rounded-full overflow-hidden'>
-                                <img src={itemsp.src} alt={itemsp.name}/>
+                                <img src={itemsp.src} alt={itemsp.name} />
                             </div>
                             <p className='text-xs mt-1 flex items-center justify-center text-white font-bold'>{itemsp.name}</p>
                         </div>
@@ -165,15 +171,32 @@ export default function App() {
                 </div>
                 <div className='flex items-center w-full justify-evenly'>
                     {platforms.map((platform) => (
-                        <div key={platform.id} onClick={() => setSearchParams(prev => { const newParams = new URLSearchParams(prev); newParams.set('source', platform.id); newParams.set("page", 1); return newParams })}>
+                        <div key={platform.id}
+                            onClick={() => setSearchParams(prev => {
+                                const newParams = new URLSearchParams(prev);
+
+                                if (newParams.get('source') === platform.id) {
+                                    newParams.delete('source')
+                                } else {
+                                    newParams.set('source', platform.id)
+                                }
+
+                                newParams.set("page", 1)
+                                return newParams
+                            })}>
                             <div>{platform.icon}</div>
                             <div className={`h-1 w-full rounded-full transition-all duration-300 ${photoQueryParams.source === platform.id ? 'bg-gray-800 scale-100' : 'bg-transparent scale-0'}`}></div>
                         </div>
                     ))}
                 </div>
-                <div className='p-3 pl-0 flex justify-end items-end'>
+                <div className='p-3 pl-0 flex relative justify-end items-end'>
+                    {(source || nickname) && (
+                        <div onClick={handleClear} className='absolute flex -left-25 hover:bg-slate-200 cursor-pointer border-slate-300 text-slate-700 items-center h-10 mr-5 border w-20 rounded-lg justify-center'>
+                            <h1>clear</h1>
+                        </div>
+                    )}
                     <div className='border gap-3 h-10 flex rounded-lg items-center overflow-hidden border-slate-300'>
-                        <div className='h-full hover:bg-slate-200 flex items-center px-2 hover:cursor-pointer'>
+                        <div className='h-full flex items-center px-2'>
                             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="oklch(70.4% 0.04 256.788)" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
                         </div>
                         <input
@@ -203,6 +226,6 @@ export default function App() {
                     </div>
                 ))}
             </div>
-        </>
+        </div>
     )
 }
