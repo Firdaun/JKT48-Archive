@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import useEmblaCarousel from 'embla-carousel-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { photoApi } from './lib/photo-api'
 import { useSearchParams } from 'react-router'
 const API_URL = import.meta.env.VITE_BACKEND_URL
@@ -86,6 +86,7 @@ export default function App() {
 
     const [searchInput, setSearchInput] = useState(nickname)
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const inputRef = useRef(null)
 
     const photoQueryParams = {
         page: page,
@@ -96,7 +97,9 @@ export default function App() {
 
     const imgQuery = useQuery({
         queryKey: ['public-photos', photoQueryParams],
-        queryFn: () => photoApi.getPublicPhotos(photoQueryParams)
+        queryFn: () => photoApi.getPublicPhotos(photoQueryParams),
+        staleTime: 1000 * 60 * 15,
+        gcTime: 1000 * 60 * 30,
     })
 
     const photos = imgQuery.data?.data || []
@@ -151,6 +154,9 @@ export default function App() {
         setSearchInput('')
         setSelectedIndex(-1)
         setSearchParams({})
+        if (inputRef.current) {
+            inputRef.current.value = ''
+        }
     }
 
     useEffect(() => {
@@ -213,8 +219,8 @@ export default function App() {
                         </div>
                         <input
                             type="text"
+                            ref={inputRef}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            value={searchInput}
                             placeholder='search member...'
                             className='w-40 h-10 rounded-lg placeholder:text-slate-400 text-sm focus:outline-none'
                         />
