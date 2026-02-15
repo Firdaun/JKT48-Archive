@@ -87,6 +87,8 @@ export default function App() {
     const [searchInput, setSearchInput] = useState(nickname)
     const [selectedIndex, setSelectedIndex] = useState(0)
     const inputRef = useRef(null)
+    const [selectedImage, setSelectedImage] = useState(null)
+    const [isImageLoaded, setIsImageLoaded] = useState(false)
 
     const photoQueryParams = {
         page: page,
@@ -161,7 +163,7 @@ export default function App() {
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            const foundIndex = photoProfile.findIndex(member => member.name.toLocaleLowerCase() === searchInput.toLowerCase().trim())
+            const foundIndex = photoProfile.findIndex(member => member.name.toLowerCase() === searchInput.toLowerCase().trim())
             foundIndex !== -1 && scrollToIndex(foundIndex)
             setSearchParams(prev => (prev.get('nickname') || '') !== searchInput ? createNicknameParams(prev, searchInput) : prev, { replace: true })
         }, 500)
@@ -173,8 +175,7 @@ export default function App() {
             <div className="overflow-hidden bg-gray-800 p-3 select-none" ref={emblaRef}>
                 <div className='h-25 flex'>
                     {photoProfile.map((itemsp, indexp) => (
-                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)} className={`${indexp === selectedIndex ? 'ring-4 ring-[#EE1D52] opacity-100 shadow-lg' : 'opacity-50 hover:opacity-100'}
-                        h-20 rounded-full ml-4`}>
+                        <div key={indexp} onClick={() => handleMemberClick(indexp, itemsp.name)} className={`${indexp === selectedIndex ? 'ring-4 ring-[#EE1D52] opacity-100 shadow-lg' : 'opacity-50 hover:opacity-100'} h-20 rounded-full ml-4`}>
                             <div className='w-20 h-full rounded-full overflow-hidden'>
                                 <img src={itemsp.src} alt={itemsp.name} />
                             </div>
@@ -238,10 +239,10 @@ export default function App() {
                             <p>tidak ada foto.</p>
                         </div>
                     ) : photos.map((items) => (
-                        <div key={items.id} className="relative aspect-square group">
+                        <div key={items.id} onClick={() => setSelectedImage(items)} className="relative aspect-square group cursor-zoom-in">
                             <img className="w-full h-full object-cover" src={`${API_URL}${items.srcUrl}`} alt={items.caption || "Foto JKT48"} />
                             <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40"></div>
-                            <div className="absolute z-10 top-2 right-0 text-white opacity-0 cursor-pointer group-hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z"></path></svg></div>
+                            <div className="absolute z-10 top-0 right-0 rounded-bl-md hover:bg-black/50 text-white opacity-0 cursor-pointer group-hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z"></path></svg></div>
                         </div>
                     ))}
                 </div>
@@ -273,6 +274,30 @@ export default function App() {
                     </button>
                 </div>
             </div>
+            {selectedImage && (
+                <div onClick={() => setSelectedImage(null)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 animate-in fade-in duration-200">
+                    <div onClick={(e) => e.stopPropagation()} className="relative max-w-5xl w-full max-h-screen flex flex-col items-center justify-center">
+                        <button onClick={() => setSelectedImage(null)} className="absolute -top-12 cursor-pointer right-0 md:top-0 md:-right-12 text-white/70 hover:text-white transition bg-black/50 rounded-full p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+                        </button>
+
+                        <img
+                            src={`${API_URL}${selectedImage.srcUrl}`}
+                            alt="Full Preview"
+                            onLoad={() => setIsImageLoaded(true)}
+                            className={`max-h-[80vh] w-auto object-contain rounded-md shadow-2xl`}
+                        />
+
+                        {isImageLoaded && selectedImage.caption && (
+                            <div className="mt-4 text-center w-full px-4">
+                                <p className="text-white text-sm md:text-base font-medium px-6 py-3 rounded-2xl inline-block max-h-[15vh] max-w-2xl overflow-y-auto">
+                                    {selectedImage.caption}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
