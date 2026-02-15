@@ -89,6 +89,7 @@ export default function App() {
     const inputRef = useRef(null)
     const [selectedImage, setSelectedImage] = useState(null)
     const [isImageLoaded, setIsImageLoaded] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
 
     const photoQueryParams = {
         page: page,
@@ -185,8 +186,19 @@ export default function App() {
                 </div>
             </div>
             <div className="flex justify-between">
-                <div className='flex w-56.75 items-center pl-3'>
+                <div className='flex gap-5 items-center pl-3'>
                     <h1 className='whitespace-nowrap'>selected: {photoQueryParams.nickname}</h1>
+                    <div className='flex items-center gap-2'>
+                        <h1 className='whitespace-nowrap'>sort by: </h1>
+                        <div onClick={() => setIsOpen(!isOpen)} className='bg-gray-300 cursor-pointer select-none w-25 p-2 items-center flex justify-center rounded-md'>
+                            <p>postingan</p>
+                            <svg
+                                className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
                 <div className='flex items-center w-full justify-evenly'>
                     {platforms.map((platform) => (
