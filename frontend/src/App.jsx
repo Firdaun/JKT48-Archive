@@ -89,13 +89,17 @@ export default function App() {
     const inputRef = useRef(null)
     const [selectedImage, setSelectedImage] = useState(null)
     const [isImageLoaded, setIsImageLoaded] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
+    const [viewMode, setViewMode] = useState('photo')
+    const [selectedPostUrl, setSelectedPostUrl] = useState(null)
+    const currentMode = selectedPostUrl ? 'photo' : viewMode
 
     const photoQueryParams = {
         page: page,
-        size: 40,
+        size: currentMode === 'album' ? 4 : 40,
         source: source,
-        nickname: nickname
+        nickname: nickname,
+        mode: currentMode,
+        post_url: selectedPostUrl || ''
     }
 
     const imgQuery = useQuery({
@@ -157,6 +161,7 @@ export default function App() {
         setSearchInput('')
         setSelectedIndex(-1)
         setSearchParams({})
+        setSelectedPostUrl(null)
         if (inputRef.current) {
             inputRef.current.value = ''
         }
@@ -189,11 +194,19 @@ export default function App() {
                 <div className='flex gap-5 items-center pl-3'>
                     <h1 className='whitespace-nowrap'>selected: {photoQueryParams.nickname}</h1>
                     <div className='flex items-center gap-2'>
-                        <h1 className='whitespace-nowrap'>sort by: </h1>
-                        <div onClick={() => setIsOpen(!isOpen)} className='bg-gray-300 cursor-pointer select-none w-25 p-2 items-center flex justify-center rounded-md'>
-                            <p>postingan</p>
+                        <h1 className='whitespace-nowrap'>tampilan: </h1>
+                        <div
+                            onClick={() => {
+                                const newMode = viewMode === 'photo' ? 'album' : 'photo'
+                                setViewMode(newMode)
+                                setSelectedPostUrl(null)
+                                setSearchParams(prev => { const n = new URLSearchParams(prev); n.set('page', 1); return n })
+                            }}
+
+                            className='bg-gray-300 cursor-pointer select-none w-25 p-2 items-center flex justify-center rounded-md'>
+                            <span className="text-sm font-bold">{viewMode === 'album' ? '📚 Album' : '🖼️ Foto'}</span>
                             <svg
-                                className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                className={`w-4 h-4 transition-transform ${viewMode === 'album' ? 'rotate-180' : ''}`}
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -241,29 +254,88 @@ export default function App() {
                 </div>
             </div>
             <div className='flex-1 overflow-y-auto'>
-                <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-10">
-                    {imgQuery.isFetching ? (
-                        <div className="col-span-full py-10 text-center text-black">
-                            <p className="animate-pulse">Loading photos...</p>
-                        </div>
-                    ) : photos.length === 0 ? (
-                        <div className="col-span-full py-10 text-center">
-                            <p>tidak ada foto.</p>
-                        </div>
-                    ) : photos.map((items) => (
-                        <div key={items.id} onClick={() => setSelectedImage(items)} className="relative aspect-square group cursor-zoom-in">
-                            <img className="w-full h-full object-cover" src={`${API_URL}${items.srcUrl}`} alt={items.caption || "Foto JKT48"} />
-                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40"></div>
-                            <div className="absolute z-10 top-0 right-0 rounded-bl-md hover:bg-black/50 text-white opacity-0 cursor-pointer group-hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z"></path></svg></div>
-                        </div>
-                    ))}
-                </div>
+                {imgQuery.isFetching ? (
+                    <div className="col-span-full py-10 text-center text-black">
+                        <p className="animate-pulse">Loading data...</p>
+                    </div>
+                ) : currentMode === 'album' ? (
+                    // 👇 5. TAMPILAN MODE ALBUM (Tumpukan Folder)
+                    <div className="grid grid-cols-1 p-15 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {photos.map((item) => (
+                            <div
+                                key={item.id}
+                                onClick={() => {
+                                    setSelectedPostUrl(item.postUrl) // Masuk ke detail postingan
+                                    setSearchParams(prev => { const n = new URLSearchParams(prev); n.set('page', 1); return n })
+                                }}
+                                className="group cursor-pointer relative p-2"
+                            >
+                                {/* Efek Tumpukan Belakang */}
+                                <div className="absolute top-0 right-0 left-4 bottom-4 bg-gray-300 rounded-lg transform rotate-6 transition-transform group-hover:rotate-12 border border-gray-400 shadow-sm"></div>
+                                <div className="absolute top-2 right-2 left-2 bottom-2 bg-gray-200 rounded-lg transform rotate-3 transition-transform group-hover:rotate-6 border border-gray-300 shadow-sm"></div>
+
+                                {/* Foto Utama (Cover Album) */}
+                                <div className="relative aspect-square bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 z-10">
+                                    <img src={`${API_URL}${item.srcUrl}`} alt="cover" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+
+                                    {/* Icon Folder di pojok kanan */}
+                                    <div className="absolute top-2 right-2 bg-black/60 p-1.5 rounded-lg text-white backdrop-blur-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M216,72H130.67L102.93,44.26A16.16,16.16,0,0,0,91.62,39.58L40,40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm0,128H40V56l51.62-.42L120,84.69V88H216Zm-56-80a8,8,0,0,1,8,8v16h16a8,8,0,0,1,0,16H168v16a8,8,0,0,1-16,0V144H136a8,8,0,0,1,0-16h16V128A8,8,0,0,1,160,120Z"></path></svg>
+                                    </div>
+                                </div>
+
+                                {/* Caption Singkat */}
+                                <div className="mt-3 px-1 relative z-20">
+                                    <p className="font-bold text-gray-800 text-sm line-clamp-1">
+                                        {new Date(item.postedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </p>
+                                    <p className="text-gray-500 text-xs line-clamp-2 mt-1">
+                                        {item.caption || "Tanpa Caption"}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    // 👇 6. TAMPILAN MODE FOTO BIASA (Grid)
+                    <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-10 gap-1">
+                        {/* Tombol Back (Muncul kalau lagi liat isi postingan) */}
+                        {selectedPostUrl && (
+                            <div
+                                onClick={() => {
+                                    setSelectedPostUrl(null) // Keluar dari detail album
+                                    setSearchParams(prev => { const n = new URLSearchParams(prev); n.set('page', 1); return n })
+                                }}
+                                className="col-span-1 aspect-square bg-slate-200 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-300 transition text-slate-600 rounded-lg border border-slate-300"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path></svg>
+                                <span className="text-xs font-bold mt-2">KEMBALI</span>
+                            </div>
+                        )}
+
+                        {/* Mapping Foto Biasa */}
+                        {photos.map((items) => (
+                            <div key={items.id} onClick={() => setSelectedImage(items)} className="relative aspect-square group cursor-zoom-in">
+                                <img className="w-full h-full object-cover" src={`${API_URL}${items.srcUrl}`} alt={items.caption || "Foto JKT48"} />
+                                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40"></div>
+                                <div className="absolute z-10 top-0 right-0 rounded-bl-md hover:bg-black/50 text-white opacity-0 cursor-pointer group-hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z"></path></svg></div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* State Kosong */}
+                {!imgQuery.isFetching && photos.length === 0 && (
+                    <div className="py-20 text-center text-gray-500">
+                        <p>Tidak ada foto ditemukan.</p>
+                    </div>
+                )}
             </div>
             <div className="p-1 flex items-center justify-between">
                 <span className="text-sm text-slate-500">
                     Total: <span className="font-semibold">
                         {paging?.total_item || 0}
-                    </span> photos
+                    </span> {currentMode === 'album' ? 'albums' : 'photos'}
                 </span>
 
                 <div className="flex items-center gap-2">

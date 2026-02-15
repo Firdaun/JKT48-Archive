@@ -9,7 +9,9 @@ const get = async (req, res, next) => {
             nickname: req.query.nickname,
             search: req.query.search,
             sort: req.query.sort,
-            source: req.query.source
+            source: req.query.source,
+            mode: req.query.mode,
+            post_url: req.query.post_url
         }
 
         const result = await photoService.get(request)

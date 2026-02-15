@@ -40,6 +40,12 @@ const get = async (request) => {
         })
     }
 
+    if (data.post_url) {
+        filters.push({
+            postUrl: data.post_url
+        })
+    }
+
     const whereClause = filters.length > 0 ? { AND: filters } : {}
 
     let orderBy = []
@@ -59,25 +65,51 @@ const get = async (request) => {
             break;
     }
 
-    const photos = await prismaClient.photo.findMany({
-        where: whereClause,
-        take: data.size,
-        skip: skip,
-        orderBy: orderBy,
-        include: {
-            member: {
-                select: {
-                    id: true,
-                    name: true,
-                    nickname: true
+    let photos = []
+    let totalItems = 0
+
+    if (data.mode === 'album') {
+        photos = await prismaClient.photo.findMany({
+            where: whereClause,
+            take: data.size,
+            skip: skip,
+            orderBy: orderBy,
+            distinct: ['postUrl'],
+            include: {
+                member: {
+                    select: {
+                        id: true,
+                        name: true,
+                        nickname: true
+                    }
                 }
             }
-        }
-    })
-
-    const totalItems = await prismaClient.photo.count({
-        where: whereClause
-    })
+        })
+        const groupCount = await prismaClient.photo.groupBy({
+            by: ['postUrl'],
+            where: whereClause,
+        })
+        totalItems = groupCount.length
+    } else {
+        photos = await prismaClient.photo.findMany({
+            where: whereClause,
+            take: data.size,
+            skip: skip,
+            orderBy: orderBy,
+            include: {
+                member: {
+                    select: {
+                        id: true,
+                        name: true,
+                        nickname: true
+                    }
+                }
+            }
+        })
+        totalItems = await prismaClient.photo.count({
+            where: whereClause
+        })
+    }
 
     return {
         data: photos,
