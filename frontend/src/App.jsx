@@ -44,7 +44,7 @@ const photoProfile = [
     { src: '/kabesha/jemima_evodie.jpg', name: 'jemima' },
     { src: '/kabesha/jessica_chandra.jpg', name: 'jessi' },
     { src: '/kabesha/jesslyn_elly.jpg', name: 'lyn' },
-    { src: '/kabesha/kathrina_irene.jpg', name: 'katrin' },
+    { src: '/kabesha/kathrina_irene.jpg', name: 'katrina' },
     { src: '/kabesha/lulu_salsabila.jpg', name: 'lulu' },
     { src: '/kabesha/marsha_lenathea.jpg', name: 'marsha' },
     { src: '/kabesha/michelle_alexandra.jpg', name: 'michie' },
@@ -53,7 +53,7 @@ const photoProfile = [
     { src: '/kabesha/mutiara_azzahra.jpg', name: 'muthe' },
     { src: '/kabesha/nayla_suji.jpg', name: 'nayla' },
     { src: '/kabesha/nina_tutachia.jpg', name: 'nachia' },
-    { src: '/kabesha/nur_intan.jpg', name: 'intah' },
+    { src: '/kabesha/nur_intan.jpg', name: 'intan' },
     { src: '/kabesha/oline_manuel.jpg', name: 'oline' },
     { src: '/kabesha/raisha_syifa.jpg', name: 'raisha' },
     { src: '/kabesha/ribka_budiman.jpg', name: 'ribka' },
@@ -95,7 +95,7 @@ export default function App() {
 
     const photoQueryParams = {
         page: page,
-        size: currentMode === 'album' ? 4 : 40,
+        size: currentMode === 'album' ? 8 : 40,
         source: source,
         nickname: nickname,
         mode: currentMode,
