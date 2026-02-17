@@ -1,17 +1,17 @@
-import puppeteer, { Target } from 'puppeteer'
+import puppeteer from 'puppeteer'
 import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import { prismaClient } from '../application/database.js'
 import { v4 as uuidv4 } from 'uuid'
-const TARGET_USERNAME = 'jkt48.fritzy.r'
-const MEMBER_NICKNAME = 'fritzy'
+const TARGET_USERNAME = 'jkt48.lily_'
+const MEMBER_NICKNAME = 'lily'
 const COOKIES_PATH = './cookies.json'
 const SAVE_BASE_DIR = './public/photos'
 
 const delay = (time) => new Promise(resolve => setTimeout(resolve, time))
 
-const downloadFile = async (url, filepath) => {
+const downloadImage = async (url, filepath) => {
     const response = await fetch(url)
     const buffer = await response.arrayBuffer()
     fs.writeFileSync(filepath, Buffer.from(buffer))
@@ -35,12 +35,9 @@ export const scrapeInstagram = async () => {
     console.log(`Memulai Bot Instagram untuk: ${MEMBER_NICKNAME}`);
 
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: 'new',
         defaultViewport: null,
-        args: [
-            '--disable-notifications',
-            // '--start-maximized'
-        ]
+        args: ['--start-maximized', '--disable-notifications']
     })
 
     try {
@@ -74,59 +71,18 @@ export const scrapeInstagram = async () => {
             return
         }
 
-        console.log("🔄 Mulai scrolling untuk mencari postingan ke-43...")
-
-        const uniqueLinks = new Set()
-        let previousHeight = 0
-        let scrollAttempts = 0
-        const TARGET_INDEX = 42
-
-        while (uniqueLinks.size <= TARGET_INDEX) {
-            const visibleLinks = await page.evaluate(() => {
-                const boxes = Array.from(document.querySelectorAll('._aagu'))
-                return boxes.map(box => {
-                    const link = box.closest('a')
-                    return link ? link.href : null
-                })
-                    .filter(href => href && href.includes('/p/') || href.includes('/reel/'))
-                    .filter((currentUrl, index, urlList) => urlList.indexOf(currentUrl) === index)
+        let postLinks = await page.evaluate(() => {
+            const boxes = Array.from(document.querySelectorAll('._aagu'))
+            return boxes.map(box => {
+                const link = box.closest('a')
+                return link ? link.href : null
             })
+                .filter(href => href && href.includes('/p/'))
+                .filter((currentUrl, index, urlList) => urlList.indexOf(currentUrl) === index)
+        })
 
-            visibleLinks.forEach(link => uniqueLinks.add(link))
-            console.log(`📄 Terdeteksi ${uniqueLinks.size}`)
-
-            if (uniqueLinks.length > TARGET_INDEX) {
-                console.log("Target postingan target sudah terlihat!")
-                break
-            }
-
-            await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-            await delay(3000)
-
-            const newHeight = await page.evaluate(() => document.body.scrollHeight)
-            if (newHeight === previousHeight) {
-                scrollAttempts++
-                console.log(`scroll mentok (Percobaan ${scrollAttempts}/3)`)
-                if (scrollAttempts >= 3) {
-                    break
-                }
-            } else {
-                scrollAttempts = 0
-                previousHeight = newHeight
-            }
-        }
-
-        const allLinks = Array.from(uniqueLinks)
-
-        let postLinks = []
-
-        if (allLinks.length > TARGET_INDEX) {
-            postLinks = allLinks.slice(TARGET_INDEX, TARGET_INDEX + 1)
-            console.log(`Mengambil Postingan ke-: ${postLinks[0]}`);
-        } else {
-            console.error(`Gagal mencapai postingan ke-43. Cuma dapat ${allLinks.length} postingan.`)
-            await browser.close()
-            return
+        if (postLinks.length >= 3) {
+            postLinks = postLinks.slice(0, 3)
         }
 
         console.log(`📦 Ditemukan ${postLinks.length} postingan terbaru.`)
@@ -156,49 +112,8 @@ export const scrapeInstagram = async () => {
 
             try {
                 await page.goto(link, { waitUntil: 'networkidle2' })
-                const orderedMediaList = await page.evaluate(async (postUrl) => {
-                    try {
-                        const response = await fetch(`${postUrl}?__a=1&__d=dis`);
-                        const json = await response.json();
-
-                        const item = json.graphql?.shortcode_media || json.items?.[0];
-
-                        if (!item) return null;
-
-                        const results = [];
-
-                        if (item.edge_sidecar_to_children) {
-                            // KASUS CAROUSEL (Banyak Slide)
-                            item.edge_sidecar_to_children.edges.forEach(edge => {
-                                results.push({
-                                    id: edge.node.id,
-                                    isVideo: edge.node.is_video,
-                                    // Instagram selalu menyediakan link .mp4 full di properti 'video_url'
-                                    url: edge.node.is_video ? edge.node.video_url : edge.node.display_url
-                                });
-                            });
-                        } else {
-                            // KASUS SINGLE POST
-                            results.push({
-                                id: item.id,
-                                isVideo: item.is_video,
-                                url: item.is_video ? item.video_url : item.display_url
-                            });
-                        }
-                        return results;
-                    } catch (error) {
-                        return null
-                    }
-                }, link)
-
-                if (orderedMediaList) {
-                    console.log(`✅ Metadata Professional berhasil diambil: ${orderedMediaList.length} slide terdeteksi.`);
-                } else {
-                    console.log("⚠️ Gagal ambil metadata JSON, menggunakan metode visual (kurang akurat untuk video).");
-                }
-
                 try {
-                    await page.waitForSelector('article img, article video', { timeout: 10000 })
+                    await page.waitForSelector('article img', { timeout: 10000 })
                 } catch {
                     await page.waitForSelector('main img', { timeout: 10000 })
                 }
@@ -248,88 +163,71 @@ export const scrapeInstagram = async () => {
                     return { text: '', source: 'TIDAK DITEMUKAN' }
                 })
 
+                if (caption.text === '') {
+                    console.error(`❌ FATAL ERROR: Caption tidak ditemukan di link: ${link}`)
+                    console.error("🛑 Program dihentikan paksa karena caption kosong.")
+
+                    console.log("📸 Menyimpan file debug 'debug-error-no-caption.html'...")
+                    const htmlContent = await page.content()
+                    fs.writeFileSync('debug-error-no-caption.html', htmlContent)
+
+                    return
+                }
+
                 console.log(`✅ Caption ditemukan menggunakan: [ ${caption.source} ]`)
                 console.log(`Isi captions: [ ${caption.text} ]`)
 
                 let slideCounter = 0
                 let hasNext = true
-                const processedMedia = new Set()
+                const processedImages = new Set()
 
                 while (hasNext) {
-                    slideCounter++
-                    let downloadInfo = null
+                    const ignoreList = Array.from(processedImages)
 
-                    if (orderedMediaList && orderedMediaList[slideCounter - 1]) {
-                        const mediaItem = orderedMediaList[slideCounter - 1];
-                        downloadInfo = {
-                            url: mediaItem.url,
-                            isVideo: mediaItem.isVideo,
-                            method: 'JSON_API'
-                        };
-                        console.log(`Slide ${slideCounter}: Menggunakan data JSON (${mediaItem.isVideo ? 'VIDEO' : 'FOTO'})`)
-                    } else {
-                        const visualData = await page.evaluate((ignoreList) => {
-                            const images = Array.from(document.querySelectorAll('article img, main img'));
-                            const validImg = images.find(img => img.src.startsWith('http') && img.clientWidth > 300 && !ignoreList.includes(img.src));
+                    const imgSrc = await page.evaluate((ignoreList) => {
+                        const images = Array.from(document.querySelectorAll('article img, main img'))
 
-                            // Cek Video Element di DOM (Seringkali blob, jadi ini last resort)
-                            const videoEl = document.querySelector('article video');
-                            // Jika ada elemen video dan tombol play, anggap video
-                            const isVideoVisual = !!videoEl || !!document.querySelector('svg[aria-label="Play"]');
+                        const validImg = images.find(img =>
+                            img.src.startsWith('http') &&
+                            img.clientWidth > 300 &&
+                            !ignoreList.includes(img.src)
+                        )
 
-                            if (validImg) return { src: validImg.src, isVideo: isVideoVisual };
-                            return null;
-                        }, Array.from(processedMedia));
+                        return validImg ? validImg.src : null
+                    }, ignoreList)
 
-                        if (visualData) {
-                            downloadInfo = {
-                                url: visualData.src, // Ini mungkin cuma thumbnail kalau video
-                                isVideo: visualData.isVideo,
-                                method: 'VISUAL_DOM'
-                            };
-                            console.log(`Slide ${slideCounter}: Menggunakan Visual DOM (Backup)`);
-                        }
-                    }
+                    if (imgSrc) {
+                        processedImages.add(imgSrc)
+                        slideCounter++
 
-                    if (downloadInfo && downloadInfo.url) {
-                        let extension = downloadInfo.isVideo ? 'mp4' : 'jpg';
-                        let mediaTypeDB = slideCounter > 1 ? 'CAROUSEL_ALBUM' : (downloadInfo.isVideo ? 'VIDEO' : 'IMAGE');
-                        if (slideCounter === 1 && downloadInfo.isVideo) mediaTypeDB = 'VIDEO';
-                        if (!processedMedia.has(downloadInfo.url)) {
-                            processedMedia.add(downloadInfo.url);
-                            const fileId = `${String(slideCounter).padStart(2, '0')}_${uuidv4()}`
-                            const fileName = `${postedAt.toISOString().split('T')[0]}_${fileId}.${extension}`
-                            const filePath = path.join(saveDir, fileName)
-                            const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
+                        const fileId = `${String(slideCounter).padStart(2, '0')}_${uuidv4()}`
+                        const fileName = `${postedAt.toISOString().split('T')[0]}_${fileId}.jpg`
+                        const filePath = path.join(saveDir, fileName)
+                        const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
 
-                            try {
-                                await downloadFile(downloadInfo.url, filePath)
+                        await downloadImage(imgSrc, filePath)
 
-                                await prismaClient.photo.create({
-                                    data: {
-                                        srcUrl: dbUrl,
-                                        fileId: fileId,
-                                        caption: caption.text,
-                                        postUrl: link,
-                                        mediaType: mediaTypeDB,
-                                        postedAt: postedAt,
-                                        memberId: member.id,
-                                        source: 'instagram'
-                                    }
-                                })
-                                console.log(`✅ Saved Slide ${slideCounter}: ${fileName}`)
-                            } catch (err) {
-                                console.error(`❌ Gagal save file: ${err.message}`)
+                        await prismaClient.photo.create({
+                            data: {
+                                srcUrl: dbUrl,
+                                fileId: fileId,
+                                caption: caption.text,
+                                postUrl: link,
+                                mediaType: slideCounter > 1 ? 'CAROUSEL_ALBUM' : 'IMAGE',
+                                postedAt: postedAt,
+                                memberId: member.id,
+                                source: 'instagram'
                             }
-                        }
-                    } else {
-                        console.log(`   ⚠️ Slide ${slideCounter} kosong atau gagal dideteksi.`)
+                        })
+                        console.log(`✅ Saved Slide ${slideCounter}: ${fileName}`)
                     }
+
                     const nextButton = await page.$('button[aria-label="Next"]')
 
                     if (nextButton) {
                         await nextButton.click()
-                        await delay(2000)
+
+                        await delay(2500)
                     } else {
                         hasNext = false
                     }
@@ -345,4 +243,3 @@ export const scrapeInstagram = async () => {
         console.log("✅ Sesi pengecekan selesai.\n")
     }
 }
-scrapeInstagram()
