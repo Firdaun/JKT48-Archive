@@ -4,8 +4,8 @@ import path from 'path'
 import fetch from 'node-fetch'
 import { prismaClient } from '../application/database.js'
 import { v4 as uuidv4 } from 'uuid'
-const TARGET_USERNAME = 'jkt48.lily_'
-const MEMBER_NICKNAME = 'lily'
+const TARGET_USERNAME = 'jkt48.oline'
+const MEMBER_NICKNAME = 'oline'
 const COOKIES_PATH = './cookies.json'
 const SAVE_BASE_DIR = './public/photos'
 
@@ -35,9 +35,12 @@ export const scrapeInstagram = async () => {
     console.log(`Memulai Bot Instagram untuk: ${MEMBER_NICKNAME}`);
 
     const browser = await puppeteer.launch({
-        headless: 'new',
+        headless: false,
         defaultViewport: null,
-        args: ['--start-maximized', '--disable-notifications']
+        args: [
+            // '--start-maximized',
+            '--disable-notifications'
+        ]
     })
 
     try {
@@ -81,9 +84,13 @@ export const scrapeInstagram = async () => {
                 .filter((currentUrl, index, urlList) => urlList.indexOf(currentUrl) === index)
         })
 
-        if (postLinks.length >= 3) {
-            postLinks = postLinks.slice(0, 3)
-        }
+        // if (postLinks.length >= 3) {
+        //     postLinks = postLinks.slice(0, 3)
+        // }
+
+        const targetPost = [1]
+
+        let postToProcess = postLinks.filter((_, index) => targetPost.includes(index))
 
         console.log(`📦 Ditemukan ${postLinks.length} postingan terbaru.`)
         console.log("📋 List Link:", postLinks)
@@ -98,7 +105,7 @@ export const scrapeInstagram = async () => {
             return
         }
 
-        for (const link of postLinks) {
+        for (const link of postToProcess) {
             const existingPost = await prismaClient.photo.findFirst({
                 where: { postUrl: link }
             })
@@ -163,16 +170,16 @@ export const scrapeInstagram = async () => {
                     return { text: '', source: 'TIDAK DITEMUKAN' }
                 })
 
-                if (caption.text === '') {
-                    console.error(`❌ FATAL ERROR: Caption tidak ditemukan di link: ${link}`)
-                    console.error("🛑 Program dihentikan paksa karena caption kosong.")
+                // if (caption.text === '') {
+                //     console.error(`❌ FATAL ERROR: Caption tidak ditemukan di link: ${link}`)
+                //     console.error("🛑 Program dihentikan paksa karena caption kosong.")
 
-                    console.log("📸 Menyimpan file debug 'debug-error-no-caption.html'...")
-                    const htmlContent = await page.content()
-                    fs.writeFileSync('debug-error-no-caption.html', htmlContent)
+                //     console.log("📸 Menyimpan file debug 'debug-error-no-caption.html'...")
+                //     const htmlContent = await page.content()
+                //     fs.writeFileSync('debug-error-no-caption.html', htmlContent)
 
-                    return
-                }
+                //     return
+                // }
 
                 console.log(`✅ Caption ditemukan menggunakan: [ ${caption.source} ]`)
                 console.log(`Isi captions: [ ${caption.text} ]`)
@@ -243,3 +250,5 @@ export const scrapeInstagram = async () => {
         console.log("✅ Sesi pengecekan selesai.\n")
     }
 }
+
+scrapeInstagram()
