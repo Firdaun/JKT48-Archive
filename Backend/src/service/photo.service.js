@@ -53,14 +53,14 @@ const get = async (request) => {
         case 'oldest':
             orderBy = [
                 { postedAt: 'asc' },
-                { id: 'asc' }
+                { fileId: 'asc' }
             ]
             break;
         case 'newest':
         default:
             orderBy = [
                 { postedAt: 'desc' },
-                { id: 'asc' }
+                { fileId: 'asc' }
             ]
             break;
     }

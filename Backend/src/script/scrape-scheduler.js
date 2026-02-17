@@ -1,13 +1,13 @@
 import cron from 'node-cron'
-import { scrapeInstagram } from './scrape-ig.js'
+import { runApifyScraper } from './scrape-apify.js'
 console.log('🚀 MONITOR INSTAGRAM DIMULAI')
 console.log('🕒 Bot akan mengecek setiap 1 jam sekali.')
 
-cron.schedule('*/15 * * * *', async () => {
+cron.schedule('* * * * *', async () => {
     try {
-        await scrapeInstagram()
+        await runApifyScraper()
     } catch (error) {
         console.error('Error Critical di Scheduler:',error)
     }
 })
-scrapeInstagram()
+runApifyScraper()
