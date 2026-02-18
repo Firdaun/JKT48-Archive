@@ -4,7 +4,6 @@ import path from 'path'
 import fetch from 'node-fetch'
 import { prismaClient } from '../application/database.js'
 import { v4 as uuidv4 } from 'uuid'
-import { execSync } from 'child_process'
 const TARGET_USERNAME = 'jkt48.fritzy.r'
 const MEMBER_NICKNAME = 'fritzy'
 const COOKIES_PATH = './cookies.json'
@@ -18,20 +17,38 @@ const downloadImage = async (url, filepath) => {
     fs.writeFileSync(filepath, Buffer.from(buffer))
 }
 
-const downloadVideo = (m3u8Url, filepath) => {
-    console.log(`🎬Mendownload video via HLS: ${m3u8Url.substring(0, 80)}...`)
+const downloadVideoWithFetch = async (url, filepath) => {
+    console.log(`🎬 Mendownload video: ${url.substring(0, 80)}...`)
+
+    const response = await fetch(url)
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+    }
+
+    const buffer = await response.arrayBuffer()
+
+    if (buffer.byteLength < 10000) {
+        throw new Error(`File terlalu kecil (${buffer.byteLength} bytes), kemungkinan bukan video utuh`)
+    }
+
+    fs.writeFileSync(filepath, Buffer.from(buffer))
+    const sizeMB = (buffer.byteLength / 1024 / 1024).toFixed(2)
+    console.log(`✅ Video berhasil disimpan: ${path.basename(filepath)} (${sizeMB} MB)`)
+}
+
+const normalizeVideoUrl = (url) => {
     try {
-        execSync(
-            `ffmpeg -y -i "${m3u8Url}" -c copy -bsf:a aac_adtstoasc "${filepath}"`,
-            { stdio: 'pipe' }
-        )
-        console.log(`✅Video berhasil disimpan: ${path.basename(filepath)}`)
-        return true
-    } catch (err) {
-        console.error(`❌ffmpeg gagal: ${err.message}`)
-        return false
+        const u = new URL(url)
+        u.searchParams.delete('bytestart')
+        u.searchParams.delete('byteend')
+        return u.toString()
+    } catch {
+        return url
     }
 }
+
+const isVideoCdnUrl = (url) => url.includes('/o1/v/t16/')
 
 export const scrapeInstagram = async () => {
     const member = await prismaClient.member.findFirst({
@@ -63,16 +80,38 @@ export const scrapeInstagram = async () => {
 
         const page = await browser.newPage()
 
-        const cdpSession = await page.createCDPSession()
-        await cdpSession.send('Network.enable')
+        const capturedVideoUrls = new Set()
+        let isCapturing = false
 
-        let capturedM3u8 = []
-
-        cdpSession.on('Network.responseReceived', (event) => {
-            const url = event.response.url
-            if (url.includes('.m3u8') && !capturedM3u8.includes(url)) {
-                capturedM3u8.push(url)
-                console.log(`📡 Terdeteksi HLS stream: ...${url.slice(-60)}`)
+        page.on('response', async (response) => {
+            if (!isCapturing) return
+            const url = response.url()
+            if (isVideoCdnUrl(url)) {
+                const normalized = normalizeVideoUrl(url)
+                if (!capturedVideoUrls.has(normalized)) {
+                    capturedVideoUrls.add(normalized)
+                    console.log(`Tertangkap video URL: ...${normalized.slice(-70)}`)
+                }
+                return
+            }
+            const isApiUrl = url.includes('/api/graphql') ||
+                url.includes('graphql/query') ||
+                url.includes('/api/v1/media/')
+            if (isApiUrl) {
+                try {
+                    const text = await response.text()
+                    const videoUrlRegex = /"video_url"\s*:\s*"([^"]+)"/g
+                    let match
+                    while ((match = videoUrlRegex.exec(text)) !== null) {
+                        const videoUrl = match[1].replace(/\\/g, '')
+                        if (videoUrl.startsWith('http') && !capturedVideoUrls.has(videoUrl)) {
+                            capturedVideoUrls.add(videoUrl)
+                            console.log(`🎥 [API] Tertangkap: ...${videoUrl.slice(-70)}`)
+                        }
+                    }
+                } catch {
+                    // Response tidak bisa dibaca -- lewati saja
+                }
             }
         })
 
@@ -119,14 +158,14 @@ export const scrapeInstagram = async () => {
                     const link = box.closest('a')
                     return link ? link.href : null
                 })
-                    .filter(href => href && href.includes('/p/') || href.includes('/reel/'))
+                    .filter(href => href && (href.includes('/p/') || href.includes('/reel/')))
                     .filter((currentUrl, index, urlList) => urlList.indexOf(currentUrl) === index)
             })
 
             visibleLinks.forEach(link => uniqueLinks.add(link))
             console.log(`📄 Terdeteksi ${uniqueLinks.size}`)
 
-            if (uniqueLinks.length > TARGET_INDEX) {
+            if (uniqueLinks.size > TARGET_INDEX) {
                 console.log("Target postingan target sudah terlihat!")
                 break
             }
@@ -207,7 +246,8 @@ export const scrapeInstagram = async () => {
             console.log(`⬇️ Memproses Post: ${link}`)
 
             try {
-                capturedM3u8 = []
+                capturedVideoUrls.clear()
+                isCapturing = true
                 await page.goto(link, { waitUntil: 'networkidle2' })
                 try {
                     await page.waitForSelector('article img', { timeout: 10000 })
@@ -216,6 +256,40 @@ export const scrapeInstagram = async () => {
                 }
 
                 await delay(3000)
+
+                await page.evaluate(() => {
+                    document.querySelectorAll('video').forEach(v => {
+                        v.muted = true
+                        v.play().catch(() => {})
+                    })
+                })
+                await delay(3000)
+
+                isCapturing = false
+
+                if (capturedVideoUrls.size === 0) {
+                    console.log('⚠️  CDN dan API tidak menangkap URL, scan HTML...')
+                    const fromHtml = await page.evaluate(() => {
+                        const results = []
+                        const allText = document.documentElement.innerHTML
+                        const reField = /\"video_url\"\s*:\s*\"([^\"]+)\"/g
+                        let m
+                        while ((m = reField.exec(allText)) !== null) {
+                            results.push(m[1].replace(/\\\\/g, ''))
+                        }
+                        const reMp4 = /https:\/\/[^"\s]*cdninstagram\.com[^"\s]*\.mp4[^"\s]*/g
+                        while ((m = reMp4.exec(allText)) !== null) {
+                            results.push(m[0].replace(/\\\\/g, ''))
+                        }
+                        return [...new Set(results)]
+                    })
+                    fromHtml.forEach(u => {
+                        if (u.startsWith('http') && !capturedVideoUrls.has(u)) {
+                            capturedVideoUrls.add(u)
+                            console.log(`🎥 [HTML] Tertangkap: ...${u.slice(-70)}`)
+                        }
+                    })
+                }
 
                 const postedAtString = await page.evaluate(() => {
                     const timeEl = document.querySelector('time')
@@ -274,23 +348,35 @@ export const scrapeInstagram = async () => {
                 console.log(`✅ Caption ditemukan menggunakan: [ ${caption.source} ]`)
                 console.log(`Isi captions: [ ${caption.text} ]`)
 
+                const videoUrlList = Array.from(capturedVideoUrls)
+                console.log(`Total video URL unik tertangkap: ${videoUrlList.length}`)
+                videoUrlList.forEach((u, i) => console.log(`[${i}] ${u.substring(0, 100)}`))
+
                 let slideCounter = 0
                 let hasNext = true
                 const processedImages = new Set()
+                let videoUrlIndex = 0
 
                 while (hasNext) {
+                    const ignoreList = Array.from(processedImages)
 
-                    const slideInfo = await page.evaluate(() => {
+                    const slideInfo = await page.evaluate((ignoreList) => {
                         const videoEl = document.querySelector('article video, main video')
-                        const imgEl = document.querySelector('article img, main img')
+                        const images = Array.from(document.querySelectorAll('article img, main img'))
+
+                        const validImg = images.find(img =>
+                            img.src.startsWith('http') &&
+                            img.clientWidth > 300 &&
+                            !ignoreList.includes(img.src)
+                        )
+
                         return {
                             isVideo: !!videoEl,
-                            imgSrc: imgEl && imgEl.src.startsWith('http') && imgEl.clientWidth > 300 ? imgEl.src : null
+                            imgSrc: validImg ? validImg.src : null
                         }
-                    })
+                    }, ignoreList)
 
                     console.log(`📎 Slide ${slideCounter + 1} — tipe: ${slideInfo.isVideo ? '🎬 VIDEO' : '🖼️ GAMBAR'}`)
-                    console.log(`   capturedM3u8 (${capturedM3u8.length} url): ${capturedM3u8.map(u => '...' + u.slice(-40)).join(' | ') || '(kosong)'}`)
 
                     let targetUrl = null
                     let extension = ''
@@ -299,33 +385,19 @@ export const scrapeInstagram = async () => {
 
                     if (slideInfo.isVideo) {
                         isVideo = true
-                        if (capturedM3u8.length === 0) {
-                            console.log(`⏳ m3u8 belum tertangkap, menunggu 3 detik lagi...`)
-                            await delay(3000)
-                        }
 
-                        const bestM3u8 = capturedM3u8.find(u => u.includes('high')) ||
-                            capturedM3u8.find(u => u.includes('mid')) ||
-                            capturedM3u8[capturedM3u8.length - 1]
-
-                        if (bestM3u8) {
-                            targetUrl = bestM3u8
+                        if (videoUrlIndex < videoUrlList.length) {
+                            targetUrl = videoUrlList[videoUrlIndex]
+                            videoUrlIndex++
+                            console.log(`Memakai video URL index ${videoUrlIndex - 1} : ${targetUrl.substring(0, 80)}`)
                         } else {
-                            const ogVideoUrl = await page.evaluate(() => {
-                                return document.querySelector('meta[property="og:video"]')?.content || null
-                            })
-
-                            if (ogVideoUrl) {
-                                console.log(`📡 Fallback: pakai og:video URL`)
-                                targetUrl = ogVideoUrl
-                            } else {
-                                console.warn(`⚠️ Slide ${slideCounter + 1} adalah video tapi URL HLS tidak tertangkap. Slide di-skip.`)
-                                process.exit(1)
-                            }
+                            console.error(`❌ Tidak ada URL video tersisa untuk slide ${slideCounter + 1}.`)
+                            console.error(`Total tertangkap: ${videoUrlList.length}, sudah dipakai: ${videoUrlIndex}`)
+                            process.exit(1)
                         }
                         extension = 'mp4'
                         mediaTypeDB = 'VIDEO'
-                    } else if (slideInfo.imgSrc && !processedImages.has(slideInfo.imgSrc)) {
+                    } else if (slideInfo.imgSrc) {
                         targetUrl = slideInfo.imgSrc
                         processedImages.add(slideInfo.imgSrc)
                         extension = 'jpg'
@@ -343,53 +415,54 @@ export const scrapeInstagram = async () => {
                         const filePath = path.join(saveDir, fileName)
                         const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
 
-                        let downloadSuccess = false
                         try {
                             if (isVideo) {
-                                // downloadVideo return boolean, kita cek nilainya
-                                const result = downloadVideo(targetUrl, filePath)
-                                if (result) {
-                                    downloadSuccess = true
-                                } else {
-                                    throw new Error("FFmpeg failed")
-                                }
+                                await downloadVideoWithFetch(targetUrl, filePath)
                             } else {
-                                // downloadImage throw error kalau gagal
                                 await downloadImage(targetUrl, filePath)
-                                downloadSuccess = true
                             }
                         } catch (err) {
-                            console.error(`❌ Gagal download slide ${slideCounter}: ${err.message}`)
-                            downloadSuccess = false
+                            console.error(`🛑 Menghentikan proses karena video gagal didownload.`)
+                            process.exit(1)
                         }
 
-                        if (downloadSuccess) {
-                            try {
-                                await prismaClient.photo.create({
-                                    data: {
-                                        srcUrl: dbUrl,
-                                        fileId: fileId,
-                                        caption: caption.text,
-                                        postUrl: link,
-                                        mediaType: mediaTypeDB,
-                                        postedAt: postedAt,
-                                        memberId: member.id,
-                                        source: 'instagram'
-                                    }
-                                })
-                                console.log(`✅ Saved ${mediaTypeDB} Slide ${slideCounter}: ${fileName}`)
-                            } catch (dbErr) {
-                                console.error(`❌ Gagal simpan DB: ${dbErr.message}`)
-                            }
+                        try {
+                            await prismaClient.photo.create({
+                                data: {
+                                    srcUrl: dbUrl,
+                                    fileId: fileId,
+                                    caption: caption.text,
+                                    postUrl: link,
+                                    mediaType: mediaTypeDB,
+                                    postedAt: postedAt,
+                                    memberId: member.id,
+                                    source: 'instagram'
+                                }
+                            })
+                            console.log(`✅ Saved ${mediaTypeDB} Slide ${slideCounter}: ${fileName}`)
+                        } catch (dbErr) {
+                            console.error(`❌ Gagal simpan DB: ${dbErr.message}`)
                         }
                     }
 
                     const nextButton = await page.$('button[aria-label="Next"]')
 
                     if (nextButton) {
+                        console.log(`🔄 Pindah ke slide berikutnya...`)
+                        const isNextVideo = slideInfo.isVideo
+                        if (isNextVideo) isCapturing = true
                         await nextButton.click()
-
-                        await delay(2500)
+                        await delay(3000)
+                        if (isNextVideo) {
+                            isCapturing = false
+                            // Tambahkan URL baru (jika ada) yang masuk selama delay ke videoUrlList
+                            capturedVideoUrls.forEach(u => {
+                                if (!videoUrlList.includes(u)) {
+                                    videoUrlList.push(u)
+                                    console.log(`🎥 [Next] URL baru ditambahkan: ...${u.slice(-70)}`)
+                                }
+                            })
+                        }
                     } else {
                         hasNext = false
                     }
