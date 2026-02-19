@@ -334,17 +334,6 @@ export const scrapeInstagram = async () => {
                     return { text: '', source: 'TIDAK DITEMUKAN' }
                 })
 
-                // if (caption.text === '') {
-                //     console.error(`❌ FATAL ERROR: Caption tidak ditemukan di link: ${link}`)
-                //     console.error("🛑 Program dihentikan paksa karena caption kosong.")
-
-                //     console.log("📸 Menyimpan file debug 'debug-error-no-caption.html'...")
-                //     const htmlContent = await page.content()
-                //     fs.writeFileSync('debug-error-no-caption.html', htmlContent)
-
-                //     return
-                // }
-
                 console.log(`✅ Caption ditemukan menggunakan: [ ${caption.source} ]`)
                 console.log(`Isi captions: [ ${caption.text} ]`)
 
