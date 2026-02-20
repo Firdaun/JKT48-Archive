@@ -16,21 +16,21 @@ export const getPostInfo = async (page) => {
     const postedAt = new Date(postedAtString)
     const caption = await page.evaluate(() => {
         const extractQuote = (text) => {
-            const match = text.match(/: "([\s\S]+)"/) || text.match(/: “([\s\S]+)”/);
-            return match ? match[1] : null;
-        };
+            const match = text.match(/: "([\s\S]+)"/) || text.match(/: “([\s\S]+)”/)
+            return match ? match[1] : null
+        }
 
-        const ogTitle = document.querySelector('meta[property="og:title"]')?.content;
+        const ogTitle = document.querySelector('meta[property="og:title"]')?.content
         if (ogTitle) {
-            const extracted = extractQuote(ogTitle);
+            const extracted = extractQuote(ogTitle)
             if (extracted) {
                 return { text: extracted, source: 'PLAN A (OG Title)' }
             }
         }
 
-        const metaDesc = document.querySelector('meta[name="description"]')?.content;
+        const metaDesc = document.querySelector('meta[name="description"]')?.content
         if (metaDesc) {
-            const extracted = extractQuote(metaDesc);
+            const extracted = extractQuote(metaDesc)
             if (extracted) {
                 return { text: extracted, source: 'PLAN B (Meta Desc)' }
             }
