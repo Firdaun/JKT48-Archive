@@ -24,16 +24,3 @@ export const downloadVideoWithFetch = async (url, filepath) => {
     const sizeMB = (buffer.byteLength / 1024 / 1024).toFixed(2)
     console.log(`✅ Video berhasil disimpan: ${path.basename(filepath)} (${sizeMB} MB)`)
 }
-
-export const normalizeVideoUrl = (url) => {
-    try {
-        const u = new URL(url)
-        u.searchParams.delete('bytestart')
-        u.searchParams.delete('byteend')
-        return u.toString()
-    } catch {
-        return url
-    }
-}
-
-export const isVideoCdnUrl = (url) => url.includes('/o1/v/t16/')
