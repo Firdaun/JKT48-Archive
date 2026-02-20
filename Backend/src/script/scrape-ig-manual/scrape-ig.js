@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer'
 import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
-import { prismaClient } from '../application/database.js'
+import { prismaClient } from '../../application/database.js'
 import { v4 as uuidv4 } from 'uuid'
 const TARGET_USERNAME = 'jkt48.fritzy.r'
 const MEMBER_NICKNAME = 'fritzy'
@@ -19,19 +19,14 @@ const downloadImage = async (url, filepath) => {
 
 const downloadVideoWithFetch = async (url, filepath) => {
     console.log(`🎬 Mendownload video: ${url.substring(0, 80)}...`)
-
     const response = await fetch(url)
-
     if (!response.ok) {
         throw new Error(`HTTP ${response.status} - ${response.statusText}`)
     }
-
     const buffer = await response.arrayBuffer()
-
     if (buffer.byteLength < 10000) {
         throw new Error(`File terlalu kecil (${buffer.byteLength} bytes), kemungkinan bukan video utuh`)
     }
-
     fs.writeFileSync(filepath, Buffer.from(buffer))
     const sizeMB = (buffer.byteLength / 1024 / 1024).toFixed(2)
     console.log(`✅ Video berhasil disimpan: ${path.basename(filepath)} (${sizeMB} MB)`)
@@ -65,20 +60,33 @@ export const scrapeInstagram = async () => {
         fs.mkdirSync(saveDir, { recursive: true })
     }
 
-    console.log(`Memulai Bot Instagram untuk: ${MEMBER_NICKNAME}`);
+    console.log(`Memulai Bot Instagram untuk: ${MEMBER_NICKNAME}`)
+
+    const MOBILE_USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1'
 
     const browser = await puppeteer.launch({
         headless: false,
-        defaultViewport: null,
         args: [
             // '--start-maximized',
-            '--disable-notifications'
-        ]
+            '--disable-notifications',
+        ],
     })
 
     try {
 
         const page = await browser.newPage()
+
+        await page.emulate({
+            viewport: {
+                width: 390,
+                height: 844,
+                deviceScaleFactor: 3,
+                isMobile: true,
+                hasTouch: true,
+                isLandscape: false,
+            },
+            userAgent: MOBILE_USER_AGENT,
+        })
 
         const capturedVideoUrls = new Set()
         let isCapturing = false
@@ -260,7 +268,7 @@ export const scrapeInstagram = async () => {
                 await page.evaluate(() => {
                     document.querySelectorAll('video').forEach(v => {
                         v.muted = true
-                        v.play().catch(() => {})
+                        v.play().catch(() => { })
                     })
                 })
                 await delay(3000)
