@@ -4,15 +4,22 @@ import { downloadImage, downloadVideoWithFetch, delay } from '../utils/downloade
 import { saveMedia } from '../services/db.js';
 import { getMediaFromSlide } from './mediaExtractor.js';
 
-export const processCarousel = async (page, captureState, member, postInfo, saveDir, link) => {
+export const processCarousel = async (page, member, postInfo, saveDir, link) => {
     let slideCounter = 0;
     let hasNext = true;
-    const processedImages = new Set();
-    let videoUrlIndex = 0;
+    const processedImages = new Set()
+    const processedVideos = new Set()
 
     while (hasNext) {
-        const ignoreList = Array.from(processedImages);
-        const slideInfo = await getMediaFromSlide(page, ignoreList);
+        const ignoreImgList = Array.from(processedImages)
+        const ignoreVideoList = Array.from(processedVideos)
+        let slideInfo = await getMediaFromSlide(page, ignoreImgList, ignoreVideoList)
+
+        if (slideInfo.isVideo && !slideInfo.videoUrl) {
+            console.log("⏳ Menunggu URL video termuat di HTML...");
+            await delay(3000);
+            slideInfo = await getMediaFromSlide(page, ignoreImgList, ignoreVideoList);
+        }
 
         console.log(`📎 Slide ${slideCounter + 1} — tipe: ${slideInfo.isVideo ? '🎬 VIDEO' : '🖼️ GAMBAR'}`);
 
@@ -23,9 +30,9 @@ export const processCarousel = async (page, captureState, member, postInfo, save
 
         if (slideInfo.isVideo) {
             isVideo = true;
-            if (videoUrlIndex < captureState.videoUrlList.length) {
-                targetUrl = captureState.videoUrlList[videoUrlIndex];
-                videoUrlIndex++;
+            if (slideInfo.videoUrl) {
+                targetUrl = slideInfo.videoUrl
+                processedVideos.add(slideInfo.videoUrl)
             } else {
                 console.error(`❌ URL video habis untuk slide ${slideCounter + 1}.`);
                 process.exit(1);
@@ -71,23 +78,15 @@ export const processCarousel = async (page, captureState, member, postInfo, save
         const nextButton = await page.$('button[aria-label="Next"]');
         if (nextButton) {
             console.log(`🔄 Pindah ke slide berikutnya...`);
-            const isNextVideo = slideInfo.isVideo;
-            if (isNextVideo) captureState.isCapturing = true;
-
             await nextButton.click();
-            await delay(3000);
+            await delay(2000);
 
-            if (isNextVideo) {
-                captureState.isCapturing = false;
-                captureState.capturedVideoUrls.forEach(u => {
-                    if (!captureState.videoUrlList.includes(u)) {
-                        captureState.videoUrlList.push(u);
-                        console.log(`🎥 [Next] URL baru: ...${u.slice(-70)}`);
-                    }
-                });
-            }
+            await page.evaluate(() => {
+                document.querySelectorAll('video').forEach(v => { v.muted = true; v.play().catch(()=>{}) })
+            })
+            await delay(1000)
         } else {
             hasNext = false;
         }
     }
-};
+}

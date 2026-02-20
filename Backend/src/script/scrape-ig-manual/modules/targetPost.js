@@ -5,8 +5,7 @@ export const getPostLinksByScrolling = async (page, targetIndex) => {
     const uniqueLinks = new Set()
     let previousHeight = 0
     let scrollAttempts = 0
-    const TARGET_INDEX = 43
-    while (uniqueLinks.size <= TARGET_INDEX) {
+    while (uniqueLinks.size <= targetIndex) {
         const visibleLinks = await page.evaluate(() => {
             const boxes = Array.from(document.querySelectorAll('._aagu'))
             return boxes.map(box => {
@@ -18,7 +17,7 @@ export const getPostLinksByScrolling = async (page, targetIndex) => {
         })
         visibleLinks.forEach(link => uniqueLinks.add(link))
         console.log(`📄 Terdeteksi ${uniqueLinks.size}`)
-        if (uniqueLinks.size > TARGET_INDEX) {
+        if (uniqueLinks.size > targetIndex) {
             console.log("Target postingan target sudah terlihat!")
             break
         }
@@ -38,12 +37,12 @@ export const getPostLinksByScrolling = async (page, targetIndex) => {
     }
     const allLinks = Array.from(uniqueLinks)
     let postLinks = []
-    if (allLinks.length > TARGET_INDEX) {
-        postLinks = allLinks.slice(TARGET_INDEX, TARGET_INDEX + 1)
+    if (allLinks.length > targetIndex) {
+        postLinks = allLinks.slice(targetIndex, targetIndex + 1)
         console.log(`Mengambil Postingan ke-: ${postLinks[0]}`);
+        return postLinks
     } else {
         console.error(`Gagal mencapai postingan ke-${targetIndex}. Cuma dapat ${allLinks.length} postingan.`)
-        await browser.close()
-        return
+        return []
     }
 }
