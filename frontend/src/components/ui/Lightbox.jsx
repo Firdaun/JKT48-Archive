@@ -1,0 +1,188 @@
+import React, { useEffect, useCallback } from 'react';
+import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Play, ExternalLink } from 'lucide-react';
+
+function formatCount(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return String(n);
+}
+
+const platformColors = {
+    Instagram: '#E1306C',
+    TikTok: '#EE1D52',
+    X: '#1DA1F2',
+};
+
+export function Lightbox({ item, allItems, onClose, onNavigate }) {
+    const currentIndex = allItems.findIndex(i => i.id === item.id);
+
+    const goPrev = useCallback(() => {
+        if (currentIndex > 0) onNavigate(allItems[currentIndex - 1]);
+    }, [currentIndex, allItems, onNavigate]);
+
+    const goNext = useCallback(() => {
+        if (currentIndex < allItems.length - 1) onNavigate(allItems[currentIndex + 1]);
+    }, [currentIndex, allItems, onNavigate]);
+
+    // Handle Keyboard Navigation & Lock Scroll
+    useEffect(() => {
+        const handleKey = (e) => {
+            if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowLeft') goPrev();
+            if (e.key === 'ArrowRight') goNext();
+        };
+        window.addEventListener('keydown', handleKey);
+        document.body.style.overflow = 'hidden'; // Mengunci scroll halaman belakang
+
+        return () => {
+            window.removeEventListener('keydown', handleKey);
+            document.body.style.overflow = '';
+        };
+    }, [onClose, goPrev, goNext]);
+
+    const platformColor = platformColors[item.platform] || '#EE1D52';
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in bg-[#04040a]/92"
+            onClick={onClose}
+        >
+            {/* Blur backdrop */}
+            <div className="absolute inset-0 backdrop-blur-[28px]" />
+
+            {/* Ambient glow */}
+            <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                    background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(238,29,82,0.06) 0%, transparent 70%)',
+                }}
+            />
+
+            {/* Main content container */}
+            <div
+                className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]"
+                onClick={e => e.stopPropagation()} // Mencegah klik foto menutup modal
+            >
+                {/* Close button */}
+                <button
+                    onClick={onClose}
+                    className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white"
+                >
+                    <X size={14} />
+                    Close
+                </button>
+
+                {/* Image / Video container */}
+                <div className="relative rounded-2xl overflow-hidden max-h-[75vh]">
+                    <img
+                        src={item.image}
+                        alt={item.caption}
+                        className="block max-h-[75vh] max-w-[85vw] w-auto h-auto object-contain rounded-[20px] shadow-[0_32px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)]"
+                    />
+
+                    {/* Video play overlay mockup */}
+                    {item.isVideo && (
+                        <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/25">
+                            <button className="flex items-center justify-center w-20 h-20 rounded-full transition-all duration-300 bg-[#EE1D52]/85 backdrop-blur-md border-2 border-white/30 shadow-[0_0_40px_rgba(238,29,82,0.6)]">
+                                <Play size={32} fill="white" className="text-white ml-1" />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Frosted glass caption box */}
+                    <div className="absolute left-4 right-4 bottom-4 rounded-xl p-4 bg-[#0a0a14]/65 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+                        {/* Top row */}
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                {/* Platform badge */}
+                                <span
+                                    className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-[0.06em]"
+                                    style={{
+                                        background: `${platformColor}22`,
+                                        color: platformColor,
+                                        border: `1px solid ${platformColor}44`,
+                                    }}
+                                >
+                                    {item.platform}
+                                </span>
+                                <span className="text-[11px] text-white/40 font-medium">
+                                    @{item.member.toLowerCase()}
+                                </span>
+                            </div>
+                            <span className="text-[10px] text-white/35 font-semibold tracking-[0.06em] uppercase">
+                                {item.date}
+                            </span>
+                        </div>
+
+                        {/* Caption */}
+                        <p className="text-[13px] text-white leading-relaxed font-normal">
+                            {item.caption}
+                        </p>
+
+                        {/* Stats & Action buttons */}
+                        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-white/10">
+                            <button className="flex items-center gap-1.5 transition-all duration-150 hover:scale-105 text-white/50 text-xs">
+                                <Heart size={13} className="text-[#EE1D52]" />
+                                {formatCount(item.likes)}
+                            </button>
+                            <button className="flex items-center gap-1.5 transition-all duration-150 hover:scale-105 text-white/50 text-xs">
+                                <MessageCircle size={13} className="text-[#00D4FF]" />
+                                {formatCount(item.comments)}
+                            </button>
+
+                            <button className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/60 text-[11px] font-semibold hover:bg-white/20 hover:text-white">
+                                <Share2 size={11} />
+                                Share
+                            </button>
+                            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-[#EE1D52]/10 border border-[#EE1D52]/30 text-[#EE1D52] text-[11px] font-semibold hover:bg-[#EE1D52]/20">
+                                <ExternalLink size={11} />
+                                View Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Navigation arrow - Previous */}
+                {currentIndex > 0 && (
+                    <button
+                        onClick={goPrev}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
+                    >
+                        <ChevronLeft size={22} />
+                    </button>
+                )}
+
+                {/* Navigation arrow - Next */}
+                {currentIndex < allItems.length - 1 && (
+                    <button
+                        onClick={goNext}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
+                    >
+                        <ChevronRight size={22} />
+                    </button>
+                )}
+
+                {/* Dot indicators */}
+                <div className="mt-4 flex items-center gap-1.5">
+                    {allItems
+                        .slice(Math.max(0, currentIndex - 3), Math.min(allItems.length, currentIndex + 4))
+                        .map((i, dotIdx) => {
+                            const actualIdx = Math.max(0, currentIndex - 3) + dotIdx;
+                            const isCurrent = actualIdx === currentIndex;
+                            return (
+                                <button
+                                    key={i.id}
+                                    onClick={() => onNavigate(i)}
+                                    className="h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer"
+                                    style={{
+                                        width: isCurrent ? 24 : 6,
+                                        background: isCurrent ? '#EE1D52' : 'rgba(255,255,255,0.2)',
+                                    }}
+                                />
+                            );
+                        })}
+                </div>
+            </div>
+        </div>
+    );
+}
