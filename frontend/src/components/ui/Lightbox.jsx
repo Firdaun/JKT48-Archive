@@ -44,7 +44,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in bg-[#04040a]/92"
+            className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in bg-[#04040a]/90"
             onClick={onClose}
         >
             {/* Blur backdrop */}
@@ -61,7 +61,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
             {/* Main content container */}
             <div
                 className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]"
-                onClick={e => e.stopPropagation()} // Mencegah klik foto menutup modal
+                onClick={e => e.stopPropagation()}
             >
                 {/* Close button */}
                 <button
@@ -116,7 +116,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
 
                         {/* Caption */}
                         <p className="text-[13px] text-white leading-relaxed font-normal">
-                            {item.caption}
+                            {item.caption ? item.caption.substring(0, 150) + (item.caption.length > 150 ? "..." : "") : ""}
                         </p>
 
                         {/* Stats & Action buttons */}

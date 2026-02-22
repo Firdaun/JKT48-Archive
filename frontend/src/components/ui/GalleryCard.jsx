@@ -1,4 +1,3 @@
-import React from 'react';
 import { Play, Heart, MessageCircle } from 'lucide-react';
 
 const platformColors = {
