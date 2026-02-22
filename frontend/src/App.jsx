@@ -8,6 +8,7 @@ import { Pagination } from './components/ui/Pagination';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Sparkles, Bell } from 'lucide-react';
+import { photoApi } from './lib/photo-api';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
@@ -188,13 +189,63 @@ export default function App() {
                 </div>
             </header>
 
+            <section className="relative max-w-screen-2xl px-8 pt-13 mx-auto">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(238,29,82,0.1)] border border-[rgba(238,29,82,0.25)] text-[11px] font-bold text-[#EE1D52] tracking-[0.08em] uppercase">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#EE1D52] shadow-[0_0_8px_#EE1D52] inline-block" />
+                                Live Gallery
+                            </span>
+                            <span className="px-3 py-1.5 rounded-full bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)] text-[11px] font-semibold text-[#00D4FF] tracking-[0.06em]">
+                                Updated Feb 21, 2026
+                            </span>
+                        </div>
+
+                        <h1 className="text-[36px] font-extrabold tracking-[-0.03em] leading-[1.15] text-white m-0">
+                            Media Gallery
+                            <br />
+                            <span className="bg-[linear-gradient(135deg,#EE1D52_0%,#ff6b9d_50%,#EE1D52_100%)] bg-clip-text text-transparent bg-size-[200%]">
+                                JKT48
+                            </span>{' '}
+                            <span className="text-white/35">Official</span>
+                        </h1>
+                    </div>
+
+                    <div className="hidden lg:flex items-center gap-6">
+                        {[
+                            { label: 'Photos', value: '1,240+', color: '#EE1D52', shadow: 'rgba(238,29,82,0.4)' },
+                            { label: 'Videos', value: '380+', color: '#00D4FF', shadow: 'rgba(0,212,255,0.4)' },
+                            { label: 'Members', value: '48', color: '#a855f7', shadow: 'rgba(168,85,247,0.4)' },
+                        ].map(stat => (
+                            <div key={stat.label} className="text-center">
+                                <div
+                                    className="text-[24px] font-extrabold tracking-[-0.02em]"
+                                    style={{
+                                        color: stat.color,
+                                        textShadow: `0 0 20px ${stat.shadow}`,
+                                    }}
+                                >
+                                    {stat.value}
+                                </div>
+                                <div className="text-[11px] font-semibold text-white/35 tracking-[0.06em] uppercase">
+                                    {stat.label}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* ─── STORY CAROUSEL (Terintegrasi Embla) ─── */}
-            <div className="relative z-10 max-w-screen-2xl mx-auto">
+            <div className="relative px-8 z-10 max-w-screen-2xl mx-auto">
                 <StoryCarousel
                     activeMember={nickname}
                     onSelectMember={handleMemberSelect}
                 />
             </div>
+
+            <div className="mx-8 mb-4 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.08)_20%,rgba(255,255,255,0.08)_80%,transparent)]" />
 
             {/* ─── CONTROL BAR ─── */}
             <div className="relative z-40 max-w-screen-2xl mx-auto">
@@ -218,7 +269,7 @@ export default function App() {
                         {nickname ? `${nickname}'s` : 'All'} Posts
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#EE1D52]/10 text-[#EE1D52] border border-[#EE1D52]/25">
-                        {paging?.total_item || 0} Total
+                        {paging?.total_item || 0} results
                     </span>
                 </div>
             </div>
@@ -257,6 +308,22 @@ export default function App() {
                     onNavigate={setLightboxItem}
                 />
             )}
+
+            <footer className="px-8 py-8 border-t border-white/6 bg-white/1.5">
+                <div className="max-w-screen-2xl mx-auto flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center rounded-lg w-7 h-7 bg-linear-to-br from-[#EE1D52] to-[#c01240]">
+                            <Sparkles size={12} color="white" />
+                        </div>
+                        <span className="text-[13px] font-bold text-white/50 tracking-[0.01em]">
+                            JKT48 Media Gallery © 2026
+                        </span>
+                    </div>
+                    <span className="text-[12px] text-white/20 font-medium">
+                        Fan-made project. Not affiliated with JKT48 official management.
+                    </span>
+                </div>
+            </footer>
 
         </div>
     );

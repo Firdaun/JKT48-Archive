@@ -14,7 +14,7 @@ export function FloatingControlBar({
 
     return (
         <div className="sticky top-4 z-40 px-8 mb-8">
-            <div className="glassmorphism rounded-2xl px-6 py-4 shadow-[0_8px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-6 py-4 shadow-[0_8px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)]">
                 <div className="flex items-center justify-between gap-6 flex-wrap">
 
                     {/* ── Segmented View Toggle ── */}

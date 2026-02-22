@@ -1,5 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import "tailwindcss";
+@keyframes glowPulse {
+    0%, 100% {
+    box-shadow: 0 0 0 2px #EE1D52, 0 0 16px #EE1D52, 0 0 32px rgba(238, 29, 82, 0.5);
+    }
+  50% {
+    box-shadow: 0 0 0 3px #EE1D52, 0 0 24px #EE1D52, 0 0 48px rgba(238, 29, 82, 0.7);
+    }
+}
+
+@keyframes glowPulseCyan {
+    0%, 100% {
+    box-shadow: 0 0 0 2px #00D4FF, 0 0 16px #00D4FF, 0 0 32px rgba(0, 212, 255, 0.5);
+    }
+    50% {
+    box-shadow: 0 0 0 3px #00D4FF, 0 0 24px #00D4FF, 0 0 48px rgba(0, 212, 255, 0.7);
+    }
+}
+
 @theme {
     --font-jakarta: "Plus Jakarta Sans";
+    --animate-glow-pulse: glowPulse 2.5s ease-in-out infinite;
+    --animate-glow-pulse-cyan: glowPulseCyan 2.5s ease-in-out infinite;
 }
