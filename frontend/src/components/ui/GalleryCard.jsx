@@ -42,14 +42,12 @@ export function GalleryCard({ item, onClick, index }) {
     const platformColor = platformColors[item.platform] || '#EE1D52';
 
     return (
-        <div
-            className="relative mb-6 break-inside-avoid gallery-card cursor-pointer px-2 pt-2 pb-0"
-            style={{ animationDelay: `${index * 0.05}s` }}
-            onClick={() => onClick(item)}
-        >
+        <div className="relative mb-6 break-inside-avoid group cursor-pointer px-2 pt-2 pb-0 transition-transform duration-300 ease[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-1.5"
+            style={{ animationDelay: `${index * 0.05}s` }} onClick={() => onClick(item)}>
             {/* Stacked polaroid layers */}
-            <div className="card-stacked-layer-2" />
-            <div className="card-stacked-layer-1" />
+            {/* Stacked polaroid layers */}
+            <div className="absolute inset-1 rounded-2xl rotate-[5deg] z-0 bg-linear-to-br from-[#1e1e38] to-[#141428] border border-white/6 shadow-[0_4px_24px_rgba(0,0,0,0.5)]" />
+            <div className="absolute inset-0.5 rounded-2xl rotate-[2.5deg] z-1 bg-linear-to-br from-[#1a1a32] to-[#10102a] border border-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.4)]" />
 
             {/* Main card */}
             <div className="relative rounded-2xl overflow-hidden z-2 bg-[#111120] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
@@ -59,7 +57,7 @@ export function GalleryCard({ item, onClick, index }) {
                     <img
                         src={item.image}
                         alt={item.caption}
-                        className="w-full h-full object-cover card-image"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
                         loading="lazy"
                     />
 
