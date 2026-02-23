@@ -1,6 +1,6 @@
 import { GalleryCard } from './GalleryCard';
 
-export function GalleryGrid({ viewMode, items, onItemClick }) {
+export function GalleryGrid({ viewMode, items, onItemClick, showBackButton, onBackClick }) {
     if (!items || items.length === 0) {
         return (
             <div className="w-full py-20 flex justify-center items-center flex-col gap-2">
@@ -9,22 +9,29 @@ export function GalleryGrid({ viewMode, items, onItemClick }) {
             </div>
         );
     }
-
     // Tampilan: Mode Grid (Kotak Rapat)
     if (viewMode === 'grid') {
         return (
             <div className="px-8 pb-8">
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-1">
+                    {showBackButton && (
+                        <button onClick={onBackClick} className="aspect-square bg-black border-none p-0 cursor-pointer flex flex-col justify-center items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path></svg>
+                        </button>
+                    )}
                     {items.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => onItemClick(item)}
-                            className="group relative aspect-square overflow-hidden bg-[#111120] border-none p-0 cursor-pointer block"
-                        >
+                        <button key={item.id} onClick={() => onItemClick(item)} className="group relative aspect-square overflow-hidden bg-[#111120] border-none p-0 cursor-pointer block">
                             {item.isVideo ? (
-                                <video src={item.image} className="w-full h-full object-cover" muted />
+                                <video
+                                    src={`${item.image}#t=0.001`}
+                                    
+                                    preload="metadata"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    muted
+                                    playsInline
+                                />
                             ) : (
-                                <img src={item.image} alt={item.caption} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                                <img src={item.image} alt={item.caption} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             )}
 
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

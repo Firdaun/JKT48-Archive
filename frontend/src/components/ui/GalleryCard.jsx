@@ -1,4 +1,4 @@
-import { Play, Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle, Play } from 'lucide-react';
 
 const platformColors = {
     Instagram: '#E1306C',
@@ -54,32 +54,24 @@ export function GalleryCard({ item, onClick, index }) {
 
                 {/* Image Area */}
                 <div className="relative overflow-hidden" style={{ height: imageHeight }}>
-                    <img
-                        src={item.image}
-                        alt={item.caption}
-                        className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
-                        loading="lazy"
-                    />
+                    {item.isVideo ? (
+                        <video
+                            src={item.image}
+                            className="w-full h-full object-cover card-image transition-transform duration-500 ease-in-out group-hover:scale-105"
+                            muted
+                            playsInline
+                        />
+                    ) : (
+                        <img
+                            src={item.image}
+                            alt={item.caption}
+                            className="w-full h-full object-cover card-image transition-transform duration-500 ease-in-out group-hover:scale-105"
+                            loading="lazy"
+                        />
+                    )}
 
-                    {/* Gradient overlay untuk teks */}
                     <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(7,7,15,0.92)_0%,rgba(7,7,15,0.4)_50%,rgba(7,7,15,0.05)_100%)]" />
 
-                    {/* Video play button */}
-                    {item.isVideo && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="play-btn-glass flex items-center justify-center rounded-full w-14 h-14">
-                                <Play
-                                    size={22}
-                                    className="text-white ml-0.75 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-                                    fill="white"
-                                />
-                            </div>
-                            {/* Video badge */}
-                            <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full bg-[#EE1D52]/85 backdrop-blur-md text-[9px] font-bold text-white tracking-[0.06em]">
-                                <span>▶</span> VIDEO
-                            </div>
-                        </div>
-                    )}
 
                     {/* Platform badge */}
                     <div

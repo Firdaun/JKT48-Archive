@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { platforms } from '../data/platforms';
 
 export function FloatingControlBar({
+    onClear,
     viewMode,
     onViewModeChange,
     activePlatform,
@@ -74,7 +75,7 @@ export function FloatingControlBar({
                         />
                         {searchQuery && (
                             <button
-                                onClick={() => onSearchChange('')}
+                                onClick={() => onSearchChange(onClear)}
                                 className="flex items-center justify-center rounded-full transition-all duration-150 w-4.5 h-4.5 bg-white/10 shrink-0"
                             >
                                 <X size={10} className="text-white/70" />
