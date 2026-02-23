@@ -5,7 +5,7 @@ import { GalleryGrid } from './components/ui/GalleryGrid';
 import { useSearchParams } from 'react-router'
 import { Lightbox } from './components/ui/Lightbox';
 import { Pagination } from './components/ui/Pagination';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Sparkles, Bell } from 'lucide-react';
 import { photoApi } from './lib/photo-api';
@@ -19,102 +19,119 @@ const isVideoFile = (url, type) => {
 export default function App() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Membaca state dari URL agar bisa di-share/refresh
     const source = searchParams.get('source') || 'All';
     const nickname = searchParams.get('nickname') || '';
     const page = parseInt(searchParams.get('page') || '1');
-
-    // Local State
+    const [postUrl, setPostUrl] = useState('')
     const [viewMode, setViewMode] = useState('album');
     const [searchInput, setSearchInput] = useState(nickname);
     const [lightboxItem, setLightboxItem] = useState(null);
 
     const photoQueryParams = {
         page: page,
-        size: viewMode === 'album' ? 8 : 40, // 8 untuk album (besar), 40 untuk grid rapat
+        size: viewMode === 'album' ? 8 : 40,
         source: source === 'All' ? '' : source.toLowerCase(),
         nickname: nickname,
         mode: viewMode === 'grid' ? 'photo' : 'album',
-        post_url: ''
+        post_url: postUrl
     };
 
-    // Fetching Data dengan React Query
     const imgQuery = useQuery({
         queryKey: ['public-photos', photoQueryParams],
         queryFn: () => photoApi.getPublicPhotos(photoQueryParams),
         staleTime: 1000 * 60 * 15,
         gcTime: 1000 * 60 * 30,
+        placeholderData: keepPreviousData
     });
 
     const photos = imgQuery.data?.data || [];
     const paging = imgQuery.data?.paging;
     const maxPage = paging?.total_page || 1;
 
-    // MAPPING: Mengubah format API ke format yang dibutuhkan UI (GalleryCard / Lightbox)
     const mappedPhotos = photos.map((item) => ({
         id: item.id || Math.random().toString(),
         image: `${API_URL}${item.srcUrl}`,
         caption: item.caption || "Tanpa Caption",
         isVideo: isVideoFile(item.srcUrl, item.mediaType),
         platform: item.source ? item.source.charAt(0).toUpperCase() + item.source.slice(1) : 'Instagram',
-        date: new Date(item.postedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        date: new Date(item.postedAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
         likes: item.likes || 0,
         comments: item.comments || 0,
         member: nickname || 'JKT48',
-        aspectRatio: 'portrait', // Mock ratio agar masonry rapi
-        originalData: item // Simpan data asli jika dibutuhkan
-    }));
+        aspectRatio: 'portrait',
+        originalData: item
+    }))
 
-    // Handlers URL Params
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= maxPage) {
-            setSearchParams(prev => {
-                const newParams = new URLSearchParams(prev);
-                newParams.set('page', newPage);
-                return newParams;
-            });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
+    const buildParams = (prevParams, updates) => {
+        const params = new URLSearchParams(prevParams)
 
-    const handlePlatformChange = (p) => {
-        setSearchParams(prev => {
-            const newParams = new URLSearchParams(prev);
-            if (p === 'All') newParams.delete('source');
-            else newParams.set('source', p);
-            newParams.set('page', 1);
-            return newParams;
-        });
-    };
+        Object.entries(updates).forEach(([key, value]) => {
+            if (!value || value === 'All') {
+                params.delete(key)
+            } else {
+                params.set(key, value)
+            }
+        })
+
+        return params
+    }
 
     const handleMemberSelect = (memberName) => {
-        setSearchInput(memberName);
-        setSearchParams(prev => {
-            const newParams = new URLSearchParams(prev);
-            if (memberName) newParams.set('nickname', memberName);
-            else newParams.delete('nickname');
-            newParams.set('page', 1);
-            return newParams;
-        });
-    };
+        setSearchInput(memberName)
+        setSearchParams(prev => buildParams(prev, { nickname: memberName, page: 1 }))
+    }
 
-    // Debounce Search Input
+    const handleClear = () => {
+        setSearchInput('')
+        setPostUrl('')
+        setViewMode('album')
+        setSearchParams(prev => buildParams(prev, { nickname: null, source: null, page: 1 }))
+    }
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= maxPage) {
+            setSearchParams(prev => buildParams(prev, { page: newPage }))
+        }
+    }
+
+    const handlePlatformChange = (p) => {
+        setSearchParams(prev => buildParams(prev, { source: p, page: 1 }))
+    }
+
     useEffect(() => {
         const handler = setTimeout(() => {
             setSearchParams(prev => {
-                const currentNickname = prev.get('nickname') || '';
+                const currentNickname = prev.get('nickname') || ''
                 if (currentNickname !== searchInput) {
-                    const newParams = new URLSearchParams(prev);
-                    if (searchInput) newParams.set('nickname', searchInput);
-                    else newParams.delete('nickname');
-                    newParams.set('page', 1);
-                    return newParams;
+                    return buildParams(prev, { nickname: searchInput, page: 1 })
                 }
-                return prev;
-            }, { replace: true });
+                return prev
+            }, { replace: true })
         }, 500);
-        return () => clearTimeout(handler);
-    }, [searchInput, setSearchParams]);
+        return () => clearTimeout(handler)
+    }, [searchInput, setSearchParams])
+
+    const handleItemClick = (item) => {
+        if (viewMode === 'album') {
+            setPostUrl(item.originalData.postUrl);
+            setViewMode('grid');
+            setSearchParams(prev => buildParams(prev, { page: 1 }));
+        } else {
+            setLightboxItem(item);
+        }
+    };
+
+    const handleViewModeChange = (mode) => {
+        setViewMode(mode);
+        setPostUrl('')
+        setSearchParams(prev => buildParams(prev, { page: 1}));
+    }
+
+    const handleBackToAlbum = () => {
+        setViewMode('album');
+        setPostUrl('')
+        setSearchParams(prev => buildParams(prev, { page: 1 }))
+    };
 
     return (
         <div className="min-h-screen font-jakarta bg-[#07070f] text-white relative overflow-x-hidden">
@@ -177,7 +194,7 @@ export default function App() {
                         {/* Total items badge */}
                         <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[12px] font-semibold text-white/50">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] inline-block" />
-                            {/* {galleryData.length * TOTAL_PAGES} Items */} 160 Items
+                            {paging?.total_item || 0} Items
                         </div>
 
                         {/* CTA Button */}
@@ -251,14 +268,12 @@ export default function App() {
             <div className="relative z-40 max-w-screen-2xl mx-auto">
                 <FloatingControlBar
                     viewMode={viewMode}
-                    onViewModeChange={(mode) => {
-                        setViewMode(mode);
-                        handlePageChange(1); // Reset page saat ganti mode
-                    }}
+                    onViewModeChange={handleViewModeChange}
                     activePlatform={source}
                     onPlatformChange={handlePlatformChange}
                     searchQuery={searchInput}
                     onSearchChange={setSearchInput}
+                    onClear={handleClear}
                 />
             </div>
 
@@ -284,8 +299,10 @@ export default function App() {
                 ) : (
                     <GalleryGrid
                         viewMode={viewMode}
-                        items={mappedPhotos} // Lempar data yang sudah di-mapping
-                        onItemClick={setLightboxItem}
+                        items={mappedPhotos}
+                        onItemClick={handleItemClick}
+                        onBackClick={handleBackToAlbum}
+                        showBackButton={!!postUrl}
                     />
                 )}
             </main>

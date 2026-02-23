@@ -1,12 +1,10 @@
 import { Search, X, User, Filter, Loader2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react';
-const API_URL = import.meta.env.VITE_BACKEND_URL
 
-export default function PhotoManager({ photos, selectedMember, queryParams, onClearFilter, onMemberClick, loading, pagingInfo, setQueryParams }) {
+export default function PhotoManager({ item, selectedMember, queryParams, onClearFilter, onMemberClick, loading, pagingInfo, setQueryParams }) {
     const [searchInput, setSearchInput] = useState(queryParams?.search || '')
-    const displayedPhotos = photos;
     const TARGET_SLOTS = 32;
-    const emptySlotsCount = Math.max(0, TARGET_SLOTS - displayedPhotos.length);
+    const emptySlotsCount = Math.max(0, TARGET_SLOTS - item.length);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagingInfo.total_page) {
@@ -82,7 +80,7 @@ export default function PhotoManager({ photos, selectedMember, queryParams, onCl
                         <Loader2 className="animate-spin text-[#EE1D52]" size={32} />
                         <span className="text-sm font-medium">Memuat foto...</span>
                     </div>
-                ) : displayedPhotos.length === 0 ? (
+                ) : item.length === 0 ? (
                     <div className="flex h-192.75 items-center justify-center text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
                         <div className="text-center">
                             <p className="font-medium">Belum ada foto yang discrape.</p>
@@ -91,10 +89,10 @@ export default function PhotoManager({ photos, selectedMember, queryParams, onCl
                     </div>
                 ) : (
                     <div className="grid grid-cols-8 gap-4">
-                        {displayedPhotos.map((photo) => (
+                        {item.map((photo) => (
                             <div key={photo.id} className="group relative rounded-lg overflow-hidden border border-slate-200 aspect-square shadow-sm hover:shadow-md transition-all">
                                 <img
-                                    src={`${API_URL}${photo.srcUrl}`}
+                                    src={photo.media}
                                     alt={photo.caption || "Foto JKT48"}
                                     className="w-full h-full object-cover bg-slate-100"
                                     onError={(e) => {

@@ -74,20 +74,32 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
 
                 {/* Image / Video container */}
                 <div className="relative rounded-2xl overflow-hidden max-h-[75vh]">
-                    <img
-                        src={item.image}
-                        alt={item.caption}
-                        className="block max-h-[75vh] max-w-[85vw] w-auto h-auto object-contain rounded-[20px] shadow-[0_32px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)]"
-                    />
+                    {item.isVideo ? (
+                        // Jika Video, render pemutar video asli
+                        <video
+                            src={item.image}
+                            autoPlay
+                            playsInline
+                            loop
+                            className="block max-h-[75vh] max-w-[85vw] w-auto h-auto object-contain rounded-[20px] shadow-[0_32px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)]"
+                        />
+                    ) : (
+                        // Jika Foto, render gambar
+                        <img
+                            src={item.image}
+                            alt={item.caption}
+                            className="block max-h-[75vh] max-w-[85vw] w-auto h-auto object-contain rounded-[20px] shadow-[0_32px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)]"
+                        />
+                    )}
 
                     {/* Video play overlay mockup */}
-                    {item.isVideo && (
+                    {/* {item.isVideo && (
                         <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/25">
                             <button className="flex items-center justify-center w-20 h-20 rounded-full transition-all duration-300 bg-[#EE1D52]/85 backdrop-blur-md border-2 border-white/30 shadow-[0_0_40px_rgba(238,29,82,0.6)]">
                                 <Play size={32} fill="white" className="text-white ml-1" />
                             </button>
                         </div>
-                    )}
+                    )} */}
 
                     {/* Frosted glass caption box */}
                     <div className="absolute left-4 right-4 bottom-4 rounded-xl p-4 bg-[#0a0a14]/65 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">

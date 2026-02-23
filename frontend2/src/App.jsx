@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar'
 import DashboardStats from './components/DashboardStats'
 import MemberManager from './components/MemberManager'
 import PhotoManager from './components/PhotoManager'
+const API_URL = import.meta.env.VITE_BACKEND_URL
 
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('dashboard')
@@ -96,6 +97,9 @@ export default function Admin() {
 
     const photos = photosQuery.data?.data || []
     const photoPagingInfo = photosQuery.data?.paging || { total_page: 1, page: 1, total_item: 0 }
+    const mappedPhotos = photos.map((item) => ({
+        media: `${API_URL}${item.srcUrl}`
+    }))
 
     const renderContent = () => {
         switch (activeTab) {
@@ -115,7 +119,7 @@ export default function Admin() {
                 />
             case 'photos':
                 return <PhotoManager
-                    photos={photos}
+                    item={mappedPhotos}
                     loading={photosQuery.isFetching}
                     pagingInfo={photoPagingInfo}
                     queryParams={photoQueryParams}
