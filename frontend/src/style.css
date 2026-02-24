@@ -4,8 +4,19 @@
     0%, 100% {
     box-shadow: 0 0 0 2px #EE1D52, 0 0 16px #EE1D52, 0 0 32px rgba(238, 29, 82, 0.5);
     }
-  50% {
+    50% {
     box-shadow: 0 0 0 3px #EE1D52, 0 0 24px #EE1D52, 0 0 48px rgba(238, 29, 82, 0.7);
+    }
+}
+
+@keyframes fade-in-up {
+    from {
+    opacity: 0;
+    transform: translateY(24px);
+    }
+    to {
+    opacity: 1;
+    transform: translateY(0);
     }
 }
 
@@ -18,8 +29,27 @@
     }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+    opacity: 0;
+    transform: scale(0.92);
+    }
+    to {
+    opacity: 1;
+    transform: scale(1);
+    }
+}
+
 @theme {
     --font-jakarta: "Plus Jakarta Sans";
     --animate-glow-pulse: glowPulse 2.5s ease-in-out infinite;
     --animate-glow-pulse-cyan: glowPulseCyan 2.5s ease-in-out infinite;
+    --animate-fade-in-up: fade-in-up 0.4s ease-out both;
+    --animate-fade-in: fadeIn 0.3s ease-out both;
+    --animate-scale-in: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }

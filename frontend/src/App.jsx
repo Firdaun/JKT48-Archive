@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { StoryCarousel } from './components/ui/StoryCarousel';
 import { FloatingControlBar } from './components/ui/FloatingControlBar';
 import { GalleryGrid } from './components/ui/GalleryGrid';
@@ -6,7 +6,6 @@ import { useSearchParams } from 'react-router'
 import { Lightbox } from './components/ui/Lightbox';
 import { Pagination } from './components/ui/Pagination';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { Sparkles, Bell } from 'lucide-react';
 import { photoApi } from './lib/photo-api';
 
@@ -24,8 +23,9 @@ export default function App() {
     const page = parseInt(searchParams.get('page') || '1');
     const [postUrl, setPostUrl] = useState('')
     const [viewMode, setViewMode] = useState('album');
-    const [searchInput, setSearchInput] = useState(nickname);
+    const [searchInput, setSearchInput] = useState('');
     const [lightboxItem, setLightboxItem] = useState(null);
+    const searchTimeout = useRef(null)
 
     const photoQueryParams = {
         page: page,
@@ -41,7 +41,6 @@ export default function App() {
         queryFn: () => photoApi.getPublicPhotos(photoQueryParams),
         staleTime: 1000 * 60 * 15,
         gcTime: 1000 * 60 * 30,
-        placeholderData: keepPreviousData
     });
 
     const photos = imgQuery.data?.data || [];
@@ -77,12 +76,14 @@ export default function App() {
     }
 
     const handleMemberSelect = (memberName) => {
-        setSearchInput(memberName)
+        setSearchInput('')
+        if (searchTimeout.current) clearTimeout(searchTimeout.current)
         setSearchParams(prev => buildParams(prev, { nickname: memberName, page: 1 }))
     }
 
     const handleClear = () => {
         setSearchInput('')
+        if (searchTimeout.current) clearTimeout(searchTimeout.current)
         setPostUrl('')
         setViewMode('album')
         setSearchParams(prev => buildParams(prev, { nickname: null, source: null, page: 1 }))
@@ -98,18 +99,15 @@ export default function App() {
         setSearchParams(prev => buildParams(prev, { source: p, page: 1 }))
     }
 
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setSearchParams(prev => {
-                const currentNickname = prev.get('nickname') || ''
-                if (currentNickname !== searchInput) {
-                    return buildParams(prev, { nickname: searchInput, page: 1 })
-                }
-                return prev
-            }, { replace: true })
-        }, 500);
-        return () => clearTimeout(handler)
-    }, [searchInput, setSearchParams])
+    const handleSearchChange = (value) => {
+        setSearchInput(value)
+
+        if (searchTimeout.current) clearTimeout(searchTimeout.current)
+
+        searchTimeout.current = setTimeout(() => {
+            setSearchParams(prev => buildParams(prev, { nickname: value, page: 1} ))
+        }, 500)
+    }
 
     const handleItemClick = (item) => {
         if (viewMode === 'album') {
@@ -272,7 +270,7 @@ export default function App() {
                     activePlatform={source}
                     onPlatformChange={handlePlatformChange}
                     searchQuery={searchInput}
-                    onSearchChange={setSearchInput}
+                    onSearchChange={handleSearchChange}
                     onClear={handleClear}
                 />
             </div>
@@ -291,7 +289,7 @@ export default function App() {
 
             {/* ─── GALLERY GRID ─── */}
             <main className="relative z-10 max-w-screen-2xl mx-auto min-h-[40vh]">
-                {imgQuery.isFetching ? (
+                {imgQuery.isLoading ? (
                     <div className="py-20 flex justify-center items-center flex-col gap-4">
                         <div className="w-8 h-8 rounded-full border-2 border-[#EE1D52] border-t-transparent animate-spin"></div>
                         <p className="text-white/50 text-sm animate-pulse">Memuat foto...</p>
