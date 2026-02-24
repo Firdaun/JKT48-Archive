@@ -34,16 +34,6 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
         <section className="overflow-hidden pt-13 pb-3 h-47">
             <div ref={emblaRef}>
                 <div className="flex select-none">
-                    {/* <button onClick={() => onSelectMember('')} className="flex ml-5 flex-col items-center gap-2 shrink-0 group min-w-18">
-                        <div className={`relative rounded-full p-1 border-2 transition-all duration-300 ease-out ${!activeMember ? 'border-[#EE1D52] scale-110 shadow-[0_0_15px_rgba(238,29,82,0.4)]' : 'border-transparent group-hover:scale-105 opacity-50 hover:opacity-100'}`}>
-                            <div className="w-16 h-16 flex items-center justify-center rounded-full overflow-hidden bg-white/5 border border-white/10 text-2xl">
-                                🌟
-                            </div>
-                        </div>
-                        <span className={`text-center block text-[11px] tracking-[0.02em] max-w-16 truncate transition-colors duration-300 ease-in-out ${!activeMember ? 'font-bold text-white' : 'font-normal text-white/40'}`}>
-                            All
-                        </span>
-                    </button> */}
                     {PhotoProfile.map((member, index) => {
                         const isActive = activeMember?.toLowerCase() === member.name.toLowerCase();
                         const color = teamColors[member.team] || '#EE1D52';

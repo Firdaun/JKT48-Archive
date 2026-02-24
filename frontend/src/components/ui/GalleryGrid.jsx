@@ -13,34 +13,32 @@ export function GalleryGrid({ viewMode, items, onItemClick, showBackButton, onBa
     if (viewMode === 'grid') {
         return (
             <div className="px-8 pb-8">
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-1">
-                    {showBackButton && (
-                        <button onClick={onBackClick} className="aspect-square bg-black border-none p-0 cursor-pointer flex flex-col justify-center items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path></svg>
-                        </button>
-                    )}
-                    {items.map((item) => (
-                        <button key={item.id} onClick={() => onItemClick(item)} className="group relative aspect-square overflow-hidden bg-[#111120] border-none p-0 cursor-pointer block">
+                <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+                    {items.map((item, index) => (
+                        <button key={item.id} onClick={() => onItemClick(item)} style={{ animationDelay: `${index * 0.04}s` }} className="relative rounded-xl overflow-hidden group animate-fade-in-up aspect-square border border-white/[0.07] cursor-pointer">
                             {item.isVideo ? (
                                 <video
-                                    src={`${item.image}#t=0.001`}
-                                    
-                                    preload="metadata"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    src={item.image}
+                                    alt={item.caption}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     muted
                                     playsInline
                                 />
                             ) : (
-                                <img src={item.image} alt={item.caption} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <img
+                                    src={item.image}
+                                    alt={item.caption}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    loading="lazy"
+                                />
                             )}
-
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-linear-to-t from-black/90 to-transparent">
-                                <p className="text-[11px] font-medium text-white line-clamp-2 text-left">{item.caption}</p>
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 bg-[linear-gradient(to_top,rgba(7,7,15,0.95)_0%,rgba(7,7,15,0.2)_60%,transparent_100%)]">
+                                <p className="text-[11px] font-medium text-white text-left leading-[1.4] line-clamp-2">
+                                    {item.caption}
+                                </p>
                             </div>
-
                             {item.isVideo && (
-                                <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#EE1D52]/85 text-[8px] font-bold text-white tracking-[0.05em]">
+                                <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[rgba(238,29,82,0.85)] text-[8px] font-bold text-white tracking-[0.05em]">
                                     ▶ VIDEO
                                 </div>
                             )}

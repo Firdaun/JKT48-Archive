@@ -32,7 +32,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
             if (e.key === 'ArrowRight') goNext();
         };
         window.addEventListener('keydown', handleKey);
-        document.body.style.overflow = 'hidden'; // Mengunci scroll halaman belakang
+        document.body.style.overflow = 'hidden';
 
         return () => {
             window.removeEventListener('keydown', handleKey);
@@ -43,37 +43,23 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
     const platformColor = platformColors[item.platform] || '#EE1D52';
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in bg-[#04040a]/90"
-            onClick={onClose}
-        >
+        <div  className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in bg-[#04040a]/80">
             {/* Blur backdrop */}
             <div className="absolute inset-0 backdrop-blur-[28px]" />
 
             {/* Ambient glow */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(238,29,82,0.06) 0%, transparent 70%)',
-                }}
-            />
+            <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(238,29,82,0.06)_0%,transparent_70%)]" />
 
             {/* Main content container */}
-            <div
-                className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]"
-                onClick={e => e.stopPropagation()}
-            >
+            <div onClick={onClose}  className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]">
                 {/* Close button */}
-                <button
-                    onClick={onClose}
-                    className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white"
-                >
+                <button onClick={onClose} className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white">
                     <X size={14} />
                     Close
                 </button>
 
                 {/* Image / Video container */}
-                <div className="relative rounded-2xl overflow-hidden max-h-[75vh]">
+                <div onClick={e => e.stopPropagation()} className="relative rounded-2xl overflow-hidden max-h-[75vh]">
                     {item.isVideo ? (
                         // Jika Video, render pemutar video asli
                         <video
@@ -185,11 +171,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                                 <button
                                     key={i.id}
                                     onClick={() => onNavigate(i)}
-                                    className="h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer"
-                                    style={{
-                                        width: isCurrent ? 24 : 6,
-                                        background: isCurrent ? '#EE1D52' : 'rgba(255,255,255,0.2)',
-                                    }}
+                                    className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer ${isCurrent ? 'w-6 bg-[#EE1D52]' : 'w-1.5 bg-white/20'}`}
                                 />
                             );
                         })}
