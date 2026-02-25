@@ -69,23 +69,7 @@ export function GalleryCard({ item, onClick, index }) {
                             loading="lazy"
                         />
                     )}
-
                     <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(7,7,15,0.92)_0%,rgba(7,7,15,0.4)_50%,rgba(7,7,15,0.05)_100%)]" />
-
-
-                    {/* Platform badge */}
-                    <div
-                        className="absolute top-3 right-3 flex items-center justify-center rounded-full backdrop-blur-md"
-                        style={{
-                            width: 26,
-                            height: 26,
-                            background: `${platformColor}22`,
-                            border: `1px solid ${platformColor}55`,
-                            color: platformColor,
-                        }}
-                    >
-                        {platformIcons[item.platform]}
-                    </div>
 
                     {/* Bottom text overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -107,16 +91,14 @@ export function GalleryCard({ item, onClick, index }) {
                         @{item.member.toLowerCase()}
                     </span>
 
-                    {/* Stats */}
-                    <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-[11px] text-white/40">
-                            <Heart size={11} className="text-[#EE1D52]" />
-                            {formatCount(item.likes)}
-                        </span>
-                        <span className="flex items-center gap-1 text-[11px] text-white/40">
-                            <MessageCircle size={11} className="text-[#00D4FF]" />
-                            {formatCount(item.comments)}
-                        </span>
+                    <div
+                        className="flex items-center justify-center rounded-full backdrop-blur-md w-6.5 h-6.5"
+                        style={{
+                            background: `${platformColor}22`,
+                            border: `1px solid ${platformColor}55`,
+                            color: platformColor,
+                        }}>
+                        {platformIcons[item.platform]}
                     </div>
                 </div>
             </div>
