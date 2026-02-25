@@ -24,8 +24,6 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                 if (index !== -1) {
                     emblaApi.scrollTo(index);
                 }
-            } else {
-                emblaApi.scrollTo(0);
             }
         }
     }, [activeMember, emblaApi]);
@@ -43,7 +41,7 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                             <button
                                 key={index}
                                 onClick={() => onSelectMember(member.name)}
-                                className="flex mr-5 flex-col items-center gap-2 shrink-0 group min-w-18">
+                                className="flex mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18">
                                 <div className={`relative transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isActive ? 'scale-110' : 'scale-100'}`}>
                                     {/* Glow Ring */}
                                     <div className={`rounded-full p-0.75 ${isActive ? isCyan ? 'animate-glow-pulse-cyan' : 'animate-glow-pulse' : 'bg-white/12'}`}

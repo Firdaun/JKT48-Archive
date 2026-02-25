@@ -1,6 +1,6 @@
 import { GalleryCard } from './GalleryCard';
 
-export function GalleryGrid({ viewMode, items, onItemClick, showBackButton, onBackClick }) {
+export function GalleryGrid({ viewMode, items, onItemClick}) {
     if (!items || items.length === 0) {
         return (
             <div className="w-full py-20 flex justify-center items-center flex-col gap-2">
@@ -14,15 +14,6 @@ export function GalleryGrid({ viewMode, items, onItemClick, showBackButton, onBa
         return (
             <div className="px-8 pb-8">
                 <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
-                    {showBackButton && (
-                        <button
-                            onClick={onBackClick}
-                            className="aspect-square rounded-xl bg-[#111120] hover:bg-[#1a1a2e] transition-colors border border-white/[0.07] cursor-pointer flex flex-col justify-center items-center text-white/50 hover:text-white"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path></svg>
-                            <span className="text-[10px] font-bold mt-2 tracking-wider">KEMBALI</span>
-                        </button>
-                    )}
                     {items.map((item, index) => (
                         <button key={item.id} onClick={() => onItemClick(item)} style={{ animationDelay: `${index * 0.04}s` }} className="relative rounded-xl overflow-hidden group animate-fade-in-up aspect-square border border-white/[0.07] cursor-pointer">
                             {item.isVideo ? (
