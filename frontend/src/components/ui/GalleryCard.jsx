@@ -42,7 +42,7 @@ export function GalleryCard({ item, onClick, index }) {
     const platformColor = platformColors[item.platform] || '#EE1D52';
 
     return (
-        <div className="relative mb-6 break-inside-avoid group cursor-pointer px-2 pt-2 pb-0 transition-transform duration-300 ease[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-1.5"
+        <div className="relative mb-6 break-inside-avoid group cursor-pointer px-2 pt-2 pb-0"
             style={{ animationDelay: `${index * 0.05}s` }} onClick={() => onClick(item)}>
             {/* Stacked polaroid layers */}
             {/* Stacked polaroid layers */}
@@ -57,7 +57,7 @@ export function GalleryCard({ item, onClick, index }) {
                     {item.isVideo ? (
                         <video
                             src={item.image}
-                            className="w-full h-full object-cover card-image transition-transform duration-500 ease-in-out group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
                             muted
                             playsInline
                         />
@@ -65,7 +65,7 @@ export function GalleryCard({ item, onClick, index }) {
                         <img
                             src={item.image}
                             alt={item.caption}
-                            className="w-full h-full object-cover card-image transition-transform duration-500 ease-in-out group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
                             loading="lazy"
                         />
                     )}

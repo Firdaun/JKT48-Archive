@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Play, ExternalLink } from 'lucide-react';
 
 function formatCount(n) {
@@ -15,6 +15,34 @@ const platformColors = {
 
 export function Lightbox({ item, allItems, onClose, onNavigate }) {
     const currentIndex = allItems.findIndex(i => i.id === item.id);
+    const [showCaption, setShowCaption] = useState(true);
+    const hideTimer = useRef(null);
+
+    const resetAndStartTimer = useCallback(() => {
+        if (hideTimer.current) clearTimeout(hideTimer.current);
+        setShowCaption(true);
+        // Sembunyikan setelah 3 detik (3000 ms)
+        hideTimer.current = setTimeout(() => {
+            setShowCaption(false);
+        }, 3000);
+    }, []);
+
+    const handleMouseEnter = () => {
+        if (hideTimer.current) clearTimeout(hideTimer.current);
+        setShowCaption(true); // Selalu tampilkan jika kursor di dalam gambar
+    };
+
+    const handleMouseLeave = () => {
+        resetAndStartTimer(); // Mulai hitung mundur 3 detik jika kursor keluar
+    };
+
+    // Jalankan timer saat pertama kali dibuka atau saat ganti foto
+    useEffect(() => {
+        resetAndStartTimer();
+        return () => {
+            if (hideTimer.current) clearTimeout(hideTimer.current);
+        };
+    }, [item, resetAndStartTimer]);
 
     const goPrev = useCallback(() => {
         if (currentIndex > 0) onNavigate(allItems[currentIndex - 1]);
@@ -43,15 +71,12 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
     const platformColor = platformColors[item.platform] || '#EE1D52';
 
     return (
-        <div  className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in bg-[#04040a]/80">
-            {/* Blur backdrop */}
-            <div className="absolute inset-0 backdrop-blur-[28px]" />
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in backdrop-blur-xl bg-[#04040a]/80">
             {/* Ambient glow */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(238,29,82,0.06)_0%,transparent_70%)]" />
 
             {/* Main content container */}
-            <div onClick={onClose}  className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]">
+            <div onClick={onClose} className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]">
                 {/* Close button */}
                 <button onClick={onClose} className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white">
                     <X size={14} />
@@ -59,10 +84,11 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                 </button>
 
                 {/* Image / Video container */}
-                <div onClick={e => e.stopPropagation()} className="relative rounded-2xl overflow-hidden max-h-[75vh]">
+                <div onClick={e => e.stopPropagation()} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="relative rounded-2xl overflow-hidden max-h-[75vh]">
                     {item.isVideo ? (
                         // Jika Video, render pemutar video asli
                         <video
+                            ref={(el) => { if (el) el.volume = 0.3; }}
                             src={item.image}
                             autoPlay
                             playsInline
@@ -78,17 +104,9 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                         />
                     )}
 
-                    {/* Video play overlay mockup */}
-                    {/* {item.isVideo && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/25">
-                            <button className="flex items-center justify-center w-20 h-20 rounded-full transition-all duration-300 bg-[#EE1D52]/85 backdrop-blur-md border-2 border-white/30 shadow-[0_0_40px_rgba(238,29,82,0.6)]">
-                                <Play size={32} fill="white" className="text-white ml-1" />
-                            </button>
-                        </div>
-                    )} */}
-
                     {/* Frosted glass caption box */}
-                    <div className="absolute left-4 right-4 bottom-4 rounded-xl p-4 bg-[#0a0a14]/65 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+                    <div className={`absolute left-4 right-4 bottom-4 rounded-xl p-4 bg-[#0a0a14]/65 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+                        ${showCaption ? 'opacity-100' : 'opacity-0 pointer-events-none'} transition-all duration-500 ease-in-out`}>
                         {/* Top row */}
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
@@ -118,17 +136,8 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                         </p>
 
                         {/* Stats & Action buttons */}
-                        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-white/10">
-                            <button className="flex items-center gap-1.5 transition-all duration-150 hover:scale-105 text-white/50 text-xs">
-                                <Heart size={13} className="text-[#EE1D52]" />
-                                {formatCount(item.likes)}
-                            </button>
-                            <button className="flex items-center gap-1.5 transition-all duration-150 hover:scale-105 text-white/50 text-xs">
-                                <MessageCircle size={13} className="text-[#00D4FF]" />
-                                {formatCount(item.comments)}
-                            </button>
-
-                            <button className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/60 text-[11px] font-semibold hover:bg-white/20 hover:text-white">
+                        <div className="flex items-center justify-between gap-4 mt-3 pt-3 border-t border-white/10">
+                            <button className=" flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/60 text-[11px] font-semibold hover:bg-white/20 hover:text-white">
                                 <Share2 size={11} />
                                 Share
                             </button>
