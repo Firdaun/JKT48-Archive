@@ -56,10 +56,11 @@ export default function App() {
         date: new Date(item.postedAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
         likes: item.likes || 0,
         comments: item.comments || 0,
-        member: nickname || 'JKT48',
+        member: item.member?.nickname || nickname || 'JKT48',
         aspectRatio: 'portrait',
         originalData: item
     }))
+    
 
     const buildParams = (prevParams, updates) => {
         const params = new URLSearchParams(prevParams)

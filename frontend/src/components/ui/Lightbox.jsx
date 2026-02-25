@@ -143,7 +143,10 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                 {/* Navigation arrow - Previous */}
                 {currentIndex > 0 && (
                     <button
-                        onClick={goPrev}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            goPrev();
+                        }}
                         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
                     >
                         <ChevronLeft size={22} />
@@ -153,7 +156,10 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                 {/* Navigation arrow - Next */}
                 {currentIndex < allItems.length - 1 && (
                     <button
-                        onClick={goNext}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            goNext();
+                        }}
                         className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
                     >
                         <ChevronRight size={22} />
