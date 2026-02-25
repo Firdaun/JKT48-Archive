@@ -29,7 +29,7 @@ export default function App() {
 
     const photoQueryParams = {
         page: page,
-        size: viewMode === 'album' ? 8 : 40,
+        size: viewMode === 'album' ? 8 : 28,
         source: source === 'All' ? '' : source.toLowerCase(),
         nickname: nickname,
         mode: viewMode === 'grid' ? 'photo' : 'album',
@@ -114,7 +114,11 @@ export default function App() {
         if (viewMode === 'album') {
             setPostUrl(item.originalData.postUrl);
             setViewMode('grid');
-            setSearchParams(prev => buildParams(prev, { page: 1 }));
+            const targetNickname = item.originalData.member?.nickname || item.member
+            setSearchParams(prev => buildParams(prev, {
+                page: 1,
+                nickname: targetNickname
+            }));
         } else {
             setLightboxItem(item);
         }
@@ -122,14 +126,17 @@ export default function App() {
 
     const handleViewModeChange = (mode) => {
         setViewMode(mode);
-        setPostUrl('')
-        setSearchParams(prev => buildParams(prev, { page: 1}));
+        setPostUrl('');
+        if (mode === 'album') {
+            setSearchParams(prev => buildParams(prev, { page: 1, nickname: null }));
+        } else {
+            setSearchParams(prev => buildParams(prev, { page: 1,}));
+        }
     }
 
-    const handleBackToAlbum = () => {
-        setViewMode('album');
-        setPostUrl('')
-        setSearchParams(prev => buildParams(prev, { page: 1 }))
+    const handleShowAll = () => {
+        setPostUrl('');
+        setSearchParams(prev => buildParams(prev, { nickname: null, page: 1 }));
     };
 
     return (
@@ -286,6 +293,15 @@ export default function App() {
                         {paging?.total_item || 0} results
                     </span>
                 </div>
+                <div>
+                    {nickname && (
+                        <button 
+                            onClick={handleShowAll}
+                            className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
+                            show all
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* ─── GALLERY GRID ─── */}
@@ -300,8 +316,6 @@ export default function App() {
                         viewMode={viewMode}
                         items={mappedPhotos}
                         onItemClick={handleItemClick}
-                        onBackClick={handleBackToAlbum}
-                        showBackButton={!!postUrl}
                     />
                 )}
             </main>

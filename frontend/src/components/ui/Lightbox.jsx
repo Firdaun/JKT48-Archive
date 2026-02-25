@@ -21,19 +21,18 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
     const resetAndStartTimer = useCallback(() => {
         if (hideTimer.current) clearTimeout(hideTimer.current);
         setShowCaption(true);
-        // Sembunyikan setelah 3 detik (3000 ms)
         hideTimer.current = setTimeout(() => {
             setShowCaption(false);
-        }, 3000);
+        }, 2000);
     }, []);
 
     const handleMouseEnter = () => {
         if (hideTimer.current) clearTimeout(hideTimer.current);
-        setShowCaption(true); // Selalu tampilkan jika kursor di dalam gambar
+        setShowCaption(true);
     };
 
     const handleMouseLeave = () => {
-        resetAndStartTimer(); // Mulai hitung mundur 3 detik jika kursor keluar
+        resetAndStartTimer();
     };
 
     // Jalankan timer saat pertama kali dibuka atau saat ganti foto
@@ -42,7 +41,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
         return () => {
             if (hideTimer.current) clearTimeout(hideTimer.current);
         };
-    }, [item, resetAndStartTimer]);
+    }, [resetAndStartTimer]);
 
     const goPrev = useCallback(() => {
         if (currentIndex > 0) onNavigate(allItems[currentIndex - 1]);
@@ -156,7 +155,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                             e.stopPropagation();
                             goPrev();
                         }}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
+                        className="absolute left-0 cursor-pointer top-1/2 -translate-y-1/2 -translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
                     >
                         <ChevronLeft size={22} />
                     </button>
@@ -169,7 +168,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                             e.stopPropagation();
                             goNext();
                         }}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
+                        className="absolute right-0 cursor-pointer top-1/2 -translate-y-1/2 translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
                     >
                         <ChevronRight size={22} />
                     </button>
