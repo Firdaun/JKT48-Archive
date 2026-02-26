@@ -1,6 +1,6 @@
-import { Search, X, BookOpen, LayoutGrid } from 'lucide-react';
-import { useRef } from 'react';
-import { platforms } from '../data/platforms';
+import { Search, X, BookOpen, LayoutGrid } from 'lucide-react'
+import { useRef } from 'react'
+import { platforms } from '../data/platforms'
 
 export function FloatingControlBar({
     onClear,
@@ -11,7 +11,7 @@ export function FloatingControlBar({
     searchQuery,
     onSearchChange,
 }) {
-    const inputRef = useRef(null);
+    const inputRef = useRef(null)
 
     return (
         <div className="sticky top-4 z-40 px-8 mb-8">
@@ -43,7 +43,7 @@ export function FloatingControlBar({
                     {/* ── Social Platform Filter ── */}
                     <div className="relative flex items-center gap-1">
                         {platforms.map((platform) => {
-                            const isActive = activePlatform === platform.key;
+                            const isActive = activePlatform === platform.key
                             return (
                                 <button
                                     key={platform.key}
@@ -58,7 +58,7 @@ export function FloatingControlBar({
                                         <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-linear-to-r from-[#EE1D52] to-[#ff6b9d] shadow-[0_0_8px_#EE1D52]" />
                                     )}
                                 </button>
-                            );
+                            )
                         })}
                     </div>
 
@@ -86,5 +86,5 @@ export function FloatingControlBar({
                 </div>
             </div>
         </div>
-    );
+    )
 }

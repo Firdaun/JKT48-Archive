@@ -1,73 +1,73 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Play, ExternalLink } from 'lucide-react';
+import React, { useEffect, useCallback, useState, useRef } from 'react'
+import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Play, ExternalLink } from 'lucide-react'
 
 function formatCount(n) {
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-    return String(n);
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
+    return String(n)
 }
 
 const platformColors = {
     Instagram: '#E1306C',
     TikTok: '#EE1D52',
     X: '#1DA1F2',
-};
+}
 
 export function Lightbox({ item, allItems, onClose, onNavigate }) {
-    const currentIndex = allItems.findIndex(i => i.id === item.id);
-    const [showCaption, setShowCaption] = useState(true);
-    const hideTimer = useRef(null);
+    const currentIndex = allItems.findIndex(i => i.id === item.id)
+    const [showCaption, setShowCaption] = useState(true)
+    const hideTimer = useRef(null)
 
     const resetAndStartTimer = useCallback(() => {
-        if (hideTimer.current) clearTimeout(hideTimer.current);
-        setShowCaption(true);
+        if (hideTimer.current) clearTimeout(hideTimer.current)
+        setShowCaption(true)
         hideTimer.current = setTimeout(() => {
-            setShowCaption(false);
-        }, 2000);
-    }, []);
+            setShowCaption(false)
+        }, 2000)
+    }, [])
 
     const handleMouseEnter = () => {
-        if (hideTimer.current) clearTimeout(hideTimer.current);
-        setShowCaption(true);
-    };
+        if (hideTimer.current) clearTimeout(hideTimer.current)
+        setShowCaption(true)
+    }
 
     const handleMouseLeave = () => {
-        resetAndStartTimer();
-    };
+        resetAndStartTimer()
+    }
 
     // Jalankan timer saat pertama kali dibuka atau saat ganti foto
     useEffect(() => {
-        resetAndStartTimer();
+        resetAndStartTimer()
         return () => {
-            if (hideTimer.current) clearTimeout(hideTimer.current);
-        };
-    }, [resetAndStartTimer]);
+            if (hideTimer.current) clearTimeout(hideTimer.current)
+        }
+    }, [resetAndStartTimer])
 
     const goPrev = useCallback(() => {
-        if (currentIndex > 0) onNavigate(allItems[currentIndex - 1]);
-    }, [currentIndex, allItems, onNavigate]);
+        if (currentIndex > 0) onNavigate(allItems[currentIndex - 1])
+    }, [currentIndex, allItems, onNavigate])
 
     const goNext = useCallback(() => {
-        if (currentIndex < allItems.length - 1) onNavigate(allItems[currentIndex + 1]);
-    }, [currentIndex, allItems, onNavigate]);
+        if (currentIndex < allItems.length - 1) onNavigate(allItems[currentIndex + 1])
+    }, [currentIndex, allItems, onNavigate])
 
     // Handle Keyboard Navigation & Lock Scroll
     useEffect(() => {
         const handleKey = (e) => {
-            if (e.key === 'Escape') onClose();
-            if (e.key === 'ArrowLeft') goPrev();
-            if (e.key === 'ArrowRight') goNext();
-        };
-        window.addEventListener('keydown', handleKey);
-        document.body.style.overflow = 'hidden';
+            if (e.key === 'Escape') onClose()
+            if (e.key === 'ArrowLeft') goPrev()
+            if (e.key === 'ArrowRight') goNext()
+        }
+        window.addEventListener('keydown', handleKey)
+        document.body.style.overflow = 'hidden'
 
         return () => {
-            window.removeEventListener('keydown', handleKey);
-            document.body.style.overflow = '';
-        };
-    }, [onClose, goPrev, goNext]);
+            window.removeEventListener('keydown', handleKey)
+            document.body.style.overflow = ''
+        }
+    }, [onClose, goPrev, goNext])
 
-    const platformColor = platformColors[item.platform] || '#EE1D52';
+    const platformColor = platformColors[item.platform] || '#EE1D52'
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in backdrop-blur-xl bg-[#04040a]/80">
@@ -87,7 +87,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                     {item.isVideo ? (
                         // Jika Video, render pemutar video asli
                         <video
-                            ref={(el) => { if (el) el.volume = 0.3; }}
+                            ref={(el) => { if (el) el.volume = 0.3 }}
                             src={item.image}
                             autoPlay
                             playsInline
@@ -152,8 +152,8 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                 {currentIndex > 0 && (
                     <button
                         onClick={(e) => {
-                            e.stopPropagation();
-                            goPrev();
+                            e.stopPropagation()
+                            goPrev()
                         }}
                         className="absolute left-0 cursor-pointer top-1/2 -translate-y-1/2 -translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
                     >
@@ -165,8 +165,8 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                 {currentIndex < allItems.length - 1 && (
                     <button
                         onClick={(e) => {
-                            e.stopPropagation();
-                            goNext();
+                            e.stopPropagation()
+                            goNext()
                         }}
                         className="absolute right-0 cursor-pointer top-1/2 -translate-y-1/2 translate-x-16 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 bg-white/10 border border-white/15 backdrop-blur-md text-white hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40"
                     >
@@ -179,18 +179,18 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                     {allItems
                         .slice(Math.max(0, currentIndex - 3), Math.min(allItems.length, currentIndex + 4))
                         .map((i, dotIdx) => {
-                            const actualIdx = Math.max(0, currentIndex - 3) + dotIdx;
-                            const isCurrent = actualIdx === currentIndex;
+                            const actualIdx = Math.max(0, currentIndex - 3) + dotIdx
+                            const isCurrent = actualIdx === currentIndex
                             return (
                                 <button
                                     key={i.id}
                                     onClick={() => onNavigate(i)}
                                     className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer ${isCurrent ? 'w-6 bg-[#EE1D52]' : 'w-1.5 bg-white/20'}`}
                                 />
-                            );
+                            )
                         })}
                 </div>
             </div>
         </div>
-    );
+    )
 }

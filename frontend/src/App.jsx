@@ -1,30 +1,30 @@
-import { useRef, useState } from 'react';
-import { StoryCarousel } from './components/ui/StoryCarousel';
-import { FloatingControlBar } from './components/ui/FloatingControlBar';
-import { GalleryGrid } from './components/ui/GalleryGrid';
+import { useRef, useState } from 'react'
+import { StoryCarousel } from './components/ui/StoryCarousel'
+import { FloatingControlBar } from './components/ui/FloatingControlBar'
+import { GalleryGrid } from './components/ui/GalleryGrid'
 import { useSearchParams } from 'react-router'
-import { Lightbox } from './components/ui/Lightbox';
-import { Pagination } from './components/ui/Pagination';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Sparkles, Bell } from 'lucide-react';
-import { photoApi } from './lib/photo-api';
+import { Lightbox } from './components/ui/Lightbox'
+import { Pagination } from './components/ui/Pagination'
+import { useQuery } from '@tanstack/react-query'
+import { Sparkles, Bell } from 'lucide-react'
+import { photoApi } from './lib/photo-api'
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || ''
 
 const isVideoFile = (url, type) => {
-    return type === 'VIDEO' || (url && url.endsWith('.mp4'));
-};
+    return type === 'VIDEO' || (url && url.endsWith('.mp4'))
+}
 
 export default function App() {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams()
 
-    const source = searchParams.get('source') || 'All';
-    const nickname = searchParams.get('nickname') || '';
-    const page = parseInt(searchParams.get('page') || '1');
+    const source = searchParams.get('source') || 'All'
+    const nickname = searchParams.get('nickname') || ''
+    const page = parseInt(searchParams.get('page') || '1')
     const [postUrl, setPostUrl] = useState('')
-    const [viewMode, setViewMode] = useState('album');
-    const [searchInput, setSearchInput] = useState('');
-    const [lightboxItem, setLightboxItem] = useState(null);
+    const [viewMode, setViewMode] = useState('album')
+    const [searchInput, setSearchInput] = useState('')
+    const [lightboxItem, setLightboxItem] = useState(null)
     const searchTimeout = useRef(null)
 
     const photoQueryParams = {
@@ -34,18 +34,37 @@ export default function App() {
         nickname: nickname,
         mode: viewMode === 'grid' ? 'photo' : 'album',
         post_url: postUrl
-    };
+    }
 
     const imgQuery = useQuery({
         queryKey: ['public-photos', photoQueryParams],
         queryFn: () => photoApi.getPublicPhotos(photoQueryParams),
         staleTime: 1000 * 60 * 15,
         gcTime: 1000 * 60 * 30,
-    });
+    })
 
-    const photos = imgQuery.data?.data || [];
-    const paging = imgQuery.data?.paging;
-    const maxPage = paging?.total_page || 1;
+    const photos = imgQuery.data?.data || []
+    const paging = imgQuery.data?.paging
+    const maxPage = paging?.total_page || 1
+
+    const paginationGroup = () => {
+        if (maxPage <= 5) {
+            return Array.from({ length: maxPage }, (_, i) => i + 1)
+        }
+        if (page <= 3) {
+            return [1, 2, 3, 'jump-next', maxPage]
+        }
+        if (page >= maxPage - 2) {
+            return [1, 'jump-prev', maxPage - 2, maxPage - 1, maxPage]
+        }
+        return [1, 'jump-prev', page, 'jump-next', maxPage]
+    }
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= maxPage) {
+            setSearchParams(prev => buildParams(prev, { page: newPage }))
+        }
+    }
 
     const mappedPhotos = photos.map((item) => ({
         id: item.id || Math.random().toString(),
@@ -90,12 +109,6 @@ export default function App() {
         setSearchParams(prev => buildParams(prev, { nickname: null, source: null, page: 1 }))
     }
 
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= maxPage) {
-            setSearchParams(prev => buildParams(prev, { page: newPage }))
-        }
-    }
-
     const handlePlatformChange = (p) => {
         setSearchParams(prev => buildParams(prev, { source: p, page: 1 }))
     }
@@ -112,32 +125,34 @@ export default function App() {
 
     const handleItemClick = (item) => {
         if (viewMode === 'album') {
-            setPostUrl(item.originalData.postUrl);
-            setViewMode('grid');
+            setPostUrl(item.originalData.postUrl)
+            setViewMode('grid')
             const targetNickname = item.originalData.member?.nickname || item.member
             setSearchParams(prev => buildParams(prev, {
                 page: 1,
                 nickname: targetNickname
-            }));
+            }))
         } else {
-            setLightboxItem(item);
-        }
-    };
-
-    const handleViewModeChange = (mode) => {
-        setViewMode(mode);
-        setPostUrl('');
-        if (mode === 'album') {
-            setSearchParams(prev => buildParams(prev, { page: 1, nickname: null }));
-        } else {
-            setSearchParams(prev => buildParams(prev, { page: 1,}));
+            setLightboxItem(item)
         }
     }
 
+    const handleViewModeChange = (mode) => {
+        if (mode === 'album') {
+            setSearchParams(prev => buildParams(prev, { page: 1, nickname: null }))
+        } else {
+            setSearchParams(prev => buildParams(prev, { page: 1,}))
+        }
+        setTimeout(() => {
+            setViewMode(mode)
+            setPostUrl('')
+        }, 1)
+    }
+
     const handleShowAll = () => {
-        setPostUrl('');
-        setSearchParams(prev => buildParams(prev, { nickname: null, page: 1 }));
-    };
+        setPostUrl('')
+        setSearchParams(prev => buildParams(prev, { nickname: null, page: 1 }))
+    }
 
     return (
         <div className="min-h-screen font-jakarta bg-[#07070f] text-white relative overflow-x-hidden">
@@ -278,6 +293,7 @@ export default function App() {
                     currentPage={page}
                     totalPages={maxPage}
                     onPageChange={handlePageChange}
+                    paginationGroup={paginationGroup}
                 />
             </div>
 
@@ -308,5 +324,5 @@ export default function App() {
             </footer>
 
         </div>
-    );
+    )
 }
