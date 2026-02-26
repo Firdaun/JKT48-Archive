@@ -29,7 +29,52 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
     }, [activeMember, emblaApi]);
 
     return (
-        <section className="overflow-hidden pt-13 pb-3 h-47">
+        <section className="overflow-hidden pt-13 pb-3 h-[357.281px]">
+            <div className="flex items-center justify-between">
+                    <div className='mb-12'>
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(238,29,82,0.1)] border border-[rgba(238,29,82,0.25)] text-[11px] font-bold text-[#EE1D52] tracking-[0.08em] uppercase">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#EE1D52] shadow-[0_0_8px_#EE1D52] inline-block" />
+                                Live Gallery
+                            </span>
+                            <span className="px-3 py-1.5 rounded-full bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)] text-[11px] font-semibold text-[#00D4FF] tracking-[0.06em]">
+                                Updated Feb 21, 2026
+                            </span>
+                        </div>
+
+                        <h1 className="text-[36px] font-extrabold tracking-[-0.03em] leading-[1.15] text-white m-0">
+                            Media Gallery
+                            <br />
+                            <span className="bg-[linear-gradient(135deg,#EE1D52_0%,#ff6b9d_50%,#EE1D52_100%)] bg-clip-text text-transparent bg-size-[200%]">
+                                JKT48
+                            </span>{' '}
+                            <span className="text-white/35">Official</span>
+                        </h1>
+                    </div>
+
+                    <div className="hidden lg:flex items-center gap-6">
+                        {[
+                            { label: 'Photos', value: '1,240+', color: '#EE1D52', shadow: 'rgba(238,29,82,0.4)' },
+                            { label: 'Videos', value: '380+', color: '#00D4FF', shadow: 'rgba(0,212,255,0.4)' },
+                            { label: 'Members', value: '48', color: '#a855f7', shadow: 'rgba(168,85,247,0.4)' },
+                        ].map(stat => (
+                            <div key={stat.label} className="text-center">
+                                <div
+                                    className="text-[24px] font-extrabold tracking-[-0.02em]"
+                                    style={{
+                                        color: stat.color,
+                                        textShadow: `0 0 20px ${stat.shadow}`,
+                                    }}
+                                >
+                                    {stat.value}
+                                </div>
+                                <div className="text-[11px] font-semibold text-white/35 tracking-[0.06em] uppercase">
+                                    {stat.label}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             <div ref={emblaRef}>
                 <div className="flex select-none">
                     {PhotoProfile.map((member, index) => {
