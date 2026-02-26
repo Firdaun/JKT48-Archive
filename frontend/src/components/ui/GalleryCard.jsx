@@ -1,10 +1,8 @@
-import { Heart, MessageCircle, Play } from 'lucide-react';
-
 const platformColors = {
     Instagram: '#E1306C',
     TikTok: '#EE1D52',
     X: '#1DA1F2',
-};
+}
 
 const platformIcons = {
     Instagram: (
@@ -24,12 +22,6 @@ const platformIcons = {
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.739l7.73-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
     ),
-};
-
-function formatCount(n) {
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-    return String(n);
 }
 
 export function GalleryCard({ item, onClick, index }) {
@@ -37,12 +29,12 @@ export function GalleryCard({ item, onClick, index }) {
         portrait: 340,
         landscape: 220,
         square: 280,
-    };
-    const imageHeight = heightMap[item.aspectRatio] || 280;
-    const platformColor = platformColors[item.platform] || '#EE1D52';
+    }
+    const imageHeight = heightMap[item.aspectRatio] || 280
+    const platformColor = platformColors[item.platform] || '#EE1D52'
 
     return (
-        <div className="relative mb-6 break-inside-avoid group cursor-pointer px-2 pt-2 pb-0"
+        <div className="relative break-inside-avoid group cursor-pointer px-2 pt-2 pb-0"
             style={{ animationDelay: `${index * 0.05}s` }} onClick={() => onClick(item)}>
             {/* Stacked polaroid layers */}
             {/* Stacked polaroid layers */}
@@ -103,5 +95,5 @@ export function GalleryCard({ item, onClick, index }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }

@@ -1,4 +1,4 @@
-import { GalleryCard } from './GalleryCard';
+import { GalleryCard } from './GalleryCard'
 
 export function GalleryGrid({ viewMode, items, onItemClick}) {
     if (!items || items.length === 0) {
@@ -7,7 +7,7 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="rgba(255,255,255,0.2)" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216v96.69l-36.69-36.69a16,16,0,0,0-22.62,0L96,176.69,67.31,148a16,16,0,0,0-22.62,0L40,152.69Z"></path></svg>
                 <p className="text-white/40 text-sm font-medium">Tidak ada media yang ditemukan.</p>
             </div>
-        );
+        )
     }
     // Tampilan: Mode Grid (Kotak Rapat)
     if (viewMode === 'grid') {
@@ -46,17 +46,17 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
                     ))}
                 </div>
             </div>
-        );
+        )
     }
 
     // Tampilan: Mode Album
     return (
         <div className="px-8 pb-8">
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6">
+            <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
                 {items.map((item, idx) => (
                     <GalleryCard key={item.id} item={item} onClick={onItemClick} index={idx} />
                 ))}
             </div>
         </div>
-    );
+    )
 }

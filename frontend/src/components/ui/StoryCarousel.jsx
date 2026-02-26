@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { PhotoProfile } from '../data/galleryData';
+import { useEffect } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import { PhotoProfile } from '../data/galleryData'
 
 export function StoryCarousel({ activeMember, onSelectMember }) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -8,25 +8,25 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
         align: 'center',
         containScroll: 'trimSnaps',
         dragFree: true
-    });
+    })
 
     const teamColors = {
         'JKT48': '#EE1D52',
         'Team J': '#EE1D52',
         'dream': '#00D4FF',
         'Team T': '#a855f7',
-    };
+    }
 
     useEffect(() => {
         if (emblaApi) {
             if (activeMember) {
-                const index = PhotoProfile.findIndex(p => p.name.toLowerCase() === activeMember.toLowerCase());
+                const index = PhotoProfile.findIndex(p => p.name.toLowerCase() === activeMember.toLowerCase())
                 if (index !== -1) {
-                    emblaApi.scrollTo(index);
+                    emblaApi.scrollTo(index)
                 }
             }
         }
-    }, [activeMember, emblaApi]);
+    }, [activeMember, emblaApi])
 
     return (
         <section className="overflow-hidden pt-13 pb-3 h-[357.281px]">
@@ -78,9 +78,9 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
             <div ref={emblaRef}>
                 <div className="flex select-none">
                     {PhotoProfile.map((member, index) => {
-                        const isActive = activeMember?.toLowerCase() === member.name.toLowerCase();
-                        const color = teamColors[member.team] || '#EE1D52';
-                        const isCyan = color === '#00D4FF';
+                        const isActive = activeMember?.toLowerCase() === member.name.toLowerCase()
+                        const color = teamColors[member.team] || '#EE1D52'
+                        const isCyan = color === '#00D4FF'
 
                         return (
                             <button
@@ -124,10 +124,10 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                     </span>
                                 )}
                             </button>
-                        );
+                        )
                     })}
                 </div>
             </div>
         </section>
-    );
+    )
 }
