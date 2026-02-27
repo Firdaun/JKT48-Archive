@@ -1,11 +1,5 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react'
-import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Play, ExternalLink } from 'lucide-react'
-
-function formatCount(n) {
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
-    return String(n)
-}
+import { useEffect, useCallback, useState, useRef } from 'react'
+import { X, ChevronLeft, ChevronRight, Share2, ExternalLink } from 'lucide-react'
 
 const platformColors = {
     Instagram: '#E1306C',
@@ -16,6 +10,13 @@ const platformColors = {
 export function Lightbox({ item, allItems, onClose, onNavigate }) {
     const currentIndex = allItems.findIndex(i => i.id === item.id)
     const [showCaption, setShowCaption] = useState(true)
+    const [isClosing, setIsClosing] = useState(false)
+    const handleClose = useCallback(() => {
+        setIsClosing(true)
+        setTimeout(() => {
+            onClose()
+        }, 260)
+    }, [onClose])
     const hideTimer = useRef(null)
 
     const resetAndStartTimer = useCallback(() => {
@@ -35,7 +36,6 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
         resetAndStartTimer()
     }
 
-    // Jalankan timer saat pertama kali dibuka atau saat ganti foto
     useEffect(() => {
         resetAndStartTimer()
         return () => {
@@ -51,10 +51,9 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
         if (currentIndex < allItems.length - 1) onNavigate(allItems[currentIndex + 1])
     }, [currentIndex, allItems, onNavigate])
 
-    // Handle Keyboard Navigation & Lock Scroll
     useEffect(() => {
         const handleKey = (e) => {
-            if (e.key === 'Escape') onClose()
+            if (e.key === 'Escape') handleClose()
             if (e.key === 'ArrowLeft') goPrev()
             if (e.key === 'ArrowRight') goNext()
         }
@@ -65,19 +64,19 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
             window.removeEventListener('keydown', handleKey)
             document.body.style.overflow = ''
         }
-    }, [onClose, goPrev, goNext])
+    }, [handleClose, goPrev, goNext])
 
     const platformColor = platformColors[item.platform] || '#EE1D52'
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in backdrop-blur-xl bg-[#04040a]/80">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center animate-fade-in backdrop-blur-xl bg-[#04040a]/80 ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
             {/* Ambient glow */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(238,29,82,0.06)_0%,transparent_70%)]" />
 
             {/* Main content container */}
-            <div onClick={onClose} className="relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh]">
+            <div onClick={handleClose} className={`relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh] ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
                 {/* Close button */}
-                <button onClick={onClose} className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white">
+                <button onClick={handleClose} className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white">
                     <X size={14} />
                     Close
                 </button>
