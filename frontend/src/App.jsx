@@ -79,7 +79,7 @@ export default function App() {
         aspectRatio: 'portrait',
         originalData: item
     }))
-    
+
 
     const buildParams = (prevParams, updates) => {
         const params = new URLSearchParams(prevParams)
@@ -119,7 +119,7 @@ export default function App() {
         if (searchTimeout.current) clearTimeout(searchTimeout.current)
 
         searchTimeout.current = setTimeout(() => {
-            setSearchParams(prev => buildParams(prev, { nickname: value, page: 1} ))
+            setSearchParams(prev => buildParams(prev, { nickname: value, page: 1 }))
         }, 500)
     }
 
@@ -141,7 +141,7 @@ export default function App() {
         if (mode === 'album') {
             setSearchParams(prev => buildParams(prev, { page: 1, nickname: null }))
         } else {
-            setSearchParams(prev => buildParams(prev, { page: 1,}))
+            setSearchParams(prev => buildParams(prev, { page: 1, }))
         }
         setTimeout(() => {
             setViewMode(mode)
@@ -152,6 +152,14 @@ export default function App() {
     const handleShowAll = () => {
         setPostUrl('')
         setSearchParams(prev => buildParams(prev, { nickname: null, page: 1 }))
+    }
+
+    const handleShowMemberPhotos = () => {
+        setSearchParams(prev => buildParams(prev, { page: 1 }))
+        setTimeout(() => {
+            setViewMode('grid')
+            setPostUrl('')
+        }, 1)
     }
 
     return (
@@ -260,12 +268,18 @@ export default function App() {
                         {paging?.total_item || 0} results
                     </span>
                 </div>
-                <div>
+                <div className='flex flex-row-reverse gap-5'>
                     {nickname && (
-                        <button 
+                        <button
                             onClick={handleShowAll}
                             className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
-                            show all
+                            show all photos
+                        </button>
+                    )}
+                    {nickname && postUrl && (
+                        <button onClick={handleShowMemberPhotos}
+                            className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
+                            show {nickname ? `${nickname}'s` : 'All'} photos
                         </button>
                     )}
                 </div>
