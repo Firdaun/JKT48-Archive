@@ -45,6 +45,22 @@
     }
 }
 
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+@keyframes scaleOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+}
+
 @theme {
     --font-jakarta: "Plus Jakarta Sans";
     --animate-glow-pulse: glowPulse 2.5s ease-in-out infinite;
@@ -52,4 +68,6 @@
     --animate-fade-in-up: fade-in-up 0.4s ease-out both;
     --animate-fade-in: fadeIn 0.3s ease-out both;
     --animate-scale-in: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    --animate-fade-out: fadeOut 0.25s ease-in both;
+    --animate-scale-out: scaleOut 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both
 }
