@@ -7,6 +7,9 @@ import DashboardStats from './components/DashboardStats'
 import MemberManager from './components/MemberManager'
 import PhotoManager from './components/PhotoManager'
 const API_URL = import.meta.env.VITE_BACKEND_URL
+const isVideoFile = (url, type) => {
+    return type === 'VIDEO' || (url && url.endsWith('.mp4'))
+}
 
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('dashboard')
@@ -41,6 +44,7 @@ export default function Admin() {
         }),
         staleTime: 1000 * 60 * 15,
         gcTime: 1000 * 60 * 30,
+        placeholderData: keepPreviousData
     })
 
     const handleViewPhotos = (member) => {
@@ -98,7 +102,12 @@ export default function Admin() {
     const photos = photosQuery.data?.data || []
     const photoPagingInfo = photosQuery.data?.paging || { total_page: 1, page: 1, total_item: 0 }
     const mappedPhotos = photos.map((item) => ({
-        media: `${API_URL}${item.srcUrl}`
+        id: item.id,
+        media: `${API_URL}${item.srcUrl}`,
+        caption: item.caption || "No Caption",
+        date: new Date(item.postedAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        member: item.member?.nickname || 'JKT48',
+        isVideo: isVideoFile(item.srcUrl, item.mediaType)
     }))
 
     const renderContent = () => {

@@ -91,27 +91,41 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                     <div className="grid grid-cols-8 gap-4">
                         {item.map((photo) => (
                             <div key={photo.id} className="group relative rounded-lg overflow-hidden border border-slate-200 aspect-square shadow-sm hover:shadow-md transition-all">
-                                <img
-                                    src={photo.media}
-                                    alt={photo.caption || "Foto JKT48"}
-                                    className="w-full h-full object-cover bg-slate-100"
-                                    onError={(e) => {
-                                        e.target.src = "https://placehold.co/400?text=Image+Error"
-                                    }}
-                                />
+                                {photo.isVideo ? (
+                                    <video
+                                        src={photo.media}
+                                        alt={photo.caption || "Foto JKT48"}
+                                        muted
+                                        playsInline
+                                        className="w-full h-full object-cover bg-slate-100"
+                                        onError={(e) => {
+                                            e.target.src = "https://placehold.co/400?text=Image+Error"
+                                        }}
+                                    />
+                                    
+                                ) : (
+                                    <img
+                                        src={photo.media}
+                                        alt={photo.caption || "Foto JKT48"}
+                                        className="w-full h-full object-cover bg-slate-100"
+                                        onError={(e) => {
+                                            e.target.src = "https://placehold.co/400?text=Image+Error"
+                                        }}
+                                    />
+                                )}
 
                                 <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-3">
                                     <div className="mb-1">
                                         <span className="inline-block px-1.5 py-0.5 bg-[#EE1D52] text-white text-[10px] font-bold rounded-sm mb-1">
-                                            {photo.member?.nickname || 'Unknown'}
+                                            {photo.member}
                                         </span>
                                     </div>
                                     <p className="text-white text-xs line-clamp-2 mb-2 leading-tight">
-                                        {photo.caption || "No Caption"}
+                                        {photo.caption}
                                     </p>
                                     <div className="flex items-center text-white/60 text-[10px] gap-1">
                                         <Calendar size={10} />
-                                        {new Date(photo.postedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        {photo.date}
                                     </div>
                                 </div>
 
