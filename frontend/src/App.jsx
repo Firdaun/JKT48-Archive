@@ -240,6 +240,7 @@ export default function App() {
                 <StoryCarousel
                     activeMember={nickname}
                     onSelectMember={handleMemberSelect}
+                    totalMedia={paging?.total_item || 0}
                 />
             </div>
 
