@@ -11,6 +11,7 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
     }
     // Tampilan: Mode Grid (Kotak Rapat)
     if (viewMode === 'grid') {
+        const emptySlotsCount = Math.max(0, 28 - items.length)
         return (
             <div className="px-8 pb-8">
                 <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
@@ -44,17 +45,30 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
                             )}
                         </button>
                     ))}
+                    {[...Array(emptySlotsCount)].map((_, index) => (
+                        <div 
+                            key={`empty-grid-${index}`} 
+                            className="aspect-square pointer-events-none"
+                        ></div>
+                    ))}
                 </div>
             </div>
         )
     }
 
-    // Tampilan: Mode Album
+    const emptyAlbumSlotsCount = Math.max(0, 8 - items.length)
     return (
         <div className="px-8 pb-8">
             <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
                 {items.map((item, idx) => (
                     <GalleryCard key={item.id} item={item} onClick={onItemClick} index={idx} />
+                ))}
+                {[...Array(emptyAlbumSlotsCount)].map((_, index) => (
+                    <div 
+                        key={`empty-album-${index}`} 
+                        className="pointer-events-none w-full"
+                        style={{ minHeight: '402.469px' }}
+                    ></div>
                 ))}
             </div>
         </div>
