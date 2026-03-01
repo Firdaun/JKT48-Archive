@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { PhotoProfile } from '../data/galleryData'
+import { useQuery } from '@tanstack/react-query'
 
-export function StoryCarousel({ activeMember, onSelectMember, totalMedia }) {
+export function StoryCarousel({ activeMember, onSelectMember }) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: 'center',
@@ -28,8 +29,21 @@ export function StoryCarousel({ activeMember, onSelectMember, totalMedia }) {
         }
     }, [activeMember, emblaApi])
 
+    const { data: globalData } = useQuery({
+        queryKey: ['globalMediaTotal'],
+        queryFn: async () => {
+            const API_URL = import.meta.env.VITE_BACKEND_URL
+            const response = await fetch(`${API_URL}/api/photos?page=1&size=1`)
+            if (!response.ok) return null
+            return response.json()
+        },
+        staleTime: 1000 * 60 * 60
+    })
+
+    const globalTotalMedia = globalData?.paging?.total_item || 0
+
     const statItems = [
-        { label: 'Total Media', value: totalMedia ? `${new Intl.NumberFormat('id-ID').format(totalMedia)}+` : '...', color: '#00D4FF', shadow: 'rgba(0,212,255,0.4)' },
+        { label: 'Total Media', value: globalTotalMedia ? `${new Intl.NumberFormat('id-ID').format(globalTotalMedia)}` : '...', color: '#00D4FF', shadow: 'rgba(0,212,255,0.4)' },
         { label: 'Members', value: PhotoProfile.length, color: '#a855f7', shadow: 'rgba(168,85,247,0.4)' },
     ]
 
