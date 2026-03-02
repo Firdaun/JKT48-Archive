@@ -194,23 +194,6 @@ export default function App() {
                         </div>
                     </div>
 
-                    {/* Nav links */}
-                    <nav className="hidden md:flex items-center gap-6">
-                        {['Gallery', 'Schedule', 'Theater', 'Fan Club', 'Shop'].map((item, i) => (
-                            <button
-                                key={item}
-                                className={`
-                            relative pb-1 bg-transparent border-none cursor-pointer text-[13px] tracking-[0.01em] transition-colors duration-200
-                            ${i === 0 ? 'font-bold text-white' : 'font-medium text-white/40 hover:text-white/75'}`}
-                            >
-                                {item}
-                                {i === 0 && (
-                                    <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-linear-to-r from-[#EE1D52] to-[#ff6b9d]" />
-                                )}
-                            </button>
-                        ))}
-                    </nav>
-
                     {/* Right actions */}
                     <div className="flex items-center gap-3">
 
@@ -288,9 +271,30 @@ export default function App() {
             {/* ─── GALLERY GRID ─── */}
             <main className="relative z-10 max-w-screen-2xl mx-auto min-h-[40vh]">
                 {imgQuery.isLoading ? (
-                    <div className="py-20 flex justify-center items-center flex-col gap-4">
-                        <div className="w-8 h-8 rounded-full border-2 border-[#EE1D52] border-t-transparent animate-spin"></div>
-                        <p className="text-white/50 text-sm animate-pulse">Memuat foto...</p>
+                    <div className="px-8 pb-8">
+                        {viewMode === 'grid' ? (
+                            // Skeleton untuk Mode Grid
+                            <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+                                {[...Array(28)].map((_, index) => (
+                                    <div 
+                                        key={`loading-grid-${index}`} 
+                                        className="aspect-square rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
+                                        style={{ animationDelay: `${index * 0.05}s` }} // Opsional: efek denyut bergelombang
+                                    ></div>
+                                ))}
+                            </div>
+                        ) : (
+                            // Skeleton untuk Mode Album
+                            <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
+                                {[...Array(8)].map((_, index) => ( // Sesuaikan angka 8 dengan target album per page
+                                    <div 
+                                        key={`loading-album-${index}`} 
+                                        className="w-full rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
+                                        style={{ minHeight: '402.46px', animationDelay: `${index * 0.05}s` }}
+                                    ></div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <GalleryGrid
