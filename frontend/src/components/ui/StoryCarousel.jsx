@@ -12,16 +12,43 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
     })
 
     const teamColors = {
-        'JKT48': '#EE1D52',
-        'Team J': '#EE1D52',
-        'dream': '#00D4FF',
-        'Team T': '#a855f7',
+        'love': {
+            color: '#EE1D52',
+            gradientEnd: '#ff6b9d',
+            animation: 'animate-glow-pulse-red'
+        },
+        'passion': {
+            color: '#FFD700',
+            gradientEnd: '#ffeb73',
+            animation: 'animate-glow-pulse-gold'
+        },
+        'dream': {
+            color: '#00D4FF',
+            gradientEnd: '#7df9ff',
+            animation: 'animate-glow-pulse-cyan'
+        },
+        'trainee': {
+            color: '#94a3b8',
+            gradientEnd: '#cbd5e1',
+            animation: 'animate-glow-pulse-gray'
+        }
     }
+
+    const sortedProfiles = [...PhotoProfile].sort((a, b) => {
+        const teamOrder = { 'dream': 1, 'passion': 2, 'love': 3, 'trainee': 4 }
+
+        const orderA = teamOrder[a.team] || 5
+        const orderB = teamOrder[b.team] || 5
+
+        if (orderA !== orderB) return orderA - orderB
+
+        return a.name.localeCompare(b.name)
+    })
 
     useEffect(() => {
         if (emblaApi) {
             if (activeMember) {
-                const index = PhotoProfile.findIndex(p => p.name.toLowerCase() === activeMember.toLowerCase())
+                const index = sortedProfiles.findIndex(p => p.name.toLowerCase() === activeMember.toLowerCase())
                 if (index !== -1) {
                     emblaApi.scrollTo(index)
                 }
@@ -52,10 +79,6 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
             <div className="flex items-center justify-between">
                 <div className='mb-12'>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(238,29,82,0.1)] border border-[rgba(238,29,82,0.25)] text-[11px] font-bold text-[#EE1D52] tracking-[0.08em] uppercase">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#EE1D52] shadow-[0_0_8px_#EE1D52] inline-block" />
-                            Live Gallery
-                        </span>
                         <span className="px-3 py-1.5 rounded-full bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)] text-[11px] font-semibold text-[#00D4FF] tracking-[0.06em]">
                             Updated Feb 21, 2026
                         </span>
@@ -91,10 +114,9 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
             </div>
             <div ref={emblaRef}>
                 <div className="flex select-none">
-                    {PhotoProfile.map((member, index) => {
-                        const isActive = activeMember?.toLowerCase() === member.name.toLowerCase()
-                        const color = teamColors[member.team] || '#EE1D52'
-                        const isCyan = color === '#00D4FF'
+                    {sortedProfiles.map((member, index) => {
+                        const isActive = activeMember === member.name
+                        const activeStyle = teamColors[member.team] || teamColors['love']
 
                         return (
                             <button
@@ -103,8 +125,8 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                 className="flex mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18">
                                 <div className={`relative transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isActive ? 'scale-110' : 'scale-100'}`}>
                                     {/* Glow Ring */}
-                                    <div className={`rounded-full p-0.75 ${isActive ? isCyan ? 'animate-glow-pulse-cyan' : 'animate-glow-pulse' : 'bg-white/12'}`}
-                                        style={isActive ? { background: `linear-gradient(135deg, ${color}, ${isCyan ? '#7df9ff' : '#ff6b9d'})` } : undefined}>
+                                    <div className={`rounded-full p-0.75 ${isActive ? activeStyle.animation : 'bg-white/12'}`}
+                                        style={isActive ? { background: `linear-gradient(135deg, ${activeStyle.color}, ${activeStyle.gradientEnd})` } : undefined}>
                                         <div className={`rounded-full p-0.5 ${isActive ? 'bg-[#07070f]' : 'bg-transparent'}`}>
                                             <img
                                                 src={member.src}
@@ -119,24 +141,22 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                     {isActive && (
                                         <span
                                             className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-[#07070f]"
-                                            style={{ background: color }}
+                                            style={{ background: activeStyle.color }}
                                         />
                                     )}
                                 </div>
                                 <span className={`text-center block text-[11px] tracking-[0.02em] max-w-16 truncate transition-colors duration-300 ease-in-out ${isActive ? 'font-bold text-white' : 'font-normal text-white/40'}`}>
                                     {member.name}
                                 </span>
-                                {isActive && member.team !== 'JKT48' && (
-                                    <span
-                                        className="px-1.5 py-0.5 rounded-full animate-fade-in text-[9px] font-bold tracking-[0.04em]"
-                                        style={{
-                                            background: `${color}22`,
-                                            color: color,
-                                            border: `1px solid ${color}44`,
-                                        }}>
-                                        {member.team}
-                                    </span>
-                                )}
+                                <span
+                                    className="px-1.5 py-0.5 rounded-full animate-fade-in text-[9px] font-bold tracking-[0.04em]"
+                                    style={{
+                                        background: `${activeStyle.color}22`,
+                                        color: activeStyle.color,
+                                        border: `1px solid ${activeStyle.color}44`,
+                                    }}>
+                                    {member.team}
+                                </span>
                             </button>
                         )
                     })}
