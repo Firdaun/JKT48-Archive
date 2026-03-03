@@ -2,6 +2,38 @@ import { useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { PhotoProfile } from '../data/galleryData'
 import { useQuery } from '@tanstack/react-query'
+const teamColors = {
+    'love': {
+        color: '#EE1D52',
+        gradientEnd: '#ff6b9d',
+        animation: 'animate-glow-pulse-red'
+    },
+    'passion': {
+        color: '#FFD700',
+        gradientEnd: '#ffeb73',
+        animation: 'animate-glow-pulse-gold'
+    },
+    'dream': {
+        color: '#00D4FF',
+        gradientEnd: '#7df9ff',
+        animation: 'animate-glow-pulse-cyan'
+    },
+    'trainee': {
+        color: '#94a3b8',
+        gradientEnd: '#cbd5e1',
+        animation: 'animate-glow-pulse-gray'
+    }
+}
+const sortedProfiles = [...PhotoProfile].sort((a, b) => {
+    const teamOrder = { 'dream': 1, 'passion': 2, 'love': 3, 'trainee': 4 }
+
+    const orderA = teamOrder[a.team] || 5
+    const orderB = teamOrder[b.team] || 5
+
+    if (orderA !== orderB) return orderA - orderB
+
+    return a.name.localeCompare(b.name)
+})
 
 export function StoryCarousel({ activeMember, onSelectMember }) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -9,40 +41,6 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
         align: 'center',
         containScroll: 'trimSnaps',
         dragFree: true
-    })
-
-    const teamColors = {
-        'love': {
-            color: '#EE1D52',
-            gradientEnd: '#ff6b9d',
-            animation: 'animate-glow-pulse-red'
-        },
-        'passion': {
-            color: '#FFD700',
-            gradientEnd: '#ffeb73',
-            animation: 'animate-glow-pulse-gold'
-        },
-        'dream': {
-            color: '#00D4FF',
-            gradientEnd: '#7df9ff',
-            animation: 'animate-glow-pulse-cyan'
-        },
-        'trainee': {
-            color: '#94a3b8',
-            gradientEnd: '#cbd5e1',
-            animation: 'animate-glow-pulse-gray'
-        }
-    }
-
-    const sortedProfiles = [...PhotoProfile].sort((a, b) => {
-        const teamOrder = { 'dream': 1, 'passion': 2, 'love': 3, 'trainee': 4 }
-
-        const orderA = teamOrder[a.team] || 5
-        const orderB = teamOrder[b.team] || 5
-
-        if (orderA !== orderB) return orderA - orderB
-
-        return a.name.localeCompare(b.name)
     })
 
     useEffect(() => {
@@ -122,7 +120,7 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                             <button
                                 key={index}
                                 onClick={() => onSelectMember(member.name)}
-                                className="flex mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18">
+                                className="flex mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18 will-change-transform">
                                 <div className={`relative transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isActive ? 'scale-110' : 'scale-100'}`}>
                                     {/* Glow Ring */}
                                     <div className={`rounded-full p-0.75 ${isActive ? activeStyle.animation : 'bg-white/12'}`}
@@ -131,8 +129,7 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                             <img
                                                 src={member.src}
                                                 alt={member.name}
-                                                className={`rounded-full object-cover w-15.5 h-15.5 transition-[opacity,filter] duration-300 ease-in-out ${isActive ? 'opacity-100' : 'opacity-55 grayscale-20'
-                                                    }`}
+                                                className={`rounded-full object-cover w-15.5 h-15.5 transition-[opacity,filter] duration-300 ease-in-out ${isActive ? 'opacity-100' : 'opacity-55 grayscale-20'}`}
                                             />
                                         </div>
                                     </div>
