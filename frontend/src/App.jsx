@@ -180,7 +180,7 @@ export default function App() {
                             <Sparkles size={18} color="white" />
                         </div>
                         <div>
-                            <div className="flex items-baseline gap-1.5">
+                            <div className="flex items-center gap-1.5">
                                 <span className="text-[20px] font-extrabold tracking-[-0.02em] bg-linear-to-br from-white to-white/70 bg-clip-text text-transparent">
                                     JKT48
                                 </span>
@@ -198,10 +198,10 @@ export default function App() {
                     <div className="flex items-center gap-3">
 
                         {/* Notification */}
-                        <button className="relative flex items-center justify-center rounded-full w-9.5 h-9.5 bg-white/6 border border-white/10 text-white/60 transition-all duration-200">
+                        {/* <button className="relative flex items-center justify-center rounded-full w-9.5 h-9.5 bg-white/6 border border-white/10 text-white/60 transition-all duration-200">
                             <Bell size={15} />
                             <span className="absolute top-1.5 right-1.5 w-1.75 h-1.75 rounded-full bg-[#EE1D52] shadow-[0_0_8px_#EE1D52]" />
-                        </button>
+                        </button> */}
 
                         {/* Total items badge */}
                         <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[12px] font-semibold text-white/50">
