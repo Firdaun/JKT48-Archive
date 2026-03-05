@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/main.js",
     "scrape": "node src/script/scrape-ig-manual/scrape-ig.js",
+    "scrape2": "node src/script/scrape-x-manual/scrape-x.js",
     "test": "vitest run"
   },
   "keywords": [],
