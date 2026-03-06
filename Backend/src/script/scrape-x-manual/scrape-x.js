@@ -26,15 +26,16 @@ export const scrapeX = async () => {
     if (!fs.existsSync(saveDir)) fs.mkdirSync(saveDir, { recursive: true })
 
     const browser = await puppeteer.launch({ headless: false, defaultViewport: null })
-    let postDataCollector = [] // Wadah sementara untuk data dari GraphQL
+    let postDataCollector = []
 
     try {
         const page = await browser.newPage()
+
         await handleLoginAndCookiesX(page, browser, COOKIES_PATH)
 
         console.log(`🔍 Membuka profil X @${TARGET_USERNAME}...`)
-        await page.goto(`https://twitter.com/${TARGET_USERNAME}/media`, { waitUntil: 'networkidle2', timeout: 60000 })
-        await delay(3000)
+        await page.goto(`https://twitter.com/${TARGET_USERNAME}/media`, { waitUntil: 'domcontentloaded', timeout: 120000 })
+        await delay(10000)
 
         const tweetLinks = await getTweetLinks(page, TARGET_POST_INDEX, POST_COUNT)
 
@@ -47,10 +48,21 @@ export const scrapeX = async () => {
             }
 
             console.log(`⬇️ Membuka Tweet: ${link}`)
-            postDataCollector = [] // Kosongkan wadah sebelum buka link baru
+            postDataCollector.splice(0)
+
+            const waitForGraphQL = page.waitForResponse(
+                res => res.url().includes('TweetResultByRestId') && res.status() === 200,
+                { timeout: 60000 }
+            ).catch(() => console.log("⏳ Waktu tunggu GraphQL habis, mengecek sisa tangkapan..."))
+
+            await page.goto(link, {
+                waitUntil: 'domcontentloaded',
+                timeout: 120000
+            })
+
+            await waitForGraphQL 
             
-            await page.goto(link, { waitUntil: 'networkidle2', timeout: 60000 })
-            await delay(3000) // Tunggu API GraphQL selesai ditangkap
+            await delay(2000)
 
             if (postDataCollector.length > 0) {
                 const data = postDataCollector[0]
@@ -63,29 +75,37 @@ export const scrapeX = async () => {
                 console.log("🎬 Link Video  :", data.videos)
                 console.log("==================================================\n")
 
-                // let slideCounter = 0;
-                
-                // Proses Gambar
-                // for (const imgUrl of data.images) {
-                //     slideCounter++;
-                //     const fileId = `${String(slideCounter).padStart(2, '0')}_${uuidv4()}`
-                //     const fileName = `${data.postedAt.toISOString().split('T')[0]}_${fileId}.jpg`
-                //     const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
-                    
-                //     await downloadMedia(imgUrl, path.join(saveDir, fileName), false)
-                //     await saveMedia({ dbUrl, fileId, caption: data.caption, postUrl: link, mediaTypeDB: data.images.length > 1 ? 'CAROUSEL_ALBUM' : 'IMAGE', postedAt: data.postedAt, memberId: member.id })
-                // }
+                const allMedia = [
+                    ...data.images.map(url => ({
+                        url,
+                        ext: 'jpg',
+                        type: data.images.length > 1 ? 'CAROUSEL_ALBUM' : 'IMAGE',
+                        isVideo: false,
+                    })),
+                    ...data.videos.map(url => ({
+                        url,
+                        ext: 'mp4',
+                        type: 'VIDEO',
+                        isVideo: true
+                    }))
+                ]
+                for (const [index, media] of allMedia.entries()) {
+                    const slideCounter = index + 1
+                    const fileId = `${String(slideCounter).padStart(2, '0')}_${uuidv4()}`
+                    const fileName = `${data.postedAt.toISOString().split('T')[0]}_${fileId}.${media.ext}`
+                    const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
 
-                // // Proses Video
-                // for (const vidUrl of data.videos) {
-                //     slideCounter++;
-                //     const fileId = `${String(slideCounter).padStart(2, '0')}_${uuidv4()}`
-                //     const fileName = `${data.postedAt.toISOString().split('T')[0]}_${fileId}.mp4`
-                //     const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
-                    
-                //     await downloadMedia(vidUrl, path.join(saveDir, fileName), true)
-                //     await saveMedia({ dbUrl, fileId, caption: data.caption, postUrl: link, mediaTypeDB: 'VIDEO', postedAt: data.postedAt, memberId: member.id })
-                // }
+                    await downloadMedia(media.url, path.join(saveDir, fileName), media.isVideo)
+                    await saveMedia({
+                        dbUrl,
+                        fileId,
+                        postUrl: link,
+                        memberId: member.id,
+                        caption: data.caption,
+                        postedAt: data.postedAt,
+                        mediaTypeDB: media.type
+                    })
+                }
             } else {
                 console.log("⚠️ Tidak ada media yang tertangkap dari GraphQL untuk tweet ini.")
             }

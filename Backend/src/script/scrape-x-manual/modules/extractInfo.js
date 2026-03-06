@@ -1,43 +1,81 @@
 export const setupGraphQLInterceptor = (page, postDataCollector) => {
     page.on('response', async (response) => {
         const url = response.url();
-        
+
         // Tangkap response API GraphQL Twitter khusus untuk TweetDetail
-        if (url.includes('graphql') && url.includes('TweetDetail')) {
+        if (url.includes('graphql') && (url.includes('TweetDetail') || url.includes('TweetResultByRestId'))) {
+            if (response.request().method() === 'OPTIONS') return;
+
+            // ✅ GUARD 2: Skip response yang bukan 200
+            if (response.status() !== 200) return;
+
+            // ✅ GUARD 3: Pastikan content-type adalah JSON
+            const contentType = response.headers()['content-type'] || '';
+            if (!contentType.includes('application/json')) return;
             try {
                 const json = await response.json();
-                const jsonString = JSON.stringify(json);
-                
-                // Cek apakah ada media di tweet ini
-                if (jsonString.includes('media_url_https') || jsonString.includes('video_info')) {
-                    
-                    // 1. Ekstrak Caption
-                    let caption = '';
-                    const textMatch = jsonString.match(/"full_text":"(.*?)"/);
-                    if (textMatch) caption = textMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                const tweetResult = extractTweetResult(json);
+                if (!tweetResult) return;
 
-                    // 2. Ekstrak Tanggal
-                    let postedAt = new Date();
-                    const dateMatch = jsonString.match(/"created_at":"(.*?)"/);
-                    if (dateMatch) postedAt = new Date(dateMatch[1]);
+                const legacy = tweetResult.legacy;
+                if (!legacy) return;
 
-                    // 3. Ekstrak Link Gambar (JPG)
-                    const imgUrls = [...jsonString.matchAll(/"media_url_https":"(https:\/\/pbs\.twimg\.com\/media\/.*?)"/g)]
-                        .map(m => m[1] + '?format=jpg&name=large');
+                const hasMedia = legacy?.extended_entities?.media?.length > 0;
+                if (!hasMedia) return;
 
-                    // 4. Ekstrak Link Video (MP4) menggunakan regex trik rahasia
-                    const mp4Urls = [...jsonString.matchAll(/(https:\/\/video\.twimg\.com\/ext_tw_video\/[^"']+\.mp4)/g)]
-                        .map(m => m[1]);
+                console.log(`📡 [API Tersadap] Tweet ditemukan: ${legacy.id_str}`)
 
+                const caption = legacy.full_text || legacy.text || '';
+
+                const postedAt = legacy.created_at
+                    ? new Date(legacy.created_at)
+                    : new Date();
+
+                const images = []
+                const videos = []
+
+                for (const media of legacy.extended_entities.media) {
+                    if (media.type === 'photo') {
+                        images.push(`${media.media_url_https}?format=jpg&name=large`)
+                    } else if (media.type === 'video' || media.type === 'animated_gif') {
+                        const variants = media.video_info?.variants || []
+                        const best = variants
+                            .filter(v => v.content_type === 'video/mp4')
+                            .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0]
+                        if (best?.url) videos.push(best.url)
+                    }
+                }
+
+                if (images.length > 0 || videos.length > 0) {
                     postDataCollector.push({
                         caption,
                         postedAt,
-                        images: [...new Set(imgUrls)],
-                        videos: [...new Set(mp4Urls)]
-                    });
+                        images: [...new Set(images)],
+                        videos: [...new Set(videos)]
+                    })
                 }
             } catch (e) {
+                console.error(`❌ Gagal parse response dari ${url}:`, e.message)
             }
         }
     });
+}
+
+function extractTweetResult(json) {
+    const byRestId = json?.data?.tweetResult?.result || json?.data?.tweetResultByRestId?.result
+    if (byRestId?.legacy) return byRestId
+
+    const instructions = json?.data?.threaded_conversation_with_injections_v2?.instructions || []
+    for (const instruction of instructions) {
+        for (const entry of instruction.entries || []) {
+            const main = entry?.content?.itemContent?.tweet_results?.result
+            if (main?.legacy) return main
+
+            for (const item of entry?.content?.items || []) {
+                const result = item?.item?.itemContent?.tweet_results?.result
+                if (result?.legacy) return result
+            }
+        }
+    }
+    return null
 }
