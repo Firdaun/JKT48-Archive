@@ -1,35 +1,34 @@
 export const setupGraphQLInterceptor = (page, postDataCollector) => {
     page.on('response', async (response) => {
-        const url = response.url();
+        const url = response.url()
 
-        // Tangkap response API GraphQL Twitter khusus untuk TweetDetail
         if (url.includes('graphql') && (url.includes('TweetDetail') || url.includes('TweetResultByRestId'))) {
-            if (response.request().method() === 'OPTIONS') return;
+            if (response.request().method() === 'OPTIONS') return
 
-            // ✅ GUARD 2: Skip response yang bukan 200
-            if (response.status() !== 200) return;
+            if (response.status() !== 200) return
 
-            // ✅ GUARD 3: Pastikan content-type adalah JSON
-            const contentType = response.headers()['content-type'] || '';
-            if (!contentType.includes('application/json')) return;
+            const contentType = response.headers()['content-type'] || ''
+            if (!contentType.includes('application/json')) return
             try {
-                const json = await response.json();
-                const tweetResult = extractTweetResult(json);
-                if (!tweetResult) return;
+                const json = await response.json()
+                const tweetResult = extractTweetResult(json)
+                if (!tweetResult) return
 
-                const legacy = tweetResult.legacy;
-                if (!legacy) return;
+                const legacy = tweetResult.legacy
+                if (!legacy) return
 
-                const hasMedia = legacy?.extended_entities?.media?.length > 0;
-                if (!hasMedia) return;
+                const hasMedia = legacy?.extended_entities?.media?.length > 0
+                if (!hasMedia) return
 
                 console.log(`📡 [API Tersadap] Tweet ditemukan: ${legacy.id_str}`)
 
-                const caption = legacy.full_text || legacy.text || '';
+                const rawCaption = legacy.full_text || legacy.text || ''
+
+                const caption = rawCaption.replace(/https:\/\/t\.co\/\w+/g, '').trim()
 
                 const postedAt = legacy.created_at
                     ? new Date(legacy.created_at)
-                    : new Date();
+                    : new Date()
 
                 const images = []
                 const videos = []
@@ -58,7 +57,7 @@ export const setupGraphQLInterceptor = (page, postDataCollector) => {
                 console.error(`❌ Gagal parse response dari ${url}:`, e.message)
             }
         }
-    });
+    })
 }
 
 function extractTweetResult(json) {

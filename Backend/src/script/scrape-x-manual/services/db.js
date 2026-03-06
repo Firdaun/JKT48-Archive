@@ -22,7 +22,7 @@ export const saveMedia = async (data) => {
             mediaType: data.mediaTypeDB,
             postedAt: data.postedAt,
             memberId: data.memberId,
-            source: 'x' // 👈 Pastikan ini 'x' atau 'twitter'
+            source: 'x'
         }
     })
 }

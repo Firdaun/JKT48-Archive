@@ -15,7 +15,7 @@ export const getTweetLinks = async (page, targetIndex, count) => {
         
         visibleLinks.forEach(link => uniqueLinks.add(link))
         
-        if (uniqueLinks.size > endIndex) break;
+        if (uniqueLinks.size > endIndex) break
         
         await page.evaluate(() => window.scrollBy(0, 800))
         await delay(4000)

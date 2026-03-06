@@ -8,7 +8,7 @@ export const handleLoginAndCookiesX = async (page, browser, cookiesPath) => {
         const cookies = JSON.parse(cookiesString)
         await browser.setCookie(...cookies)
     } else {
-        console.log('⚠️ Cookies X tidak ditemukan. Silakan LOGIN MANUAL di browser dalam 60 detik!');
+        console.log('⚠️ Cookies X tidak ditemukan. Silakan LOGIN MANUAL di browser dalam 60 detik!')
         await page.goto('https://twitter.com/i/flow/login', { waitUntil: 'domcontentloaded', timeout: 0 })
         await delay(60000)
         
