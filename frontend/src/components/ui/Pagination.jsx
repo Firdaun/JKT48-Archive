@@ -6,7 +6,6 @@ export function Pagination({ currentPage, totalPages, onPageChange, paginationGr
         <>
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-3 py-8 px-8 border-t border-white/5">
-                    {/* Tombol Previous */}
                     <button
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
@@ -46,16 +45,13 @@ export function Pagination({ currentPage, totalPages, onPageChange, paginationGr
                         )
                     })}
 
-                    {/* Tombol Next */}
                     <button
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200 text-[13px] font-semibold tracking-[0.01em] border ${currentPage === totalPages
                             ? 'bg-white/5 border-white/10 text-white/20 cursor-not-allowed'
-                            : 'bg-white/5 border-white/10 text-white/60 cursor-pointer hover:bg-[#EE1D52]/10 hover:border-[#EE1D52]/30 hover:text-[#EE1D52]'
-                            }`}
-                    >
-                        Next
+                            : 'bg-white/5 border-white/10 text-white/60 cursor-pointer hover:bg-[#EE1D52]/10 hover:border-[#EE1D52]/30 hover:text-[#EE1D52]'}`}>
+                            Next
                         <ChevronRight size={15} />
                     </button>
 

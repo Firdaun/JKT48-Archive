@@ -122,7 +122,6 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                 onClick={() => onSelectMember(member.name)}
                                 className="flex mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18 will-change-transform">
                                 <div className={`relative transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isActive ? 'scale-110' : 'scale-100'}`}>
-                                    {/* Glow Ring */}
                                     <div className={`rounded-full p-0.75 ${isActive ? activeStyle.animation : 'bg-white/12'}`}
                                         style={isActive ? { background: `linear-gradient(135deg, ${activeStyle.color}, ${activeStyle.gradientEnd})` } : undefined}>
                                         <div className={`rounded-full p-0.5 ${isActive ? 'bg-[#07070f]' : 'bg-transparent'}`}>
@@ -134,7 +133,6 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                         </div>
                                     </div>
 
-                                    {/* Online indicator dot for active */}
                                     {isActive && (
                                         <span
                                             className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-[#07070f]"

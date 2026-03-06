@@ -70,21 +70,16 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
 
     return (
         <div className={`fixed inset-0 z-50 flex items-center justify-center animate-fade-in backdrop-blur-xl bg-[#04040a]/80 ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
-            {/* Ambient glow */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(238,29,82,0.06)_0%,transparent_70%)]" />
 
-            {/* Main content container */}
             <div onClick={handleClose} className={`relative z-10 flex flex-col items-center animate-scale-in w-full max-w-[90vw] max-h-[90vh] ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
-                {/* Close button */}
                 <button onClick={handleClose} className="absolute -top-12 right-0 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/70 backdrop-blur-md text-[13px] font-semibold hover:bg-[#EE1D52]/20 hover:border-[#EE1D52]/40 hover:text-white">
                     <X size={14} />
                     Close
                 </button>
 
-                {/* Image / Video container */}
                 <div onClick={e => e.stopPropagation()} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="relative rounded-2xl overflow-hidden max-h-[75vh]">
                     {item.isVideo ? (
-                        // Jika Video, render pemutar video asli
                         <video
                             ref={(el) => { if (el) el.volume = 0.3 }}
                             src={item.image}
@@ -94,7 +89,6 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                             className="block max-h-[75vh] max-w-[85vw] w-auto h-auto object-contain rounded-[20px] shadow-[0_32px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)]"
                         />
                     ) : (
-                        // Jika Foto, render gambar
                         <img
                             src={item.image}
                             alt={item.caption}
@@ -102,13 +96,10 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                         />
                     )}
 
-                    {/* Frosted glass caption box */}
                     <div className={`absolute left-4 right-4 bottom-4 rounded-xl p-4 bg-[#0a0a14]/65 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
                         ${showCaption ? 'opacity-100' : 'opacity-0 pointer-events-none'} transition-all duration-500 ease-in-out`}>
-                        {/* Top row */}
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                                {/* Platform badge */}
                                 <span
                                     className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-[0.06em]"
                                     style={{
@@ -128,18 +119,16 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                             </span>
                         </div>
 
-                        {/* Caption */}
                         <p className="text-[13px] text-white leading-relaxed font-normal">
                             {item.caption ? item.caption.substring(0, 150) + (item.caption.length > 150 ? "..." : "") : ""}
                         </p>
 
-                        {/* Stats & Action buttons */}
                         <div className="flex items-center justify-between gap-4 mt-3 pt-3 border-t border-white/10">
                             <button className=" flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-white/10 border border-white/10 text-white/60 text-[11px] font-semibold hover:bg-white/20 hover:text-white">
                                 <Share2 size={11} />
                                 Share
                             </button>
-                            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-[#EE1D52]/10 border border-[#EE1D52]/30 text-[#EE1D52] text-[11px] font-semibold hover:bg-[#EE1D52]/20">
+                            <button onClick={() => window.open(item.originalData.postUrl, '_blank')} className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 bg-[#EE1D52]/10 border border-[#EE1D52]/30 text-[#EE1D52] text-[11px] font-semibold hover:bg-[#EE1D52]/20">
                                 <ExternalLink size={11} />
                                 View Post
                             </button>
@@ -147,7 +136,6 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                     </div>
                 </div>
 
-                {/* Navigation arrow - Previous */}
                 {currentIndex > 0 && (
                     <button
                         onClick={(e) => {
@@ -160,7 +148,6 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                     </button>
                 )}
 
-                {/* Navigation arrow - Next */}
                 {currentIndex < allItems.length - 1 && (
                     <button
                         onClick={(e) => {
@@ -173,7 +160,6 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                     </button>
                 )}
 
-                {/* Dot indicators */}
                 <div className="mt-4 flex items-center gap-1.5">
                     {allItems
                         .slice(Math.max(0, currentIndex - 3), Math.min(allItems.length, currentIndex + 4))

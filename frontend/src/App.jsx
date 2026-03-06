@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router'
 import { Lightbox } from './components/ui/Lightbox'
 import { Pagination } from './components/ui/Pagination'
 import { useQuery } from '@tanstack/react-query'
-import { Sparkles, Bell } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { photoApi } from './lib/photo-api'
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || ''
@@ -165,7 +165,6 @@ export default function App() {
     return (
         <div className="min-h-screen font-jakarta bg-[#07070f] text-white relative overflow-x-hidden">
 
-            {/* ─── Background Decorative Gradients ─── */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute -top-50 -left-50 w-150 h-150 rounded-full bg-[radial-gradient(circle,rgba(238,29,82,0.06)_0%,transparent_70%)] blur-[60px]" />
                 <div className="absolute top-25 -right-50 w-125 h-125 rounded-full bg-[radial-gradient(circle,rgba(0,212,255,0.05)_0%,transparent_70%)] blur-[60px]" />
@@ -174,7 +173,6 @@ export default function App() {
 
             <header className="sticky top-0 z-50 px-8 py-4 bg-[rgba(7,7,15,0.85)] backdrop-blur-2xl border-b border-white/6">
                 <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
-                    {/* Logo */}
                     <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center rounded-xl w-10 h-10 bg-linear-to-br from-[#EE1D52] to-[#c01240] shadow-[0_4px_20px_rgba(238,29,82,0.45)]">
                             <Sparkles size={18} color="white" />
@@ -194,22 +192,12 @@ export default function App() {
                         </div>
                     </div>
 
-                    {/* Right actions */}
                     <div className="flex items-center gap-3">
-
-                        {/* Notification */}
-                        {/* <button className="relative flex items-center justify-center rounded-full w-9.5 h-9.5 bg-white/6 border border-white/10 text-white/60 transition-all duration-200">
-                            <Bell size={15} />
-                            <span className="absolute top-1.5 right-1.5 w-1.75 h-1.75 rounded-full bg-[#EE1D52] shadow-[0_0_8px_#EE1D52]" />
-                        </button> */}
-
-                        {/* Total items badge */}
                         <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[12px] font-semibold text-white/50">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] inline-block" />
                             {paging?.total_item || 0} Items
                         </div>
 
-                        {/* CTA Button */}
                         <button className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-br from-[#EE1D52] to-[#c01240] text-[13px] font-bold text-white border-none cursor-pointer tracking-[0.01em] shadow-[0_4px_16px_rgba(238,29,82,0.35)] transition-all duration-200">
                             <Sparkles size={13} />
                             Fan Club
@@ -218,7 +206,6 @@ export default function App() {
                 </div>
             </header>
 
-            {/* ─── STORY CAROUSEL (Terintegrasi Embla) ─── */}
             <div className="relative px-8 z-10 max-w-screen-2xl mx-auto">
                 <StoryCarousel
                     activeMember={nickname}
@@ -228,7 +215,6 @@ export default function App() {
 
             <div className="mx-8 mb-4 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.08)_20%,rgba(255,255,255,0.08)_80%,transparent)]" />
 
-            {/* ─── CONTROL BAR ─── */}
             <div className="relative z-40 max-w-screen-2xl mx-auto">
                 <FloatingControlBar
                     viewMode={viewMode}
@@ -241,7 +227,6 @@ export default function App() {
                 />
             </div>
 
-            {/* ─── SECTION LABEL ─── */}
             <div className="px-8 mb-6 max-w-screen-2xl mx-auto flex items-center justify-between z-10 relative">
                 <div className="flex items-center gap-3">
                     <span className="text-[13px] font-bold text-white/35 uppercase">
@@ -268,25 +253,22 @@ export default function App() {
                 </div>
             </div>
 
-            {/* ─── GALLERY GRID ─── */}
             <main className="relative z-10 max-w-screen-2xl mx-auto min-h-[40vh]">
                 {imgQuery.isLoading ? (
                     <div className="px-8 pb-8">
                         {viewMode === 'grid' ? (
-                            // Skeleton untuk Mode Grid
                             <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
                                 {[...Array(28)].map((_, index) => (
                                     <div 
                                         key={`loading-grid-${index}`} 
                                         className="aspect-square rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
-                                        style={{ animationDelay: `${index * 0.05}s` }} // Opsional: efek denyut bergelombang
+                                        style={{ animationDelay: `${index * 0.05}s` }}
                                     ></div>
                                 ))}
                             </div>
                         ) : (
-                            // Skeleton untuk Mode Album
                             <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
-                                {[...Array(8)].map((_, index) => ( // Sesuaikan angka 8 dengan target album per page
+                                {[...Array(8)].map((_, index) => (
                                     <div 
                                         key={`loading-album-${index}`} 
                                         className="w-full rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
@@ -305,7 +287,6 @@ export default function App() {
                 )}
             </main>
 
-            {/* ─── PAGINATION ─── */}
             <div className="relative z-10 max-w-screen-2xl mx-auto">
                 <Pagination
                     currentPage={page}
@@ -315,7 +296,6 @@ export default function App() {
                 />
             </div>
 
-            {/* ─── LIGHTBOX ─── */}
             {lightboxItem && (
                 <Lightbox
                     item={lightboxItem}

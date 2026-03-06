@@ -10,7 +10,7 @@ export const platforms = [
         ),
     },
     {
-        key: 'Instagram',
+        key: 'instagram',
         label: 'Instagram',
         icon: (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -21,7 +21,7 @@ export const platforms = [
         ),
     },
     {
-        key: 'TikTok',
+        key: 'tikTok',
         label: 'TikTok',
         icon: (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -30,7 +30,7 @@ export const platforms = [
         ),
     },
     {
-        key: 'X',
+        key: 'x',
         label: 'X / Twitter',
         icon: (
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">

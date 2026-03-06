@@ -9,7 +9,7 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
             </div>
         )
     }
-    // Tampilan: Mode Grid (Kotak Rapat)
+    
     if (viewMode === 'grid') {
         const emptySlotsCount = Math.max(0, 28 - items.length)
         return (
