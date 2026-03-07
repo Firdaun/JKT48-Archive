@@ -22,7 +22,9 @@ export const setupGraphQLInterceptor = (page, postDataCollector) => {
 
                 console.log(`📡 [API Tersadap] Tweet ditemukan: ${legacy.id_str}`)
 
-                const rawCaption = legacy.full_text || legacy.text || ''
+                const noteText = tweetResult.note_tweet?.note_tweet_results?.result?.text
+
+                const rawCaption = noteText || legacy.full_text || legacy.text || ''
 
                 const caption = rawCaption.replace(/https:\/\/t\.co\/\w+/g, '').trim()
 

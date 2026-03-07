@@ -10,10 +10,10 @@ import { getPostLinksByScrolling } from './modules/targetPost.js'
 import { getPostInfo } from './modules/extractInfo.js'
 import { processCarousel } from './modules/carousel.js'
 
-const TARGET_USERNAME = 'jkt48.christy'
-const MEMBER_NICKNAME = 'christy'
-const TARGET_POST_INDEX = 0
-const POST_COUNT = 2
+const TARGET_USERNAME = 'jkt48.alya_'
+const MEMBER_NICKNAME = 'alya'
+const TARGET_POST_INDEX = 1
+const POST_COUNT = 4
 const COOKIES_PATH = './cookies.json'
 const SAVE_BASE_DIR = './public/photos'
 
