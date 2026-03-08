@@ -107,7 +107,9 @@ export default function Admin() {
         caption: item.caption || "No Caption",
         date: new Date(item.postedAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
         member: item.member?.nickname || 'JKT48',
-        isVideo: isVideoFile(item.srcUrl, item.mediaType)
+        isVideo: isVideoFile(item.srcUrl, item.mediaType),
+        mediaType: item.mediaType,
+        originalData: item
     }))
 
     const renderContent = () => {

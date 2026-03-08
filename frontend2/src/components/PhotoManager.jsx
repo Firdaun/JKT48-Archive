@@ -1,10 +1,12 @@
 import { Search, X, User, Filter, Loader2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react';
+import PreviewMedia from './PreviewMedia';
 
 export default function PhotoManager({ item, selectedMember, queryParams, onClearFilter, onMemberClick, loading, pagingInfo, setQueryParams }) {
     const [searchInput, setSearchInput] = useState(queryParams?.search || '')
     const TARGET_SLOTS = 32;
     const emptySlotsCount = Math.max(0, TARGET_SLOTS - item.length);
+    const [previewData, setPreviewData] = useState(null)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagingInfo.total_page) {
@@ -90,7 +92,7 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                 ) : (
                     <div className="grid grid-cols-8 gap-4">
                         {item.map((photo) => (
-                            <div key={photo.id} className="group relative rounded-lg overflow-hidden border border-slate-200 aspect-square shadow-sm hover:shadow-md transition-all">
+                            <div key={photo.id} onClick={() => setPreviewData(photo)} className="cursor-pointer group relative rounded-lg overflow-hidden border border-slate-200 aspect-square shadow-sm hover:shadow-md transition-all">
                                 {photo.isVideo ? (
                                     <video
                                         src={photo.media}
@@ -102,7 +104,7 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                                             e.target.src = "https://placehold.co/400?text=Image+Error"
                                         }}
                                     />
-                                    
+
                                 ) : (
                                     <img
                                         src={photo.media}
@@ -132,6 +134,11 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                                 {photo.mediaType === 'CAROUSEL_ALBUM' && (
                                     <div className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded backdrop-blur-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M9 3v18" /><path d="m14 8 2 2-2 2" /><path d="m14 16 2-2-2-2" /></svg>
+                                    </div>
+                                )}
+                                {photo.isVideo && (
+                                    <div className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>
                                     </div>
                                 )}
                             </div>
@@ -170,6 +177,10 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                     </div>
                 </div>
             </div>
+            <PreviewMedia
+                media={previewData} 
+                onClose={() => setPreviewData(null)} 
+            />
         </div>
     )
 }
