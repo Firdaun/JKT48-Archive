@@ -52,14 +52,14 @@ const get = async (request) => {
     switch (data.sort) {
         case 'oldest':
             orderBy = [
-                { postedAt: 'asc' },
+                { savedAt: 'asc' },
                 { fileId: 'asc' }
             ]
             break;
         case 'newest':
         default:
             orderBy = [
-                { postedAt: 'desc' },
+                { savedAt: 'desc' },
                 { fileId: 'asc' }
             ]
             break;

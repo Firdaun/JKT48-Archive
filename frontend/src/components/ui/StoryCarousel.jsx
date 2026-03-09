@@ -72,13 +72,23 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
         { label: 'Members', value: PhotoProfile.length, color: '#a855f7', shadow: 'rgba(168,85,247,0.4)' },
     ]
 
+    const latestDateRaw = globalData?.data?.[0]?.savedAt
+
+    const formattedUpdateDate = latestDateRaw
+        ? new Date(latestDateRaw).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        })
+        : 'Updating...';
+
     return (
         <section className="overflow-hidden pt-13 pb-3 h-[357.281px]">
             <div className="flex items-center justify-between">
                 <div className='mb-12'>
                     <div className="flex items-center gap-3 mb-2">
                         <span className="px-3 py-1.5 rounded-full bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)] text-[11px] font-semibold text-[#00D4FF] tracking-[0.06em]">
-                            Updated Feb 21, 2026
+                            Updated {formattedUpdateDate}
                         </span>
                     </div>
 
