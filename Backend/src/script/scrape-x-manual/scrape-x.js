@@ -9,11 +9,14 @@ import { handleLoginAndCookiesX } from './modules/auth.js'
 import { getTweetLinks } from './modules/targetPost.js'
 import { setupGraphQLInterceptor } from './modules/extractInfo.js'
 
-const TARGET_USERNAME = 'AA_AlyaJKT48'
-const MEMBER_NICKNAME = 'alya'
+const TARGET_USERNAME = 'A_LuluJKT48'
+const MEMBER_NICKNAME = 'lulu'
 
-const TARGET_POST_INDEX = 0
-const POST_COUNT = 18
+// const TARGET_POST = 1
+// const POST_COUNT = 3
+
+const TARGET_POST = [1, 3]
+const POST_COUNT = null
 
 const COOKIES_PATH = './cookies-x.json'
 const SAVE_BASE_DIR = './public/photos'
@@ -37,7 +40,7 @@ export const scrapeX = async () => {
         await page.goto(`https://twitter.com/${TARGET_USERNAME}/media`, { waitUntil: 'domcontentloaded', timeout: 120000 })
         await delay(10000)
 
-        const tweetLinks = await getTweetLinks(page, TARGET_POST_INDEX, POST_COUNT)
+        const tweetLinks = await getTweetLinks(page, TARGET_POST, POST_COUNT)
 
         setupGraphQLInterceptor(page, postDataCollector)
 
