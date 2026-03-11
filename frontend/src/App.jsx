@@ -43,9 +43,17 @@ export default function App() {
         gcTime: 1000 * 60 * 30,
     })
 
+    const memberGlobalQuery = useQuery({
+        queryKey: ['member-global-total', nickname],
+        queryFn: () => photoApi.getPublicPhotos({ nickname, mode: 'album', size: 1 }),
+        enabled: !!nickname,
+        staleTime: 1000 * 60 * 15,
+    })
+
     const photos = imgQuery.data?.data || []
     const paging = imgQuery.data?.paging
     const maxPage = paging?.total_page || 1
+    const globalAlbumCount = memberGlobalQuery.data?.paging?.total_item || 0
 
     const paginationGroup = () => {
         if (maxPage <= 5) {
@@ -139,7 +147,7 @@ export default function App() {
 
     const handleViewModeChange = (mode) => {
         if (mode === 'album') {
-            setSearchParams(prev => buildParams(prev, { page: 1, nickname: null }))
+            setSearchParams(prev => buildParams(prev, { page: 1, }))
         } else {
             setSearchParams(prev => buildParams(prev, { page: 1, }))
         }
@@ -151,11 +159,12 @@ export default function App() {
 
     const handleShowAll = () => {
         setPostUrl('')
-        setSearchParams(prev => buildParams(prev, { nickname: null, page: 1 }))
+        setSearchInput('')
+        setSearchParams(prev => buildParams(prev, { nickname: null, source: null, page: 1 }))
     }
 
     const handleShowMemberPhotos = () => {
-        setSearchParams(prev => buildParams(prev, { page: 1 }))
+        setSearchParams(prev => buildParams(prev, { page: 1, source: null }))
         setTimeout(() => {
             setViewMode('grid')
             setPostUrl('')
@@ -224,13 +233,14 @@ export default function App() {
                     searchQuery={searchInput}
                     onSearchChange={handleSearchChange}
                     onClear={handleClear}
+                    postUrl={postUrl}
                 />
             </div>
 
             <div className="px-8 mb-6 max-w-screen-2xl mx-auto flex items-center justify-between z-10 relative">
                 <div className="flex items-center gap-3">
                     <span className="text-[13px] font-bold text-white/35 uppercase">
-                        {nickname ? `${nickname}'s` : 'All'} Posts
+                        {nickname ? `${nickname}'s` : 'All'} {viewMode === 'grid' ? 'photos' : 'albums'}
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#EE1D52]/10 text-[#EE1D52] border border-[#EE1D52]/25">
                         {paging?.total_item || 0} results
@@ -241,10 +251,10 @@ export default function App() {
                         <button
                             onClick={handleShowAll}
                             className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
-                            show all photos
+                            show all {viewMode === 'grid' ? 'photos' : 'albums'}
                         </button>
                     )}
-                    {nickname && postUrl && (
+                    {nickname && postUrl && globalAlbumCount > 1 && (
                         <button onClick={handleShowMemberPhotos}
                             className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
                             show {nickname ? `${nickname}'s` : 'All'} photos
@@ -259,8 +269,8 @@ export default function App() {
                         {viewMode === 'grid' ? (
                             <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
                                 {[...Array(28)].map((_, index) => (
-                                    <div 
-                                        key={`loading-grid-${index}`} 
+                                    <div
+                                        key={`loading-grid-${index}`}
                                         className="aspect-square rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
                                         style={{ animationDelay: `${index * 0.05}s` }}
                                     ></div>
@@ -269,8 +279,8 @@ export default function App() {
                         ) : (
                             <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
                                 {[...Array(8)].map((_, index) => (
-                                    <div 
-                                        key={`loading-album-${index}`} 
+                                    <div
+                                        key={`loading-album-${index}`}
                                         className="w-full rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
                                         style={{ minHeight: '402.46px', animationDelay: `${index * 0.05}s` }}
                                     ></div>

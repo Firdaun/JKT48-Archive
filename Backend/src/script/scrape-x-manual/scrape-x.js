@@ -9,14 +9,14 @@ import { handleLoginAndCookiesX } from './modules/auth.js'
 import { getTweetLinks } from './modules/targetPost.js'
 import { setupGraphQLInterceptor } from './modules/extractInfo.js'
 
-const TARGET_USERNAME = 'A_LuluJKT48'
-const MEMBER_NICKNAME = 'lulu'
+const TARGET_USERNAME = 'Auwia_JKT48'
+const MEMBER_NICKNAME = 'auwia'
 
-// const TARGET_POST = 1
-// const POST_COUNT = 3
+const TARGET_POST = 3
+const POST_COUNT = 3
 
-const TARGET_POST = [1, 3]
-const POST_COUNT = null
+// const TARGET_POST = [1, 3]
+// const POST_COUNT = null
 
 const COOKIES_PATH = './cookies-x.json'
 const SAVE_BASE_DIR = './public/photos'

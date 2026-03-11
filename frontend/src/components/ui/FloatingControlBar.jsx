@@ -10,6 +10,7 @@ export function FloatingControlBar({
     onPlatformChange,
     searchQuery,
     onSearchChange,
+    postUrl
 }) {
     const inputRef = useRef(null)
 
@@ -38,27 +39,29 @@ export function FloatingControlBar({
                             Grid View
                         </button>
                     </div>
+                    {!postUrl && (
+                        <div className="relative flex items-center gap-1">
+                            {platforms.map((platform) => {
+                                const isActive = activePlatform === platform.key
+                                return (
+                                    <button
+                                        key={platform.key}
+                                        onClick={() => onPlatformChange(platform.key)}
+                                        className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-all duration-200 text-xs tracking-[0.02em] ${isActive ? 'text-white font-bold bg-[#EE1D52]/10' : 'text-white/40 font-medium bg-transparent'
+                                            }`}>
+                                        <span className={isActive ? 'text-[#EE1D52]' : 'text-white/40'}>
+                                            {platform.icon}
+                                        </span>
+                                        <span>{platform.label}</span>
+                                        {isActive && (
+                                            <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-linear-to-r from-[#EE1D52] to-[#ff6b9d] shadow-[0_0_8px_#EE1D52]" />
+                                        )}
+                                    </button>
+                                )
+                            })}
+                        </div>
 
-                    <div className="relative flex items-center gap-1">
-                        {platforms.map((platform) => {
-                            const isActive = activePlatform === platform.key
-                            return (
-                                <button
-                                    key={platform.key}
-                                    onClick={() => onPlatformChange(platform.key)}
-                                    className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-all duration-200 text-xs tracking-[0.02em] ${isActive ? 'text-white font-bold bg-[#EE1D52]/10' : 'text-white/40 font-medium bg-transparent'
-                                        }`}>
-                                    <span className={isActive ? 'text-[#EE1D52]' : 'text-white/40'}>
-                                        {platform.icon}
-                                    </span>
-                                    <span>{platform.label}</span>
-                                    {isActive && (
-                                        <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-linear-to-r from-[#EE1D52] to-[#ff6b9d] shadow-[0_0_8px_#EE1D52]" />
-                                    )}
-                                </button>
-                            )
-                        })}
-                    </div>
+                    )}
 
                     <div className="flex items-center gap-2 px-4 py-2.5 rounded-full flex-1 min-w-50 max-w-70 bg-white/5 border border-white/10 transition-colors duration-200 focus-within:border-[#EE1D52]/50 focus-within:shadow-[0_0_0_3px_rgba(238,29,82,0.12)]">
                         <Search size={14} className="text-white/35 shrink-0" />
