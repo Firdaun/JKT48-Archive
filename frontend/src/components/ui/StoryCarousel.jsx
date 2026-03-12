@@ -102,18 +102,18 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                     </h1>
                 </div>
 
-                <div className="hidden lg:flex items-center gap-6">
+                <div className="flex flex-row gap-2">
                     {statItems.map(stat => (
                         <div key={stat.label} className="text-center">
                             <div
-                                className="text-[24px] font-extrabold tracking-[-0.02em]"
+                                className="text-[20px] md:text-[24px] font-extrabold tracking-[-0.02em]"
                                 style={{
                                     color: stat.color,
                                     textShadow: `0 0 20px ${stat.shadow}`,
                                 }}>
                                 {stat.value}
                             </div>
-                            <div className="text-[11px] font-semibold text-white/35 tracking-[0.06em] uppercase">
+                            <div className="text-[8px] md:text-[9.5px] lg:text-[11px] font-semibold text-white/35 tracking-[0.06em] uppercase">
                                 {stat.label}
                             </div>
                         </div>
@@ -127,10 +127,8 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                         const activeStyle = teamColors[member.team] || teamColors['love']
 
                         return (
-                            <button
-                                key={index}
-                                onClick={() => onSelectMember(member.name)}
-                                className="flex mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18 will-change-transform">
+                            <button key={index} onClick={() => onSelectMember(member.name)}
+                                className="flex mr-3 md:mr-5 cursor-pointer flex-col items-center gap-2 shrink-0 group min-w-18 will-change-transform">
                                 <div className={`relative transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isActive ? 'scale-110' : 'scale-100'}`}>
                                     <div className={`rounded-full p-0.75 ${isActive ? activeStyle.animation : 'bg-white/12'}`}
                                         style={isActive ? { background: `linear-gradient(135deg, ${activeStyle.color}, ${activeStyle.gradientEnd})` } : undefined}>
@@ -138,7 +136,7 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
                                             <img
                                                 src={member.src}
                                                 alt={member.name}
-                                                className={`rounded-full object-cover w-15.5 h-15.5 transition-[opacity,filter] duration-300 ease-in-out ${isActive ? 'opacity-100' : 'opacity-55 grayscale-20'}`}
+                                                className={`rounded-full object-cover w-14 md:w-15.5 h-14 md:h-15.5 transition-[opacity,filter] duration-300 ease-in-out ${isActive ? 'opacity-100' : 'opacity-55 grayscale-20'}`}
                                             />
                                         </div>
                                     </div>
