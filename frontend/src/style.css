@@ -80,6 +80,7 @@
 }
 
 @theme {
+    --breakpoint-xs: 412px;
     --font-jakarta: "Plus Jakarta Sans";
     --animate-glow-pulse-red: glowPulseRed 2.5s ease-in-out infinite;
     --animate-glow-pulse-cyan: glowPulseCyan 2.5s ease-in-out infinite;

@@ -180,18 +180,18 @@ export default function App() {
                 <div className="absolute bottom-50 left-[40%] w-100 h-100 rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.04)_0%,transparent_70%)] blur-[80px]" />
             </div>
 
-            <header className="sticky top-0 z-50 px-8 py-4 bg-[rgba(7,7,15,0.85)] backdrop-blur-2xl border-b border-white/6">
+            <header className="sticky top-0 z-50 px-3 lg:px-8 py-4 bg-[rgba(7,7,15,0.85)] backdrop-blur-2xl border-b border-white/6">
                 <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center rounded-xl w-10 h-10 bg-linear-to-br from-[#EE1D52] to-[#c01240] shadow-[0_4px_20px_rgba(238,29,82,0.45)]">
+                        <div className="flex items-center justify-center rounded-xl w-8 md:w-9 lg:w-10 h-8 md:h-9 lg:h-10 bg-linear-to-br from-[#EE1D52] to-[#c01240] shadow-[0_4px_20px_rgba(238,29,82,0.45)]">
                             <Sparkles size={18} color="white" />
                         </div>
                         <div>
                             <div className="flex items-center gap-1.5">
-                                <span className="text-[20px] font-extrabold tracking-[-0.02em] bg-linear-to-br from-white to-white/70 bg-clip-text text-transparent">
+                                <span className="text-lg md:text-[20px] font-extrabold tracking-[-0.02em] bg-linear-to-br from-white to-white/70 bg-clip-text text-transparent">
                                     JKT48
                                 </span>
-                                <span className="text-[12px] font-bold text-[#EE1D52] tracking-[0.08em] uppercase bg-[rgba(238,29,82,0.12)] px-1.75 py-px rounded-md border border-[rgba(238,29,82,0.3)]">
+                                <span className="text-[11px] md:text-[12px] font-bold text-[#EE1D52] tracking-[0.08em] uppercase bg-[rgba(238,29,82,0.12)] px-1.75 py-px rounded-md border border-[rgba(238,29,82,0.3)]">
                                     Media
                                 </span>
                             </div>
@@ -202,7 +202,7 @@ export default function App() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[12px] font-semibold text-white/50">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[12px] font-semibold text-white/50">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] inline-block" />
                             {paging?.total_item || 0} Items
                         </div>
@@ -215,7 +215,7 @@ export default function App() {
                 </div>
             </header>
 
-            <div className="relative px-8 z-10 max-w-screen-2xl mx-auto">
+            <div className="relative px-3 lg:px-8 z-10 max-w-screen-2xl mx-auto">
                 <StoryCarousel
                     activeMember={nickname}
                     onSelectMember={handleMemberSelect}
@@ -237,26 +237,26 @@ export default function App() {
                 />
             </div>
 
-            <div className="px-8 mb-6 max-w-screen-2xl mx-auto flex items-center justify-between z-10 relative">
-                <div className="flex items-center gap-3">
-                    <span className="text-[13px] font-bold text-white/35 uppercase">
+            <div className="px-3 lg:px-8 mb-6 max-w-screen-2xl mx-auto flex items-center justify-between z-10 relative">
+                <div className="flex items-center gap-1">
+                    <span className="text-[10px] md:text-[11.5px] lg:text-[13px] font-bold text-white/35 uppercase">
                         {nickname ? `${nickname}'s` : 'All'} {viewMode === 'grid' ? 'photos' : 'albums'}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#EE1D52]/10 text-[#EE1D52] border border-[#EE1D52]/25">
+                    <span className="px-2 py-0.5 rounded-full text-[10px]  lg:text-[11px] font-bold bg-[#EE1D52]/10 text-[#EE1D52] border border-[#EE1D52]/25">
                         {paging?.total_item || 0} results
                     </span>
                 </div>
-                <div className='flex flex-row-reverse gap-5'>
+                <div className='flex flex-row-reverse gap-2'>
                     {nickname && (
                         <button
                             onClick={handleShowAll}
-                            className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
+                            className="bg-transparent border-none text-[10px] md:text-[11.5px] lg:text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
                             show all {viewMode === 'grid' ? 'photos' : 'albums'}
                         </button>
                     )}
                     {nickname && postUrl && globalAlbumCount > 1 && (
                         <button onClick={handleShowMemberPhotos}
-                            className="bg-transparent border-none text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
+                            className="bg-transparent border-none text-[6px] xs:text-[10px] md:text-[11.5px] lg:text-[13px] font-bold text-white/35 uppercase cursor-pointer hover:text-white transition-colors duration-200">
                             show {nickname ? `${nickname}'s` : 'All'} photos
                         </button>
                     )}
@@ -315,8 +315,8 @@ export default function App() {
                 />
             )}
 
-            <footer className="px-8 py-8 border-t border-white/6 bg-white/1.5">
-                <div className="max-w-screen-2xl mx-auto flex items-center justify-between flex-wrap gap-4">
+            <footer className="px-3 lg:px-8 py-8 border-t border-white/6 bg-white/1.5">
+                <div className="max-w-screen-2xl mx-auto flex items-center justify-between flex-col md:flex-row gap-4">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center justify-center rounded-lg w-7 h-7 bg-linear-to-br from-[#EE1D52] to-[#c01240]">
                             <Sparkles size={12} color="white" />
@@ -325,12 +325,11 @@ export default function App() {
                             JKT48 Media Gallery © 2026
                         </span>
                     </div>
-                    <span className="text-[12px] text-white/20 font-medium">
+                    <span className="text-[12px] text-white/20 text-center font-medium">
                         Fan-made project. Not affiliated with JKT48 official management.
                     </span>
                 </div>
             </footer>
-
         </div>
     )
 }

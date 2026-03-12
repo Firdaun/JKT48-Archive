@@ -83,16 +83,16 @@ export function StoryCarousel({ activeMember, onSelectMember }) {
         : 'Updating...';
 
     return (
-        <section className="overflow-hidden pt-13 pb-3 h-[357.281px]">
-            <div className="flex items-center justify-between">
-                <div className='mb-12'>
+        <section className="overflow-hidden pt-7 lg:pt-11 pb-3">
+            <div className="flex justify-between">
+                <div className='mb-7 lg:mb-11'>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="px-3 py-1.5 rounded-full bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)] text-[11px] font-semibold text-[#00D4FF] tracking-[0.06em]">
+                        <span className="px-3 py-1.5 rounded-full bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)] text-[8px] md:text-[9.5px] lg:text-[11px] font-semibold text-[#00D4FF] tracking-[0.06em]">
                             Updated {formattedUpdateDate}
                         </span>
                     </div>
 
-                    <h1 className="text-[36px] font-extrabold tracking-[-0.03em] leading-[1.15] text-white m-0">
+                    <h1 className="text-3xl md:text-[34px] lg:text-[36px] font-extrabold tracking-[-0.03em] leading-[1.15] text-white m-0">
                         Media Gallery
                         <br />
                         <span className="bg-[linear-gradient(135deg,#EE1D52_0%,#ff6b9d_50%,#EE1D52_100%)] bg-clip-text text-transparent bg-size-[200%]">
