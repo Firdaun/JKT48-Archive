@@ -127,7 +127,8 @@ export default function App() {
         if (searchTimeout.current) clearTimeout(searchTimeout.current)
 
         searchTimeout.current = setTimeout(() => {
-            setSearchParams(prev => buildParams(prev, { nickname: value, page: 1 }))
+            const cleanValue = value.trim().toLowerCase()
+            setSearchParams(prev => buildParams(prev, { nickname: cleanValue, page: 1 }))
         }, 500)
     }
 
