@@ -266,30 +266,11 @@ export default function App() {
 
             <main className="relative z-10 max-w-screen-2xl mx-auto min-h-[40vh]">
                 {imgQuery.isLoading ? (
-                    <div className="px-8 pb-8">
-                        {viewMode === 'grid' ? (
-                            <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
-                                {[...Array(28)].map((_, index) => (
-                                    <div
-                                        key={`loading-grid-${index}`}
-                                        className="aspect-square rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
-                                        style={{ animationDelay: `${index * 0.05}s` }}
-                                    ></div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
-                                {[...Array(8)].map((_, index) => (
-                                    <div
-                                        key={`loading-album-${index}`}
-                                        className="w-full rounded-xl bg-white/5 border border-white/[0.07] animate-pulse"
-                                        style={{ minHeight: '402.46px', animationDelay: `${index * 0.05}s` }}
-                                    ></div>
-                                ))}
-                            </div>
-                        )}
+                    <div className="py-20 flex justify-center items-center flex-col gap-4">
+                        <div className="w-8 h-8 rounded-full border-2 border-[#EE1D52] border-t-transparent animate-spin"></div>
+                        <p className="text-white/50 text-[10px] md:text-sm animate-pulse">Memuat foto...</p>
                     </div>
-                ) : (
+                ): (
                     <GalleryGrid
                         viewMode={viewMode}
                         items={mappedPhotos}

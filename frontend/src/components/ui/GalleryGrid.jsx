@@ -5,16 +5,15 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
         return (
             <div className="w-full py-20 flex justify-center items-center flex-col gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="rgba(255,255,255,0.2)" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216v96.69l-36.69-36.69a16,16,0,0,0-22.62,0L96,176.69,67.31,148a16,16,0,0,0-22.62,0L40,152.69Z"></path></svg>
-                <p className="text-white/40 text-sm font-medium">Tidak ada media yang ditemukan.</p>
+                <p className="text-white/40 text-[10px] md:text-sm font-medium">Tidak ada media yang ditemukan.</p>
             </div>
         )
     }
     
     if (viewMode === 'grid') {
-        const emptySlotsCount = Math.max(0, 28 - items.length)
         return (
-            <div className="px-8 pb-8">
-                <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+            <div className="px-3 lg:px-8 pb-8">
+                <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7">
                     {items.map((item, index) => (
                         <button key={item.id} onClick={() => onItemClick(item)} style={{ animationDelay: `${index * 0.04}s` }} className="relative rounded-xl overflow-hidden group animate-fade-in-up aspect-square border border-white/[0.07] cursor-pointer">
                             {item.isVideo ? (
@@ -45,30 +44,16 @@ export function GalleryGrid({ viewMode, items, onItemClick}) {
                             )}
                         </button>
                     ))}
-                    {[...Array(emptySlotsCount)].map((_, index) => (
-                        <div 
-                            key={`empty-grid-${index}`} 
-                            className="aspect-square pointer-events-none"
-                        ></div>
-                    ))}
                 </div>
             </div>
         )
     }
 
-    const emptyAlbumSlotsCount = Math.max(0, 8 - items.length)
     return (
-        <div className="px-8 pb-8">
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="px-3 lg:px-8 pb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
                 {items.map((item, idx) => (
                     <GalleryCard key={item.id} item={item} onClick={onItemClick} index={idx} />
-                ))}
-                {[...Array(emptyAlbumSlotsCount)].map((_, index) => (
-                    <div 
-                        key={`empty-album-${index}`} 
-                        className="pointer-events-none w-full"
-                        style={{ minHeight: '402.469px' }}
-                    ></div>
                 ))}
             </div>
         </div>
