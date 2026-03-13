@@ -36,7 +36,7 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                 <h3 className="font-bold text-lg">Scraped Photos</h3>
                 {loading && (
                     <p className="text-xs top-10 absolute text-[#EE1D52] animate-pulse font-medium">
-                        Sedang memuat data...
+                        Sedang memuat data....
                     </p>
                 )}
                 <div className={`flex items-center border rounded-lg overflow-hidden transition-all duration-300 ${selectedMember ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-300 border-dashed'}`}>
