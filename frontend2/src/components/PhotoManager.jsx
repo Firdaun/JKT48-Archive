@@ -104,7 +104,6 @@ export default function PhotoManager({ item, selectedMember, queryParams, onClea
                                             e.target.src = "https://placehold.co/400?text=Image+Error"
                                         }}
                                     />
-
                                 ) : (
                                     <img
                                         src={photo.media}
