@@ -36,8 +36,7 @@ export function GalleryCard({ item, onClick, index }) {
         <div className="relative break-inside-avoid group cursor-pointer px-2 pt-2 pb-0"
             style={{ animationDelay: `${index * 0.05}s` }} onClick={() => onClick(item)}>
             <div className="absolute inset-1 rounded-xl md:rounded-2xl rotate-[5deg] z-0 bg-linear-to-br from-[#1e1e38] to-[#141428] border border-white/6 shadow-[0_4px_24px_rgba(0,0,0,0.5)]" />
-            <div className="absolute inset-0.5 rounded-xl md:rounded-2xl rotate-[2.5deg] z-1 bg-linear-to-br from-[#1a1a32] to-[#10102a] border border-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.4)]" />
-
+            <div className="absolute inset-0.5 rounded-xl md:rounded-2xl rotate-[1.2deg] z-1 bg-linear-to-br from-[#1a1a32] to-[#10102a] border border-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.4)]" />
             <div className="relative rounded-xl md:rounded-2xl overflow-hidden z-2 bg-[#111120] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
 
                 <div className="relative overflow-hidden h-50 xs:h-70 xl:h-85">
