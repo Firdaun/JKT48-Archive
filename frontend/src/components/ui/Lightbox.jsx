@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from 'react'
 import { X, ChevronLeft, ChevronRight, Share2, ExternalLink } from 'lucide-react'
+import { platformIcons } from '../data/platforms'
 
 const platformColors = {
     Instagram: '#E1306C',
@@ -99,7 +100,7 @@ export function Lightbox({ item, allItems, onClose, onNavigate }) {
                                         color: platformColor,
                                         border: `1px solid ${platformColor}44`,
                                     }}>
-                                    {item.platform}
+                                    {platformIcons[item.platform]}
                                 </span>
                                 <span className="text-[10px] md:text-[11px] text-white/40 font-medium">
                                     @{item.member.toLowerCase()}
