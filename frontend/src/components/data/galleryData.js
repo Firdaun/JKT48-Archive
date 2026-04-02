@@ -1,7 +1,5 @@
 export const PhotoProfile = [
     { src: '/kabesha/adeline_wijaya.jpg',       name: 'delynn',     team: 'dream' },
-    { src: '/kabesha/amanda_sukma.jpg',         name: 'amanda',     team: 'dream' },
-    { src: '/kabesha/chelsea_davina.jpg',       name: 'chelsea',    team: 'dream' },
     { src: '/kabesha/febriola_sinambela.jpg',   name: 'olla',       team: 'dream' },
     { src: '/kabesha/freya_jayawardana.jpg',    name: 'freya',      team: 'dream' },
     { src: '/kabesha/gabriela_abigail.jpg',     name: 'ella',       team: 'dream' },
