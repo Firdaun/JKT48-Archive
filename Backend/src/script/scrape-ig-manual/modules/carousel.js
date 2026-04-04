@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { downloadImage, downloadVideoWithFetch, delay } from '../utils/downloader.js'
 import { saveMedia } from '../services/db.js'
 import { getMediaFromSlide } from './mediaExtractor.js'
+import { uploadToCloudinary } from '../../../application/cloudinary.js'
 
 export const processCarousel = async (page, member, postInfo, saveDir, link) => {
     let slideCounter = 0
@@ -59,8 +60,10 @@ export const processCarousel = async (page, member, postInfo, saveDir, link) => 
                 if (isVideo) await downloadVideoWithFetch(targetUrl, filePath)
                 else await downloadImage(targetUrl, filePath)
 
+                const cloudinaryUrl = await uploadToCloudinary(filePath, member.nickname.toLowerCase(), isVideo)
+
                 await saveMedia({
-                    dbUrl,
+                    dbUrl: cloudinaryUrl,
                     fileId,
                     caption: postInfo.caption,
                     postUrl: link,

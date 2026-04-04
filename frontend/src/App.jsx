@@ -76,7 +76,7 @@ export default function App() {
 
     const mappedPhotos = photos.map((item) => ({
         id: item.id || Math.random().toString(),
-        image: `${API_URL}${item.srcUrl}`,
+        image: item.srcUrl.startsWith('http') ? item.srcUrl : `${API_URL}${item.srcUrl}`,
         caption: item.caption || "Tanpa Caption",
         isVideo: isVideoFile(item.srcUrl, item.mediaType),
         platform: item.source ? item.source.charAt(0).toUpperCase() + item.source.slice(1) : 'Instagram',

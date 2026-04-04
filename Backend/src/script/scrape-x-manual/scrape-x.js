@@ -1,22 +1,23 @@
-import puppeteer from 'puppeteer'
 import fs from 'fs'
 import path from 'path'
+import puppeteer from 'puppeteer'
 import { v4 as uuidv4 } from 'uuid'
 
-import { getMember, checkPostExists, saveMedia } from './services/db.js'
-import { delay, downloadMedia } from './utils/downloader.js'
+import { uploadToCloudinary } from '../../application/cloudinary.js'
 import { handleLoginAndCookiesX } from './modules/auth.js'
-import { getTweetLinks } from './modules/targetPost.js'
 import { setupGraphQLInterceptor } from './modules/extractInfo.js'
+import { getTweetLinks } from './modules/targetPost.js'
+import { checkPostExists, getMember, saveMedia } from './services/db.js'
+import { delay, downloadMedia } from './utils/downloader.js'
 
-const TARGET_USERNAME = 'Auwia_JKT48'
-const MEMBER_NICKNAME = 'auwia'
+const TARGET_USERNAME = 'M_OlineJKT48'
+const MEMBER_NICKNAME = 'oline'
 
-const TARGET_POST = 3
-const POST_COUNT = 3
+const TARGET_POST = [8]
+const POST_COUNT = null
 
 // const TARGET_POST = [1, 3]
-// const POST_COUNT = null
+// const POST_COUNT = nullfoto 
 
 const COOKIES_PATH = './cookies-x.json'
 const SAVE_BASE_DIR = './public/photos'
@@ -63,8 +64,8 @@ export const scrapeX = async () => {
                 timeout: 120000
             })
 
-            await waitForGraphQL 
-            
+            await waitForGraphQL
+
             await delay(2000)
 
             if (postDataCollector.length > 0) {
@@ -96,18 +97,25 @@ export const scrapeX = async () => {
                     const slideCounter = index + 1
                     const fileId = `${String(slideCounter).padStart(2, '0')}_${uuidv4()}`
                     const fileName = `${data.postedAt.toISOString().split('T')[0]}_${fileId}.${media.ext}`
-                    const dbUrl = `/photos/${member.nickname.toLowerCase()}/${fileName}`
+                    const dbUrl = path.join(saveDir, fileName)
+                    try {
+                        await downloadMedia(media.url, dbUrl, media.isVideo)
 
-                    await downloadMedia(media.url, path.join(saveDir, fileName), media.isVideo)
-                    await saveMedia({
-                        dbUrl,
-                        fileId,
-                        postUrl: link,
-                        memberId: member.id,
-                        caption: data.caption,
-                        postedAt: data.postedAt,
-                        mediaTypeDB: media.type
-                    })
+                        const cloudinaryUrl = await uploadToCloudinary(dbUrl, member.nickname.toLowerCase(), media.isVideo)
+
+                        await saveMedia({
+                            dbUrl: cloudinaryUrl,
+                            fileId,
+                            postUrl: link,
+                            memberId: member.id,
+                            caption: data.caption,
+                            postedAt: data.postedAt,
+                            mediaTypeDB: media.type
+                        })
+                    } catch (e) {
+                        console.error(`❌ Gagal memproses media X: ${e.message}`)
+                        process.exit(1)
+                    }
                 }
             } else {
                 console.log("⚠️ Tidak ada media yang tertangkap dari GraphQL untuk tweet ini.")

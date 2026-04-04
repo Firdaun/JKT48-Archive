@@ -6,7 +6,7 @@ import { adminRouter } from "./routes/admin.routes.js"
 import { errorMiddleware } from "./middleware/error.middleware.js"
 
 export const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
