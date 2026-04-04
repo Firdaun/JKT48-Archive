@@ -10,14 +10,11 @@ import { getTweetLinks } from './modules/targetPost.js'
 import { checkPostExists, getMember, saveMedia } from './services/db.js'
 import { delay, downloadMedia } from './utils/downloader.js'
 
-const TARGET_USERNAME = 'M_OlineJKT48'
-const MEMBER_NICKNAME = 'oline'
+const TARGET_USERNAME = ''
+const MEMBER_NICKNAME = ''
 
-const TARGET_POST = [8]
+const TARGET_POST = [0]
 const POST_COUNT = null
-
-// const TARGET_POST = [1, 3]
-// const POST_COUNT = nullfoto 
 
 const COOKIES_PATH = './cookies-x.json'
 const SAVE_BASE_DIR = './public/photos'

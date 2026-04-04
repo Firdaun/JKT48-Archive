@@ -10,10 +10,11 @@ import { getPostLinksByScrolling } from './modules/targetPost.js'
 import { getPostInfo } from './modules/extractInfo.js'
 import { processCarousel } from './modules/carousel.js'
 
-const TARGET_USERNAME = 'jkt48.oline'
-const MEMBER_NICKNAME = 'oline'
-const TARGET_POST_INDEX = 3
-const POST_COUNT = 1
+const TARGET_USERNAME = ''
+const MEMBER_NICKNAME = ''
+
+const TARGET_POST = [0]
+const POST_COUNT = null
 const COOKIES_PATH = './cookies.json'
 const SAVE_BASE_DIR = './public/photos'
 
@@ -74,7 +75,7 @@ export const scrapeInstagram = async () => {
 
         await delay(1000)
         await page.waitForSelector('._aagu', { timeout: 20000 })
-        const postLinks = await getPostLinksByScrolling(page, TARGET_POST_INDEX, POST_COUNT)
+        const postLinks = await getPostLinksByScrolling(page, TARGET_POST, POST_COUNT)
 
         for (const link of postLinks) {
             if (await checkPostExists(link)) {

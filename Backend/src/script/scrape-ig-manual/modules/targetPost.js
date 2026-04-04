@@ -1,12 +1,18 @@
 import { delay } from "../utils/downloader.js"
 
-export const getPostLinksByScrolling = async (page, targetIndex, count = 1) => {
-    const endIndex = targetIndex + count - 1
-    console.log(`🔄 Mulai scrolling mencari postingan dari index ke-${targetIndex} sampai ${endIndex}...`)
+export const getPostLinksByScrolling = async (page, target, count = 1) => {
+
+    const isSpesific = Array.isArray(target)
+
+    const maxIndex = isSpesific ? Math.max(...target) : target + count - 1
+
+    console.log(`🔄 Mulai scrolling mencari postingan dari index ke-${target} sampai ${maxIndex}...`)
+
     const uniqueLinks = new Set()
+
     let previousHeight = 0
     let scrollAttempts = 0
-    while (uniqueLinks.size <= endIndex) {
+    while (uniqueLinks.size <= maxIndex) {
         const visibleLinks = await page.evaluate(() => {
             const boxes = Array.from(document.querySelectorAll('._aagu'))
             return boxes.map(box => {
@@ -18,7 +24,7 @@ export const getPostLinksByScrolling = async (page, targetIndex, count = 1) => {
         })
         visibleLinks.forEach(link => uniqueLinks.add(link))
         console.log(`📄 Terdeteksi ${uniqueLinks.size}`)
-        if (uniqueLinks.size > endIndex) {
+        if (uniqueLinks.size > maxIndex) {
             console.log("Target postingan target sudah terlihat!")
             break
         }
@@ -36,15 +42,16 @@ export const getPostLinksByScrolling = async (page, targetIndex, count = 1) => {
             previousHeight = newHeight
         }
     }
+
     const allLinks = Array.from(uniqueLinks)
-    let postLinks = []
-    if (allLinks.length > targetIndex) {
-        postLinks = allLinks.slice(targetIndex, targetIndex + count)
-        console.log(`Mengambil Postingan ${postLinks.length}`)
-        postLinks.forEach((link, i) => console.log(`   ${targetIndex + i}. ${link}`))
-        return postLinks
+    if (isSpesific) {
+        console.log(`🎯 [MODE SPESIFIK] Mengambil post di index: ${target.join(', ')}`)
+        return target.map(index => allLinks[index]).filter(Boolean)
     } else {
-        console.error(`Gagal mencapai postingan ke-${targetIndex}. Cuma dapat ${allLinks.length} postingan.`)
+        console.log(`🎯 [MODE RANGE] Mengambil ${count} post mulai dari index ke-${target}`)
+        if (allLinks.length > target) {
+            return allLinks.slice(target, target + count)
+        }
         return []
     }
 }
