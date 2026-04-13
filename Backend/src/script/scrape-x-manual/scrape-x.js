@@ -10,8 +10,8 @@ import { getTweetLinks } from './modules/targetPost.js'
 import { checkPostExists, getMember, saveMedia } from './services/db.js'
 import { delay, downloadMedia } from './utils/downloader.js'
 
-const TARGET_USERNAME = ''
-const MEMBER_NICKNAME = ''
+const TARGET_USERNAME = 'Freya_JKT48'
+const MEMBER_NICKNAME = 'freya'
 
 const TARGET_POST = [0]
 const POST_COUNT = null
